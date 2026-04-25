@@ -19,13 +19,24 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
         ]);
 
-        $user = User::firstOrCreate([
-            'email' => 'test@example.com',
+        // Default Admin
+        $admin = User::firstOrCreate([
+            'email' => 'admin@admin.com',
         ], [
-            'name' => 'Test User',
-            'password' => 'password',
+            'name' => 'Admin User',
+            'password' => 'password', // By default cast to hashed
+            'email_verified_at' => now(),
         ]);
+        $admin->assignRole('admin');
 
-        $user->assignRole('admin');
+        // Default Regular User
+        $user = User::firstOrCreate([
+            'email' => 'user@user.com',
+        ], [
+            'name' => 'Regular User',
+            'password' => 'password',
+            'email_verified_at' => now(),
+        ]);
+        $user->assignRole('user');
     }
 }
