@@ -7,7 +7,7 @@
         content="width=device-width, initial-scale=1">
   <meta name="csrf-token"
         content="{{ csrf_token() }}">
-  <title>Saved Scholarships - ScholarFind</title>
+  <title>Saved Scholarships - ScholarBot</title>
 
   <link rel="preconnect"
         href="https://fonts.bunny.net">
@@ -17,24 +17,14 @@
   @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-sans bg-slate-100 text-slate-800 antialiased">
-  <header class="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur">
+<body class="font-sans bg-slate-50 text-slate-800 antialiased flex flex-col min-h-screen relative">
+  <!-- Global background pattern -->
+  <div class="fixed inset-0 z-[-1] bg-gradient-to-br from-indigo-50 via-slate-50 to-purple-50"></div>
+  
+  <header class="sticky top-0 z-50 border-b border-white/50 bg-white/70 backdrop-blur-xl shadow-sm">
     <div class="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-      <a href="{{ url('/') }}"
-         class="flex items-center gap-2.5">
-        <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white">
-          <svg xmlns="http://www.w3.org/2000/svg"
-               class="h-4 w-4"
-               fill="none"
-               viewBox="0 0 24 24"
-               stroke="currentColor"
-               stroke-width="2">
-            <path stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M8 10h8m-8 4h5M6 19h12a2 2 0 002-2V7a2 2 0 00-2-2h-3.5a1 1 0 01-.8-.4l-.9-1.2a1 1 0 00-.8-.4h-2a1 1 0 00-.8.4l-.9 1.2a1 1 0 01-.8.4H6a2 2 0 00-2 2v10a2 2 0 002 2z" />
-          </svg>
-        </span>
-        <span class="text-xl font-bold">ScholarFind</span>
+      <a href="{{ url('/') }}" class="flex items-center gap-2.5">
+        <span class="text-2xl font-bold text-gray-800 tracking-tight">🤖ScholarBot</span>
       </a>
 
       <nav class="hidden items-center gap-2 text-sm font-medium md:flex">
@@ -53,7 +43,7 @@
           <div x-data="{ open: false }"
                class="relative">
             <button x-on:click="open = !open"
-                    class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 text-sm font-bold text-white">
+                    class="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-50 text-sm font-bold text-indigo-600 shadow-sm hover:bg-indigo-100 transition-all">
               {{ strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}
             </button>
 
@@ -75,13 +65,13 @@
           </div>
         @else
           <a href="{{ route('login') }}"
-             class="rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-6 py-2 text-sm font-semibold text-white hover:opacity-95">Login</a>
+             class="rounded-xl bg-indigo-50 px-6 py-2.5 text-sm font-semibold text-indigo-600 shadow-sm hover:bg-indigo-100 transition-all">Login</a>
         @endauth
       </div>
     </div>
   </header>
 
-  <main class="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+  <main class="flex-grow mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
     <div class="flex items-center gap-3">
       <svg xmlns="http://www.w3.org/2000/svg"
            class="h-8 w-8 text-indigo-600"
@@ -95,7 +85,7 @@
       </svg>
       <h1 class="text-4xl font-bold text-slate-800">Saved Scholarships</h1>
     </div>
-    <p class="mt-2 text-slate-500">You have 3 saved scholarships</p>
+    <p class="mt-2 text-slate-500">Kamu punya 3 beasiswa tersimpan</p>
 
     <section class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
       @php
@@ -103,7 +93,7 @@
       @endphp
 
       @foreach ($saved as $item)
-        <article class="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+        <article class="group overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-indigo-500/10">
           <img src="{{ $item['image'] }}"
                alt="{{ $item['title'] }}"
                class="h-32 w-full object-cover" />
@@ -141,6 +131,41 @@
       @endforeach
     </section>
   </main>
+  <footer class="w-full bg-slate-800 py-16 text-slate-400 flex-grow-0 relative z-10 mt-20">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 gap-12 md:grid-cols-3 md:gap-8 text-center md:text-left">
+        <div>
+          <a href="{{ url('/') }}" class="flex items-center gap-2.5 justify-center md:justify-start text-white">
+            <span class="text-2xl font-bold tracking-tight">🤖ScholarBot</span>
+          </a>
+          <p class="mt-4 text-sm leading-relaxed text-slate-400 max-w-xs mx-auto md:mx-0">
+            Platform pintar untuk menemukan beasiswa yang tepat untuk masa depanmu.
+          </p>
+        </div>
+        
+        <div class="flex flex-col items-center">
+          <h3 class="text-sm font-bold tracking-wider text-white uppercase mb-4">Navigation</h3>
+          <div class="flex flex-col gap-3 text-sm font-medium">
+            <a href="{{ url('/') }}" class="hover:text-indigo-400 transition-colors">Home</a>
+            <a href="{{ route('scholarship') }}" class="hover:text-indigo-400 transition-colors">Scholarships</a>
+            <a href="{{ route('chatbot') }}" class="hover:text-indigo-400 transition-colors">Chatbot</a>
+            <a href="{{ route('bookmarks') }}" class="hover:text-indigo-400 transition-colors">Saved</a>
+          </div>
+        </div>
+        
+        <div class="flex flex-col items-center md:items-end">
+          <h3 class="text-sm font-bold tracking-wider text-white uppercase mb-4">Mulai Sekarang</h3>
+          <p class="text-sm text-slate-400 mb-4 font-medium">Punya pertanyaan soal beasiswa? Tanya AI sekarang.</p>
+          <a href="{{ route('chatbot') }}" class="inline-flex items-center justify-center rounded-xl bg-indigo-500 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 transition-all">
+            Tanya AI
+          </a>
+        </div>
+      </div>
+      <div class="mt-16 border-t border-slate-700 pt-8 text-center">
+        <p class="text-sm text-slate-500">© 2026 ScholarBot. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
 </body>
 
 </html>

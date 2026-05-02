@@ -13,7 +13,7 @@
   <meta name="csrf-token"
         content="{{ csrf_token() }}">
 
-  <title>{{ config('app.name', 'Laravel') }}</title>
+  <title>ScholarBot</title>
 
   <!-- Fonts -->
   <link rel="preconnect"
@@ -30,10 +30,7 @@
     <aside class="hidden md:flex md:w-1/2 bg-gradient-to-br from-indigo-500 to-violet-600 text-white p-10 xl:p-14 flex-col justify-between">
       <a href="{{ url('/') }}"
          class="inline-flex items-center gap-3">
-        <span class="w-10 h-10 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
-          <x-application-logo class="w-5 h-5 fill-current text-white" />
-        </span>
-        <span class="text-3xl font-semibold leading-none">ScholarFind</span>
+        <span class="text-3xl font-semibold leading-none">🤖ScholarBot</span>
       </a>
 
       <div class="max-w-md">
@@ -42,7 +39,7 @@
       </div>
 
       <div class="text-indigo-100 text-sm flex flex-wrap gap-8">
-        <span>© {{ now()->year }} ScholarFind</span>
+        <span>© {{ now()->year }} ScholarBot</span>
         <a href="#"
            class="hover:text-white transition">Bantuan</a>
         <a href="#"

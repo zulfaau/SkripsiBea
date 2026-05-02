@@ -17,8 +17,9 @@
                     </x-nav-link>
                     
                     @role('admin')
-                    <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')">
-                        {{ __('User Management') }}
+
+                    <x-nav-link :href="route('admin.scholarships.index')" :active="request()->routeIs('admin.scholarships.*')">
+                        {{ __('Scholarships') }}
                     </x-nav-link>
                     @endrole
                 </div>
@@ -45,8 +46,9 @@
                         </x-dropdown-link>
 
                         @role('admin')
-                        <x-dropdown-link :href="route('users.index')">
-                            {{ __('User Management') }}
+
+                        <x-dropdown-link :href="route('admin.scholarships.index')">
+                            {{ __('Scholarships') }}
                         </x-dropdown-link>
                         @endrole
 
@@ -84,8 +86,9 @@
             </x-responsive-nav-link>
             
             @role('admin')
-            <x-responsive-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')">
-                {{ __('User Management') }}
+
+            <x-responsive-nav-link :href="route('admin.scholarships.index')" :active="request()->routeIs('admin.scholarships.*')">
+                {{ __('Scholarships') }}
             </x-responsive-nav-link>
             @endrole
         </div>
@@ -103,8 +106,9 @@
                 </x-responsive-nav-link>
 
                 @role('admin')
-                <x-responsive-nav-link :href="route('users.index')">
-                    {{ __('User Management') }}
+
+                <x-responsive-nav-link :href="route('admin.scholarships.index')">
+                    {{ __('Scholarships') }}
                 </x-responsive-nav-link>
                 @endrole
 

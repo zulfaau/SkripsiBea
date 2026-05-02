@@ -7,7 +7,7 @@
         content="width=device-width, initial-scale=1">
   <meta name="csrf-token"
         content="{{ csrf_token() }}">
-  <title>Chatbot - ScholarFind</title>
+  <title>Chatbot - ScholarBot</title>
 
   <link rel="preconnect"
         href="https://fonts.bunny.net">
@@ -17,24 +17,13 @@
   @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-sans bg-slate-100 text-slate-800 antialiased">
+<body class="font-sans bg-slate-50 text-slate-800 antialiased flex flex-col min-h-screen relative">
+  <!-- Global background pattern -->
+  <div class="fixed inset-0 z-[-1] bg-gradient-to-br from-indigo-50 via-slate-50 to-purple-50"></div>
   <header class="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur">
     <div class="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-      <a href="{{ url('/') }}"
-         class="flex items-center gap-2.5">
-        <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white">
-          <svg xmlns="http://www.w3.org/2000/svg"
-               class="h-4 w-4"
-               fill="none"
-               viewBox="0 0 24 24"
-               stroke="currentColor"
-               stroke-width="2">
-            <path stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M8 10h8m-8 4h5M6 19h12a2 2 0 002-2V7a2 2 0 00-2-2h-3.5a1 1 0 01-.8-.4l-.9-1.2a1 1 0 00-.8-.4h-2a1 1 0 00-.8.4l-.9 1.2a1 1 0 01-.8.4H6a2 2 0 00-2 2v10a2 2 0 002 2z" />
-          </svg>
-        </span>
-        <span class="text-xl font-bold">ScholarFind</span>
+      <a href="{{ url('/') }}" class="flex items-center gap-2.5">
+        <span class="text-2xl font-bold text-gray-800 tracking-tight">🤖ScholarBot</span>
       </a>
 
       <nav class="hidden items-center gap-2 text-sm font-medium md:flex">
@@ -53,7 +42,7 @@
           <div x-data="{ open: false }"
                class="relative">
             <button x-on:click="open = !open"
-                    class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 text-sm font-bold text-white">
+                    class="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-50 text-sm font-bold text-indigo-600 shadow-sm hover:bg-indigo-100 transition-all">
               {{ strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}
             </button>
 
@@ -75,7 +64,7 @@
           </div>
         @else
           <a href="{{ route('login') }}"
-             class="rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-6 py-2 text-sm font-semibold text-white hover:opacity-95">Login</a>
+             class="rounded-xl bg-indigo-50 px-6 py-2.5 text-sm font-semibold text-indigo-600 shadow-sm hover:bg-indigo-100 transition-all">Login</a>
         @endauth
       </div>
     </div>
@@ -84,7 +73,7 @@
   <main class="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
     <section class="grid min-h-[calc(100vh-8rem)] grid-cols-1 overflow-hidden rounded-2xl border border-slate-200 bg-white lg:grid-cols-12">
       <aside class="border-b border-slate-200 bg-slate-50 p-4 lg:col-span-3 lg:border-b-0 lg:border-r">
-        <button class="mb-6 w-full rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-2.5 text-sm font-semibold text-white">✨ New Chat</button>
+        <button class="mb-6 w-full rounded-xl bg-indigo-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-600 transition-all">✨ New Chat</button>
 
         <h3 class="text-xs font-semibold uppercase tracking-wide text-slate-400">Chat History</h3>
         <div class="mt-3 space-y-4">
@@ -125,7 +114,7 @@
             <input type="text"
                    placeholder="Ask about scholarships (e.g. fully funded S2 in Japan)"
                    class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 placeholder:text-slate-400 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100" />
-            <button class="rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-6 py-3 text-sm font-semibold text-white hover:opacity-95">Send</button>
+            <button class="rounded-xl bg-indigo-500 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-600 transition-all">Send</button>
           </div>
         </div>
       </div>
