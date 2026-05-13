@@ -40,10 +40,6 @@
 
       <div class="text-indigo-100 text-sm flex flex-wrap gap-8">
         <span>© {{ now()->year }} ScholarBot</span>
-        <a href="#"
-           class="hover:text-white transition">Bantuan</a>
-        <a href="#"
-           class="hover:text-white transition">Syarat &amp; Ketentuan</a>
       </div>
     </aside>
 

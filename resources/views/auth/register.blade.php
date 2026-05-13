@@ -107,33 +107,18 @@
     </button>
   </form>
 
-  <div class="my-6 flex items-center gap-3 text-sm text-slate-400">
-    <div class="h-px flex-1 bg-slate-200"></div>
-    <span>atau</span>
-    <div class="h-px flex-1 bg-slate-200"></div>
+  <div class="relative my-8">
+    <div class="absolute inset-0 flex items-center">
+      <div class="w-full border-t border-slate-200"></div>
+    </div>
+    <div class="relative flex justify-center text-sm">
+      <span class="bg-white px-4 text-slate-500">atau</span>
+    </div>
   </div>
 
-  <button type="button"
-          class="w-full rounded-xl border border-slate-200 bg-white px-5 py-3 text-base font-semibold text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-200 inline-flex items-center justify-center gap-3">
-    <svg class="h-5 w-5"
-         viewBox="0 0 24 24"
-         xmlns="http://www.w3.org/2000/svg"
-         aria-hidden="true">
-      <path fill="#EA4335"
-            d="M12 10.2v3.9h5.5c-.2 1.2-1.4 3.6-5.5 3.6-3.3 0-6-2.8-6-6.2s2.7-6.2 6-6.2c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 2.7 14.6 1.8 12 1.8 6.9 1.8 2.8 6.1 2.8 11.5S6.9 21.2 12 21.2c6.9 0 9.1-4.9 9.1-7.4 0-.5-.1-.9-.1-1.3H12Z" />
-      <path fill="#34A853"
-            d="M2.8 11.5c0 1.7.5 3.3 1.4 4.6l3.3-2.5c-.2-.6-.4-1.3-.4-2.1s.1-1.4.4-2.1L4.2 6.9c-.9 1.3-1.4 2.9-1.4 4.6Z" />
-      <path fill="#FBBC05"
-            d="M12 21.2c2.6 0 4.8-.9 6.5-2.5l-3.1-2.5c-.8.6-1.9 1-3.4 1-2.6 0-4.9-1.8-5.7-4.2L3 15.5c1.8 3.5 5.3 5.7 9 5.7Z" />
-      <path fill="#4285F4"
-            d="M21.1 13.8c0-.5-.1-.9-.1-1.3H12v3.9h5.5c-.3 1.3-1 2.3-2.1 3l3.1 2.5c1.8-1.7 2.6-4.1 2.6-7.1Z" />
-    </svg>
-    Daftar dengan Google
-  </button>
-
-  <p class="mt-6 text-center text-sm text-slate-500">
+  <p class="text-center text-sm text-slate-500">
     Sudah punya akun?
     <a href="{{ route('login') }}"
-       class="font-semibold text-indigo-600 hover:text-indigo-500">Masuk</a>
+       class="font-bold text-slate-900 hover:text-indigo-600 transition-colors">Masuk</a>
   </p>
 </x-guest-layout>

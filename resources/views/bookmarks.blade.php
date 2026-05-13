@@ -85,50 +85,71 @@
       </svg>
       <h1 class="text-4xl font-bold text-slate-800">Saved Scholarships</h1>
     </div>
-    <p class="mt-2 text-slate-500">Kamu punya 3 beasiswa tersimpan</p>
+    <p class="mt-2 text-slate-500">Kamu punya {{ $savedScholarships->count() }} beasiswa tersimpan</p>
 
     <section class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-      @php
-        $saved = [['title' => 'LPDP Scholarship', 'university' => 'Various Universities', 'country' => 'Indonesia', 'date' => 'May 30, 2026', 'image' => '/images/scholarships/lpdp.jpg', 'region' => 'Domestic'], ['title' => 'Chevening Scholarship', 'university' => 'UK Universities', 'country' => 'United Kingdom', 'date' => 'Jun 15, 2026', 'image' => '/images/scholarships/chevening.jpg', 'region' => 'International'], ['title' => 'Fulbright Scholarship', 'university' => 'US Universities', 'country' => 'United States', 'date' => 'Jul 1, 2026', 'image' => '/images/scholarships/fulbright.jpg', 'region' => 'International']];
-      @endphp
-
-      @foreach ($saved as $item)
+      @forelse ($savedScholarships as $item)
         <article class="group overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-indigo-500/10">
-          <img src="{{ $item['image'] }}"
-               alt="{{ $item['title'] }}"
-               class="h-32 w-full object-cover" />
+          <div class="h-32 w-full bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg px-4 text-center">
+            {{ $item->nama_beasiswa }}
+          </div>
           <div class="p-4">
             <div class="mb-3 flex gap-2 text-[11px] font-semibold text-white">
-              <span class="rounded-full bg-emerald-500 px-2 py-0.5">Fully Funded</span>
-              <span class="rounded-full bg-violet-500 px-2 py-0.5">{{ $item['region'] }}</span>
+                @if($item->kategori)
+                    <span class="rounded-full bg-emerald-500 px-2 py-0.5">{{ $item->kategori }}</span>
+                @endif
+                <span class="rounded-full bg-violet-500 px-2 py-0.5">{{ $item->negara ?? 'International' }}</span>
             </div>
             <div class="flex items-start justify-between gap-3">
               <div>
-                <h3 class="text-2xl font-bold text-slate-800">{{ $item['title'] }}</h3>
-                <p class="text-sm text-slate-500">{{ $item['university'] }}</p>
+                <h3 class="text-xl font-bold text-slate-800 line-clamp-2 leading-tight h-14">{{ $item->nama_beasiswa }}</h3>
+                <p class="text-sm text-slate-500 mt-1">{{ Str::limit($item->deskripsi, 50) }}</p>
               </div>
-              <button class="mt-1 text-slate-400 hover:text-indigo-600"
-                      aria-label="Saved">
-                <svg xmlns="http://www.w3.org/2000/svg"
-                     class="h-5 w-5"
-                     viewBox="0 0 24 24"
-                     fill="none"
-                     stroke="currentColor"
-                     stroke-width="2">
-                  <path stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
-                </svg>
-              </button>
+              <form action="{{ route('bookmarks.toggle', $item->id) }}" method="POST">
+                @csrf
+                <button type="submit" class="mt-1 text-indigo-600 hover:text-rose-600 transition-colors" title="Remove from Saved">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+                    </svg>
+                </button>
+              </form>
             </div>
             <div class="mt-3 flex items-center gap-3 text-xs text-slate-500">
-              <span>{{ $item['country'] }}</span>
-              <span>{{ $item['date'] }}</span>
+              <span class="flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  {{ $item->negara }}
+              </span>
+              <span class="flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  {{ $item->deadline }}
+              </span>
             </div>
-            <span class="mt-3 inline-flex rounded-full bg-indigo-50 px-2 py-0.5 text-[11px] font-semibold text-indigo-600">S2</span>
+            <div class="mt-4 flex gap-2">
+                <a href="{{ route('scholarship.detail', $item->id) }}" class="flex-1 text-center py-2 bg-indigo-50 text-indigo-600 rounded-xl text-xs font-bold hover:bg-indigo-100 transition-colors">
+                    Lihat Detail
+                </a>
+            </div>
           </div>
         </article>
-      @endforeach
+      @empty
+        <div class="col-span-full py-20 text-center">
+            <div class="inline-flex h-20 w-20 items-center justify-center rounded-full bg-slate-100 text-slate-400 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-800">Belum ada beasiswa tersimpan</h3>
+            <p class="text-slate-500 mt-2">Cari beasiswa favoritmu dan klik tombol simpan untuk melihatnya di sini.</p>
+            <a href="{{ route('scholarship') }}" class="mt-6 inline-block bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200">
+                Cari Beasiswa
+            </a>
+        </div>
+      @endforelse
     </section>
   </main>
   <footer class="w-full bg-slate-800 py-16 text-slate-400 flex-grow-0 relative z-10 mt-20">

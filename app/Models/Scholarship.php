@@ -9,20 +9,29 @@ class Scholarship extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $fillable = [
-        'name',
-        'continent',
-        'country',
-        'level',
-        'description',
+        'nama_beasiswa',
+        'slug',
+        'benua',
+        'negara',
+        'jenjang',
+        'deskripsi',
         'deadline',
-        'category',
-        'major',
+        'kategori',
+        'funding_type',
+        'jurusan',
         'benefit',
-        'requirements',
-        'source',
+        'persyaratan',
+        'sumber',
         'url',
-        'original_url',
+        'url_asli',
         'embedding'
     ];
+
+    public function bookmarkedBy()
+    {
+        return $this->hasMany(Bookmark::class);
+    }
 }

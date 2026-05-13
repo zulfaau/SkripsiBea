@@ -45,12 +45,6 @@
                             {{ __('Profile') }}
                         </x-dropdown-link>
 
-                        @role('admin')
-
-                        <x-dropdown-link :href="route('admin.scholarships.index')">
-                            {{ __('Scholarships') }}
-                        </x-dropdown-link>
-                        @endrole
 
                         <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}">
@@ -105,12 +99,6 @@
                     {{ __('Profile') }}
                 </x-responsive-nav-link>
 
-                @role('admin')
-
-                <x-responsive-nav-link :href="route('admin.scholarships.index')">
-                    {{ __('Scholarships') }}
-                </x-responsive-nav-link>
-                @endrole
 
                 <!-- Authentication -->
                 <form method="POST" action="{{ route('logout') }}">

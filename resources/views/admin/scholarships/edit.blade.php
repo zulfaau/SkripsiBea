@@ -9,32 +9,32 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <form action="{{ route('admin.scholarships.update', $id ?? 1) }}" method="POST">
+                    <form action="{{ route('admin.scholarships.update', $scholarship->id) }}" method="POST">
                         @csrf
                         @method('PUT')
                         
                         <div class="mb-4">
-                            <label for="title" class="block text-sm font-medium text-gray-700">Judul Beasiswa</label>
-                            <input type="text" name="title" id="title" value="Contoh Judul Beasiswa" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
+                            <label for="nama_beasiswa" class="block text-sm font-medium text-gray-700">Judul Beasiswa</label>
+                            <input type="text" name="nama_beasiswa" id="nama_beasiswa" value="{{ $scholarship->nama_beasiswa ?? $scholarship->name }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
                         </div>
 
                         <div class="mb-4">
-                            <label for="university" class="block text-sm font-medium text-gray-700">Universitas</label>
-                            <input type="text" name="university" id="university" value="Contoh Universitas" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            <label for="negara" class="block text-sm font-medium text-gray-700">Negara</label>
+                            <input type="text" name="negara" id="negara" value="{{ $scholarship->negara ?? $scholarship->country }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                         </div>
 
                         <div class="mb-4">
-                            <label for="degree" class="block text-sm font-medium text-gray-700">Jenjang</label>
-                            <select name="degree" id="degree" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                <option value="S1">S1 / Sarjana</option>
-                                <option value="S2" selected>S2 / Magister</option>
-                                <option value="S3">S3 / Doktoral</option>
+                            <label for="jenjang" class="block text-sm font-medium text-gray-700">Jenjang</label>
+                            <select name="jenjang" id="jenjang" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                <option value="S1" {{ ($scholarship->jenjang ?? $scholarship->level) == 'S1' ? 'selected' : '' }}>S1 / Sarjana</option>
+                                <option value="S2" {{ ($scholarship->jenjang ?? $scholarship->level) == 'S2' ? 'selected' : '' }}>S2 / Magister</option>
+                                <option value="S3" {{ ($scholarship->jenjang ?? $scholarship->level) == 'S3' ? 'selected' : '' }}>S3 / Doktoral</option>
                             </select>
                         </div>
 
                         <div class="mb-4">
-                            <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi Lengkap (Teks ini yang akan dijadikan Vector AI)</label>
-                            <textarea name="description" id="description" rows="5" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">Ini adalah contoh deskripsi beasiswa yang nantinya akan dikonversi menjadi embedding vektor.</textarea>
+                            <label for="deskripsi" class="block text-sm font-medium text-gray-700">Deskripsi Lengkap (Teks ini yang akan dijadikan Vector AI)</label>
+                            <textarea name="deskripsi" id="deskripsi" rows="5" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">{{ $scholarship->deskripsi ?? $scholarship->description }}</textarea>
                             <p class="mt-1 text-sm text-gray-500">Catatan: Mengubah deskripsi akan mereset status Vector menjadi Pending (harus di-sync ulang).</p>
                         </div>
 

@@ -30,4 +30,14 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function bookmarks()
+    {
+        return $this->hasMany(Bookmark::class);
+    }
+
+    public function savedScholarships()
+    {
+        return $this->belongsToMany(Scholarship::class, 'bookmarks', 'user_id', 'scholarship_id')->withTimestamps();
+    }
 }
