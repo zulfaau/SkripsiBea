@@ -114,9 +114,8 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::resource('admin/scholarships', \App\Http\Controllers\AdminScholarshipController::class)->names('admin.scholarships');
     Route::post('admin/scholarships/sync-embeddings', [\App\Http\Controllers\AdminScholarshipController::class, 'syncEmbeddings'])->name('admin.scholarships.sync_embeddings');
     Route::post('admin/scholarships/upload-dataset', [\App\Http\Controllers\AdminScholarshipController::class, 'uploadDataset'])->name('admin.scholarships.upload');
-});
 
-Route::middleware('auth')->group(function () {
+    // Profile Routes (Admin Only)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

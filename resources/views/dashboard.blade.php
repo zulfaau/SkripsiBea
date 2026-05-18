@@ -118,8 +118,14 @@
             </form>
 
             <!-- Table Header & Actions -->
-            <div class="flex justify-between items-center pt-2">
+            <div class="flex flex-col md:flex-row justify-between items-center pt-2 gap-4">
                 <p class="text-sm text-gray-500">Showing {{ $scholarships->firstItem() }} to {{ $scholarships->lastItem() }} of {{ $scholarships->total() }} results</p>
+                <div class="flex space-x-3">
+                    <a href="{{ route('admin.scholarships.create') }}" class="inline-flex items-center px-4 py-2 bg-[#2563eb] hover:bg-blue-700 text-white text-xs font-bold uppercase tracking-widest rounded-lg transition-colors shadow-sm">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Add Scholarship
+                    </a>
+                </div>
             </div>
 
             <!-- Table -->

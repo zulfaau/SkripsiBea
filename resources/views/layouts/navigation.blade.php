@@ -15,13 +15,7 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    
-                    @role('admin')
 
-                    <x-nav-link :href="route('admin.scholarships.index')" :active="request()->routeIs('admin.scholarships.*')">
-                        {{ __('Scholarships') }}
-                    </x-nav-link>
-                    @endrole
                 </div>
             </div>
 
@@ -41,9 +35,11 @@
                     </x-slot>
 
                     <x-slot name="content">
+                        @role('admin')
                         <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Profile') }}
                         </x-dropdown-link>
+                        @endrole
 
 
                         <!-- Authentication -->
@@ -78,13 +74,7 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
-            
-            @role('admin')
 
-            <x-responsive-nav-link :href="route('admin.scholarships.index')" :active="request()->routeIs('admin.scholarships.*')">
-                {{ __('Scholarships') }}
-            </x-responsive-nav-link>
-            @endrole
         </div>
 
         <!-- Responsive Settings Options -->
@@ -95,9 +85,11 @@
             </div>
 
             <div class="mt-3 space-y-1">
+                @role('admin')
                 <x-responsive-nav-link :href="route('profile.edit')">
                     {{ __('Profile') }}
                 </x-responsive-nav-link>
+                @endrole
 
 
                 <!-- Authentication -->

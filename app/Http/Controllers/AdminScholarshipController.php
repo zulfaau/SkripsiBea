@@ -8,8 +8,7 @@ class AdminScholarshipController extends Controller
 {
     public function index()
     {
-        $scholarships = \App\Models\Scholarship::orderBy('id', 'desc')->paginate(20);
-        return view('admin.scholarships.index', compact('scholarships'));
+        return redirect()->route('dashboard');
     }
 
     public function create()
@@ -27,7 +26,7 @@ class AdminScholarshipController extends Controller
 
         \App\Models\Scholarship::create($request->all());
 
-        return redirect()->route('admin.scholarships.index')->with('success', 'Data Beasiswa berhasil ditambahkan!');
+        return redirect()->route('dashboard')->with('success', 'Data Beasiswa berhasil ditambahkan!');
     }
 
     public function edit($id)

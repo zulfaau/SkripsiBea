@@ -10,6 +10,11 @@ use Illuminate\Support\Str;
 
 class ChatbotController extends Controller
 {
+    private $startTime;
+    private $userMessage;
+    private $currentIntent = 'unknown';
+    private $vectorSearchTime = 0;
+
     /**
      * Endpoint utama untuk chatbot (Rule-Based + AI Fallback)
      */
@@ -19,6 +24,9 @@ class ChatbotController extends Controller
             'message' => 'required|string|max:500',
             'rag_enabled' => 'nullable|boolean',
         ]);
+
+        $this->startTime = microtime(true);
+        $this->userMessage = $request->input('message');
 
         $ragEnabled = $request->input('rag_enabled', true);
         $rawMessage = $request->input('message');
@@ -30,6 +38,11 @@ class ChatbotController extends Controller
         $normalizedData = $this->normalizeText($rawMessage);
         $message = $normalizedData['text'];
 
+        // PAKSA DETEKSI LOKASI (Karena filter sering bocor)
+        $forcedLocation = null;
+        if (preg_match('/\b(dalam negeri|indo|domestik|nasional)\b/i', $rawMessage)) $forcedLocation = 'dalam';
+        if (preg_match('/\b(luar negeri|internasional|global|abroad)\b/i', $rawMessage)) $forcedLocation = 'luar';
+
         try {
             // TYPO SEKARANG LANGSUNG DIPROSES (TIDAK BERTANYA LAGI)
             // Sistem akan menggunakan pesan yang sudah dikoreksi di $message
@@ -37,16 +50,19 @@ class ChatbotController extends Controller
 
             // 1. GREETING DETECTION
             if ($this->isGreeting($message)) {
+                $this->currentIntent = 'greeting';
                 return $this->finalizeResponse($this->getGreetingResponse($message), $normalizedData);
             }
 
             // 1.2 OUT OF TOPIC DETECTION (Sangat Prioritas - Agar tidak menjawab materi kuliah)
             if ($ragEnabled && $this->isOutOfTopic($message)) {
+                $this->currentIntent = 'out_of_topic';
                 return $this->finalizeResponse($this->getOutOfTopicResponse(), $normalizedData);
             }
 
             // 1.5 THANK YOU DETECTION
             if ($this->isThankYou($message)) {
+                $this->currentIntent = 'thank_you';
                 return $this->finalizeResponse($this->getThankYouResponse(), $normalizedData);
             }
 
@@ -55,62 +71,70 @@ class ChatbotController extends Controller
 
             // 1.7.5 VALIDASI JURUSAN (Konteks Follow-up: Apakah beasiswa ini ada jurusan X?)
             if ($ragEnabled && (session()->has('selected_scholarship') || session()->has('last_search_results'))) {
-                // Pola: "beasiswa ini ada jurusan X?", "ada jurusan Y?", "no 1 ada jurusan Z?"
-                if (preg_match('/\b(beasiswa\s+)?(ini|itu|tersebut|no\s+\d+|nomor\s+\d+|ke\s+\d+)?\s*(ada|tersedia|punya|bisa)\s+(jurusan|prodi|bidang|fakultas|studi)\s+([a-z\s]+)/i', $message, $matches)) {
-                    $ref = trim($matches[2] ?? '');
-                    $majorFound = trim($matches[5]);
+                // Pola: "beasiswa ini ada jurusan X?", "ada jurusan Y?", "jurusan X ada di beasiswa tersebut?"
+                $majorRegex = '/\b(jurusan|prodi|bidang|fakultas|studi)\s+([a-z\s]+).*?\b(ini|itu|tersebut|no\s+\d+|nomor\s+\d+|ke\s+\d+)\b|\b(ini|itu|tersebut|no\s+\d+|nomor\s+\d+|ke\s+\d+).*?\b(jurusan|prodi|bidang|fakultas|studi)\s+([a-z\s]+)\b/i';
+                if (preg_match($majorRegex, $message, $matches)) {
+                    $ref = trim($matches[3] ?: $matches[4]);
+                    $majorFound = trim($matches[2] ?: $matches[6]);
+                    $this->currentIntent = 'validation_major';
                     return $this->handleMajorValidation($majorFound, $normalizedData, $ref);
                 }
             }
 
             // 1.7.6 VALIDASI PENDANAAN (Konteks Follow-up: Apakah ini fully funded?)
             if ($ragEnabled && (session()->has('selected_scholarship') || session()->has('last_search_results'))) {
-                $fundingRegex = '/\b(beasiswa\s+)?(ini|itu|tersebut|no\s+\d+|nomor\s+\d+|ke\s+\d+)?\s*(apakah|tipe)?\s*(fully\s+funded|full\s+funded|partially\s+funded|partial\s+funded|dana\s+penuh|dana\s+sebagian|biaya\s+penuh|biaya\s+sebagian)\b/i';
+                // Pola: "fully funded kah beasiswa ini?", "apakah ini fully funded?"
+                $fundingTypes = '(fully\s+funded|full\s+funded|partially\s+funded|partial\s+funded|dana\s+penuh|dana\s+sebagian|biaya\s+penuh|biaya\s+sebagian)';
+                $refs = '(ini|itu|tersebut|no\s+\d+|nomor\s+\d+|ke\s+\d+)';
+                $fundingRegex = "/\b$fundingTypes.*?\b$refs\b|\b$refs.*?\b$fundingTypes\b/i";
+                
                 if (preg_match($fundingRegex, $message, $matches)) {
-                    $ref = trim($matches[2] ?? '');
-                    $fundingFound = trim($matches[4]);
+                    // Cari mana yang merupakan rujukan dan mana yang merupakan tipe pendanaan
+                    $ref = "";
+                    $fundingFound = "";
+                    
+                    if (preg_match("/\b$refs\b/i", $message, $mRef)) $ref = $mRef[0];
+                    if (preg_match("/\b$fundingTypes\b/i", $message, $mFund)) $fundingFound = $mFund[0];
+
+                    $this->currentIntent = 'validation_funding';
                     return $this->handleFundingValidation($fundingFound, $normalizedData, $ref);
                 }
             }
 
             // 2. DETAIL & SELECTION LOGIC (Prioritas Tinggi)
-            
+            $detailIntent = $this->getDetailIntent($message);
+            $isExplicitSearch = preg_match('/\b(cari|carikan|berikan|tampilkan|temukan|info beasiswa|daftar beasiswa)\b/i', $message);
+
             // 2.1 Deteksi Pemilihan Nomor (Misal: "pilih no 1" atau "benefit no 2")
             $selectedNumber = null;
             if (preg_match('/\b(?:nomor|no|pilih|nmr|#)\s*([0-9]+)\b/i', $message, $matches) || 
                 preg_match('/^(?:pilih\s+|nomor\s+|no\s+|nmr\s+|#)?([0-9]+)$/i', trim($message), $matches)) {
                 $selectedNumber = (int)$matches[1];
-            } else if ($detailIntent && preg_match('/\b([0-9]+)\b/', $message, $matches)) {
+            } else if ($detailIntent && preg_match('/\b([0-9]{1,2})\b/', $message, $matches)) {
                 $selectedNumber = (int)$matches[1];
             }
 
             // 2.2 Jika ada intent detail dan sudah ada beasiswa terpilih
-            if ($detailIntent && session()->has('selected_scholarship') && !$selectedNumber) {
-                $criteria = $this->extractCriteria($message);
-                $hasNewFilters = !empty($criteria['negara']) || !empty($criteria['benua']) || 
-                                !empty($criteria['jenjang']) || !empty($criteria['bulan']) || 
-                                !empty($criteria['funding']);
-                
-                // JIKA TIDAK ADA FILTER BARU, BERIKAN DETAIL BEASISWA SAAT INI
-                if (!$hasNewFilters) {
-                    return $this->handleDetailRequest($detailIntent, $normalizedData);
-                }
+            // Jika ada intent detail, TAPI kalimatnya juga merupakan kalimat pencarian spesifik, maka prioritas ke pencarian
+            if ($detailIntent && session()->has('selected_scholarship') && !$selectedNumber && !($isExplicitSearch && $this->isSearchQuery($message))) {
+                $this->currentIntent = 'detail';
+                return $this->handleDetailRequest($detailIntent, $normalizedData);
             }
 
             // 2.3 Eksekusi Pemilihan Nomor
             if ($selectedNumber) {
                 $allResults = session()->get('last_search_all_results', []);
                 if (isset($allResults[$selectedNumber - 1])) {
-                    session()->put('selected_scholarship', (array)$allResults[$allResults[$selectedNumber - 1]->id ?? ($selectedNumber - 1)]);
-                    // Ambil ulang data session untuk mendapatkan array lengkap
                     $selected = (array)$allResults[$selectedNumber - 1];
                     session()->put('selected_scholarship', $selected);
 
                     // Jika ada intent detail sekaligus (misal "benefit no 1")
                     if ($detailIntent) {
+                        $this->currentIntent = 'detail';
                         return $this->handleDetailRequest($detailIntent, $normalizedData);
                     }
-                    return $this->finalizeResponse("Anda telah memilih **{$selected['nama_beasiswa']}**.\n\nDetail apa yang ingin Anda ketahui? (Benefit, Syarat, Deadline, atau Cara Daftar)", $normalizedData);
+                    $this->currentIntent = 'selection';
+                    return $this->finalizeResponse("Anda telah memilih **{$selected['nama_beasiswa']}**.\n\nDetail apa yang ingin Anda ketahui? 👉 Ketik: **Benefit, Syarat, Deadline, Cara Daftar**, atau **Detail**", $normalizedData);
                 } else {
                     return $this->finalizeResponse("Maaf, nomor tersebut tidak valid atau tidak ada dalam daftar pencarian terakhir Anda.", $normalizedData);
                 }
@@ -118,13 +142,8 @@ class ChatbotController extends Controller
             
             // 3.5 KONFIRMASI (Acknowledgment: Oke/Iya/Siap)
             if ($this->isAcknowledgment($message)) {
+                $this->currentIntent = 'acknowledgment';
                 return $this->finalizeResponse("Baik, senang bisa membantu Anda! 😊 Jika nanti ada hal lain yang ingin ditanyakan seputar beasiswa, jangan ragu untuk kembali lagi ya. Semangat dan sukses untuk studinya! 🎓✨", $normalizedData);
-            }
-
-            // 4. PERTANYAAN UMUM (FAQ / Rule-based knowledge)
-            $faqAnswer = $this->handleFAQ($message);
-            if ($faqAnswer) {
-                return $this->finalizeResponse($faqAnswer, $normalizedData);
             }
 
             // 4.5 NEXT PAGE (YANG LAIN)
@@ -135,15 +154,22 @@ class ChatbotController extends Controller
                 $isSameCountry = empty($criteria['negara']) || $criteria['negara'] === ($lastCriteria['negara'] ?? []);
                 
                 if ($isSameCountry) {
+                    $this->currentIntent = 'next_page';
                     return $this->handleNextPage($normalizedData);
                 }
             }
 
-
-
-            // 6. SEARCH & FILTER (Hanya jika RAG aktif)
+            // 6. SEARCH & FILTER (Hanya jika RAG aktif) - DIPRIORITASKAN
             if ($ragEnabled && $this->isSearchQuery($message)) {
-                return $this->handleSearch($rawMessage, $message, $normalizedData);
+                $this->currentIntent = 'search';
+                return $this->handleSearch($rawMessage, $message, $normalizedData, $forcedLocation);
+            }
+
+            // 4. PERTANYAAN UMUM (FAQ / Pengertian) - DIPINDAH KE BAWAH SEARCH
+            $faqAnswer = $this->handleFAQ($message);
+            if ($faqAnswer) {
+                $this->currentIntent = 'faq';
+                return $this->finalizeResponse($faqAnswer, $normalizedData);
             }
 
             // 1.8 TOPIC GUARD (Penyaring Topik Ketat untuk Sidang)
@@ -154,11 +180,13 @@ class ChatbotController extends Controller
             // LOGIKA UTAMA: Jika RAG Aktif, WAJIB masuk salah satu kategori di atas. 
             // Jika tidak (pertanyaan random), TOLAK LANGSUNG.
             if ($ragEnabled && !$isGreeting && !$isSearch && !$isDetail) {
+                $this->currentIntent = 'out_of_topic';
                 return $this->finalizeResponse($this->getOutOfTopicResponse(), $normalizedData);
             }
 
             // 1.9 PENGECUALIAN DEFINISI (Apa itu, Pengertian, dsb)
             if ($ragEnabled && preg_match('/\b(apa itu|pengertian|definisi|jelaskan|maksud dari)\b/i', $message)) {
+                $this->currentIntent = 'out_of_topic';
                 return $this->finalizeResponse($this->getOutOfTopicResponse(), $normalizedData);
             }
 
@@ -166,14 +194,24 @@ class ChatbotController extends Controller
 
             // 1.10 SEARCH HANDLER
             if ($ragEnabled && $isSearch) {
-                return $this->handleSearch($rawMessage, $message, $normalizedData);
+                $response = $this->handleSearch($rawMessage, $message, $normalizedData);
+                
+                // JIKA HASIL DATABASE KOSONG, JANGAN MENYERAH, TANYA AI
+                $data = $response->getData();
+                if (isset($data->answer) && (str_contains($data->answer, 'Maaf, saya tidak menemukan') || str_contains($data->answer, 'belum memiliki data'))) {
+                    return $this->handlePureAI($rawMessage, $ragEnabled, $normalizedData);
+                }
+                
+                return $response;
             }
 
-            // 1.11 AI FALLBACK (Hanya jika RAG OFF atau lolos filter di atas)
+            // 1.11 AI FALLBACK (Untuk pertanyaan random yang masih seputar pendidikan/beasiswa)
+            $this->currentIntent = 'ai_fallback';
             return $this->handlePureAI($rawMessage, $ragEnabled, $normalizedData);
 
         } catch (\Exception $e) {
             Log::error("Chatbot Error: " . $e->getMessage());
+            $this->currentIntent = 'error';
             
             $errorMessage = 'Maaf, terjadi gangguan saat memproses pertanyaan kamu. Silakan coba lagi nanti.';
             if (str_contains($e->getMessage(), 'timed out') || str_contains($e->getMessage(), 'Connection timed out')) {
@@ -196,13 +234,15 @@ class ChatbotController extends Controller
         $correctedWord = '';
 
         $synonyms = [
+            'beasiswa' => 'beasiswa', 'beas' => 'beasiswa', 'schol' => 'scholarship', 'scholar' => 'scholarship',
+            'jurusan' => 'bidang', 'jur' => 'bidang', 'prodi' => 'bidang', 'studi' => 'bidang',
+            'univ' => 'universitas', 'kampus' => 'universitas', 'uni' => 'universitas',
+            'link' => 'url', 'tautan' => 'url', 'web' => 'url', 'website' => 'url', 'linknya' => 'url', 'link nya' => 'url', 'urlnya' => 'url', 'url nya' => 'url',
             'cara daftar' => 'apply', 'cr dftr' => 'apply', 'daftar gimana' => 'apply', 'daftar gmn' => 'apply', 'cara apply' => 'apply',
             'fasilitas' => 'benefit', 'keuntungan' => 'benefit', 'manfaat' => 'benefit',
             'dana penuh' => 'fully funded', 'beasiswa penuh' => 'fully funded', 'pendanaan penuh' => 'fully funded',
             'dana sebagian' => 'partially funded', 'partial funded' => 'partially funded', 'pendanaan sebagian' => 'partially funded',
-            'arab saudi' => 'arab saudi',
-
-            // KAMUS SINGKATAN / SLANG INDONESIA (SUPER LENGKAP)
+            'indo' => 'indonesia', 'as' => 'amerika serikat', 'uk' => 'inggris', 'jpn' => 'jepang', 'kor' => 'korea',
             'trs' => 'terus', 'gmn' => 'gimana', 'yg' => 'yang', 'dgn' => 'dengan', 'dg' => 'dengan',
             'pebruari' => 'februari', 'febuari' => 'februari', 'pebuari' => 'februari', 'feb' => 'februari', 'peb' => 'februari',
             'nopember' => 'november', 'okey' => 'oke', 'okei' => 'oke', 'ok' => 'oke', 'siap' => 'oke', 'baik' => 'oke',
@@ -288,6 +328,23 @@ class ChatbotController extends Controller
 
     private function finalizeResponse($answer, $normalizedData = null, $success = true)
     {
+        // Simpan log ke database untuk evaluasi kinerja (Response Time & Accuracy)
+        try {
+            $duration = microtime(true) - $this->startTime;
+            DB::table('chat_logs')->insert([
+                'user_id' => auth()->id(),
+                'user_message' => $this->userMessage,
+                'bot_response' => is_string($answer) ? $answer : json_encode($answer),
+                'response_time' => round($duration, 3),
+                'vector_search_time' => round($this->vectorSearchTime, 3),
+                'intent' => $this->currentIntent,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Failed to save chat log: " . $e->getMessage());
+        }
+
         // Catatan koreksi otomatis dihapus sesuai permintaan user agar tampilan tetap bersih
         return response()->json([
             'success' => $success,
@@ -431,6 +488,11 @@ class ChatbotController extends Controller
             }
         }
 
+        // Jika tidak ada keyword wajib, cek apakah ada angka tahun (4 digit)
+        if (!$hasStrongKeyword && preg_match('/\b20[0-9]{2}\b/', $message)) {
+            $hasStrongKeyword = true;
+        }
+
         // Jika tidak ada keyword wajib, cek apakah ada kombinasi (Negara/Bulan + Jurusan/Prodi)
         if (!$hasStrongKeyword) {
             $criteria = $this->extractCriteria($message);
@@ -491,9 +553,10 @@ class ChatbotController extends Controller
 
         // 1. Kata kunci utama yang WAJIB ada salah satunya agar dianggap relevan
         $scholarshipKeywords = [
-            'beasiswa', 'scholarship', 'apply', 'daftar', 'pendaftaran',
+            'beasiswa', 'scholarship', 'apply', 'daftar', 'pendaftaran', 'bantuan', 'dana', 'kuliah', 'studi',
             'deadline', 'ielts', 'toefl', 'loa', 's1', 's2', 's3', 'd3', 'd4', 'syarat', 'persyaratan', 
-            'benefit', 'biaya', 'funding', 'pendanaan', 'negara', 'benua', 'akademik', 'edukasi'
+            'benefit', 'biaya', 'funding', 'pendanaan', 'negara', 'benua', 'akademik', 'edukasi', 'ukt', 'ipk', 'gpa',
+            'graduate', 'mampu', 'miskin', 'perempuan', 'semester', 'wawancara', 'interview', 'detail', 'info', 'link'
         ];
 
         $hasScholarshipContext = false;
@@ -504,123 +567,89 @@ class ChatbotController extends Controller
             }
         }
 
-        // Khusus 'kuliah' dan 'studi', cek apakah dia 'mata kuliah' atau semacamnya
-        if (!$hasScholarshipContext) {
-            if (preg_match('/\b(kuliah|studi)\b/i', $message)) {
-                if (preg_match('/\bmata\s+kuliah\b/i', $message) || preg_match('/\b(belajar|materi|tugas)\b/i', $message)) {
-                    return true; // Dianggap OOT
-                }
-                $hasScholarshipContext = true;
-            }
-        }
-
-        // 2. Jika ada kata kunci beasiswa, anggap masuk topik
+        // Jika ada konteks beasiswa, anggap masuk topik
         if ($hasScholarshipContext) return false;
 
-        // 3. Deteksi Matematika (Misal: 1+1, 10 * 5, dll)
-        if (preg_match('/[0-9]+[\s]*[\+\-\*\/\^=][\s]*[0-9]+/', $message)) {
-            return true;
-        }
-
-        // 4. Jika tidak ada kata kunci beasiswa, cek kata kunci institusi yang sering ditanyakan (tapi berisiko OOT)
-        $broadKeywords = ['universitas', 'kampus', 'institut', 'sekolah', 'jurusan', 'prodi', 'fakultas'];
-        foreach ($broadKeywords as $broad) {
-            if (str_contains($message, $broad)) {
-                // "Universitas" tanpa kata "beasiswa/kuliah/studi" dianggap Out of Topic
-                return true; 
-            }
-        }
-
-        // 5. Daftar kata yang menunjukkan pertanyaan di luar topik (Blacklist Luas)
-        $forbiddenKeywords = [
-            // Umum & Hiburan
-            'polisi', 'cuaca', 'resep', 'makan', 'masak', 'game', 'berita', 'politik', 'presiden', 'menteri', 'pemilu',
-            'agama', 'sholat', 'doa', 'cinta', 'pacar', 'menikah', 'belanja', 'harga', 'shopee', 'tokopedia', 'tiktok', 'tidur',
-            'makanan', 'minuman', 'restoran', 'lokasi', 'alamat', 'peta', 'film', 'bioskop', 'download', 'nonton',
-            'bola', 'pemain', 'atlet', 'klub', 'skor', 'pertandingan',
-            
-            // Teknologi & Gadget (Non-Edukasi)
-            'laptop', 'gaming', 'hp', 'handphone', 'spek', 'iphone', 'android', 'rakit pc',
-            'react', 'programming', 'coding', 'laravel', 'python', 'javascript', 'html', 'css',
-            
-            // Personal & Emosi
-            'siapa kamu', 'siapa anda', 'pencipta', 'dibuat oleh', 'nama kamu', 'umur kamu',
-            'sedih', 'capek', 'lelah', 'pusing', 'galau', 'kesal', 'marah', 'bosan', 'curhat',
-            
-            // Keamanan & Ilegal
-            'hack', 'hacking', 'bobol', 'virus', 'malware', 'phishing', 'judi', 'slot', 'gacor', 'link judi',
-            
-            // Karir & Pekerjaan Umum
-            'loker', 'lowongan', 'kerja', 'gaji', 'cpns', 'pns', 'magang umum', 'karir',
-            
-            // Kata Tanya/Instruksi Umum (Tanpa Konteks Beasiswa)
-            'metode', 'cara', 'tutor', 'tutorial', 'tips', 'trik', 'rekomendasi', 'apa itu'
+        // Blacklist kata-kata yang SANGAT tidak relevan (seperti resep, judi, dsb)
+        $extremeForbidden = [
+            'resep', 'masak', 'makan', 'minum', 'game', 'judi', 'slot', 'hack', 'pacar', 'bola', 'film'
         ];
-
-        foreach ($forbiddenKeywords as $bad) {
+        foreach ($extremeForbidden as $bad) {
             if (str_contains($message, $bad)) return true;
         }
 
-        // 6. Kata tanya umum di awal kalimat tanpa konteks beasiswa
-        if (preg_match('/^(siapa|dimana|kapan|mengapa|bagaimana|apa)\b/i', trim($message))) {
-            return true;
-        }
-
-        // 7. Default: Jika pesan lumayan panjang tapi tidak mengandung kata kunci beasiswa sama sekali
-        return strlen($message) > 10; 
-    }
+        // Jika pesan pendek dan tidak ada keyword beasiswa, anggap OOT
+        return strlen($message) > 15; 
+    } 
 
     private function handleFAQ($message)
     {
-        if (str_contains($message, 'perbedaan') && str_contains($message, 'fully funded') && str_contains($message, 'partially funded')) {
+        $m = strtolower($message);
+        
+        // List pertanyaan titipan user (Possibility)
+        if (str_contains($m, 'lpdp') && (str_contains($m, 'kapan') || str_contains($m, 'buka'))) {
+            return "Beasiswa LPDP biasanya dibuka dalam 2 tahap setiap tahunnya (sekitar bulan Januari-Februari untuk Tahap 1 dan Juni-Juli untuk Tahap 2). Untuk update resmi tahun 2026, silakan pantau terus situs lpdp.kemenkeu.go.id ya! 😊";
+        }
+        if (str_contains($m, 'tanpa toefl') || str_contains($m, 'tanpa ielts')) {
+            return "Ada beberapa beasiswa yang tidak mewajibkan TOEFL/IELTS, seperti beasiswa Turkiye Burslari (Turki), GKS (Korea - jalur tertentu), atau beasiswa Pemerintah Rusia. Beberapa beasiswa dalam negeri juga banyak yang tidak memerlukan sertifikat bahasa Inggris. Mau saya carikan yang spesifik? 😊";
+        }
+        if (str_contains($m, 'wawancara') && str_contains($m, 'tidak pakai')) {
+            return "Beasiswa tanpa wawancara biasanya fokus pada seleksi berkas dan nilai akademik. Contohnya beberapa beasiswa bantuan UKT atau beasiswa dari yayasan swasta tertentu. Namun mayoritas beasiswa bergengsi biasanya tetap menyertakan tahap wawancara.";
+        }
+        if (str_contains($m, 'fresh graduate')) {
+            return "Tentu! Banyak beasiswa S2 luar negeri yang sangat terbuka untuk fresh graduate tanpa syarat pengalaman kerja, seperti beasiswa Erasmus+ (Eropa), MEXT (Jepang), atau beasiswa dari universitas di Taiwan.";
+        }
+        if (str_contains($m, 'kurang mampu') || str_contains($m, 'anak mampu')) {
+            return "Untuk mahasiswa kurang mampu, pilihan utamanya adalah KIP Kuliah (untuk dalam negeri) atau beasiswa yang berbasis 'Need-based Financial Aid' untuk luar negeri. Kami memiliki beberapa data bantuan kuliah tersebut di database.";
+        }
+
+        if (str_contains($m, 'perbedaan') && str_contains($m, 'fully funded') && str_contains($m, 'partially funded')) {
             return "Perbedaan utamanya:\n- **Fully Funded** menanggung seluruh biaya (kuliah, hidup, tiket, dll).\n- **Partially Funded** hanya menanggung sebagian biaya (misal hanya biaya kuliah atau uang saku saja).";
         }
-        if (str_contains($message, 'apa itu fully funded') || (str_contains($message, 'fully funded') && str_contains($message, 'apa'))) {
-            return "Fully Funded adalah jenis beasiswa yang menanggung seluruh biaya studi, biasanya mencakup biaya kuliah (tuition fee), biaya hidup (living allowance), asuransi kesehatan, hingga tiket pesawat.";
+        
+        // Deteksi Pengertian (Hanya jika 'apa itu' secara spesifik)
+        if (preg_match('/\b(apa itu|pengertian|maksud dari|definisi)\b/i', $m)) {
+            if (str_contains($m, 'fully funded') || str_contains($m, 'full funded')) {
+                return "Fully Funded adalah jenis beasiswa yang menanggung seluruh biaya studi, biasanya mencakup biaya kuliah (tuition fee), biaya hidup (living allowance), asuransi kesehatan, hingga tiket pesawat.";
+            }
+            if (str_contains($m, 'partially funded') || str_contains($m, 'partial funded')) {
+                return "Partially Funded adalah beasiswa yang hanya menanggung sebagian biaya studi, misalnya hanya membiayai uang kuliah saja (tuition only) tanpa biaya hidup, atau sebaliknya.";
+            }
         }
-        if (str_contains($message, 'apa itu partially funded') || (str_contains($message, 'partially funded') && str_contains($message, 'apa'))) {
-            return "Partially Funded adalah beasiswa pendanaan sebagian. Beasiswa ini hanya menanggung sebagian biaya, misalnya hanya biaya kuliah saja, atau hanya memberikan uang saku tertentu tanpa menanggung tiket pesawat.";
-        }
-        if (str_contains($message, 'apa itu ielts')) {
+
+        if (str_contains($m, 'apa itu ielts')) {
             return "IELTS (International English Language Testing System) adalah tes standar internasional untuk mengukur kemampuan bahasa Inggris bagi mereka yang ingin kuliah atau bekerja di negara berbahasa Inggris.";
         }
-        if (str_contains($message, 'apa itu loa')) {
+        if (str_contains($m, 'apa itu loa')) {
             return "LoA (Letter of Acceptance) adalah surat resmi dari universitas yang menyatakan bahwa Anda telah diterima sebagai mahasiswa di universitas tersebut. LoA sering menjadi salah satu syarat mendaftar beasiswa.";
-        }
-        if (str_contains($message, 'apa itu motivation letter')) {
-            return "Motivation Letter adalah surat esai yang menjelaskan alasan Anda mendaftar beasiswa/universitas, latar belakang, serta rencana masa depan Anda. Ini sangat penting untuk meyakinkan panitia seleksi.";
-        }
-        if (str_contains($message, 'apa itu recommendation letter') || str_contains($message, 'surat rekomendasi')) {
-            return "Recommendation Letter (Surat Rekomendasi) adalah surat dari dosen, atasan, atau tokoh akademis yang memberikan testimoni positif tentang kemampuan dan karakter Anda untuk mendukung pendaftaran beasiswa.";
         }
         return null;
     }
 
     // Fungsi handleSelection dihapus karena logikanya sudah terintegrasi di ask()
     
-    private function getDetailIntent($message)
+    private function getDetailIntent($m)
     {
-        $m = strtolower($message);
+        $m = strtolower($m);
         
-        // Prioritas: Cara Daftar / Apply (menggunakan str_contains agar tahan banting)
-        if (str_contains($m, 'daftar') || str_contains($m, 'apply') || str_contains($m, 'registrasi') || 
-            str_contains($m, 'pendaftaran') || str_contains($m, 'gabung') || str_contains($m, 'join')) {
-            return 'apply';
+        // GUNAKAN PREG_MATCH DENGAN WORD BOUNDARY (\b) AGAR TIDAK SALAH TANGKAP
+        if (preg_match('/\b(url|link|tautan|web|website)\b/i', $m)) return 'url';
+        if (preg_match('/\b(daftar|apply|registrasi|gabung|join)\b/i', $m)) return 'apply';
+        if (preg_match('/\b(benefit|tunjangan|fasilitas|dana|biaya|funding)\b/i', $m)) {
+            if (preg_match('/\b(dana|biaya|funding)\b/i', $m)) return 'funding';
+            return 'benefit';
         }
-
-        if (str_contains($m, 'benefit') || str_contains($m, 'cakupan') || str_contains($m, 'manfaat')) return 'benefit';
-        if (str_contains($m, 'syarat') || str_contains($m, 'persyaratan') || str_contains($m, 'kualifikasi')) return 'persyaratan';
-        if (str_contains($m, 'deadline') || str_contains($m, 'batas') || str_contains($m, 'tutup')) return 'deadline';
-        if (str_contains($m, 'dana') || str_contains($m, 'biaya') || str_contains($m, 'funding')) return 'funding';
-        if (str_contains($m, 'detail') || str_contains($m, 'info') || str_contains($m, 'lengkap')) return 'detail';
+        if (preg_match('/\b(syarat|persyaratan|kualifikasi)\b/i', $m)) return 'persyaratan';
+        if (preg_match('/\b(deadline|batas|tutup)\b/i', $m)) return 'deadline';
+        if (preg_match('/\b(detail|info|lengkap|ringkasan)\b/i', $m)) return 'detail';
 
         return null;
     }
 
     private function handleDetailRequest($intent, $normalizedData)
     {
-        $selected = session()->get('selected_scholarship');
-        $name = $selected['nama_beasiswa'];
+        $selected = (array)session()->get('selected_scholarship');
+        $name = $selected['nama_beasiswa'] ?? 'Beasiswa';
         $ans = "";
 
         switch ($intent) {
@@ -649,17 +678,27 @@ class ChatbotController extends Controller
             case 'funding':
                 $ans = "Kategori Pendanaan **$name**: " . ($selected['kategori'] ?? '-');
                 break;
+            case 'url':
+                $urlPendaftaran = $selected['url'] ?? null;
+                $urlUniv = $selected['url_asli'] ?? null;
+                
+                $link1 = $urlPendaftaran ? "[Link Pendaftaran]($urlPendaftaran)" : "_Belum tersedia_";
+                $link2 = $urlUniv ? "[Website Resmi]($urlUniv)" : "_Belum tersedia_";
+
+                $ans = "Berikut ini adalah link beasiswa **$name**: $link1, $link2";
+                break;
             case 'apply':
-                $url = route('scholarship.detail', ['id' => $selected['id']]);
-                $ans = "Untuk melihat informasi lengkap dan melakukan pendaftaran **$name**, silakan kunjungi halaman detail beasiswa berikut:\n\n👉 [**Buka Halaman Detail Beasiswa**]($url)";
+                $url = route('scholarship.detail', ['id' => $selected['id'] ?? 0]);
+                $ans = "Untuk melihat cara pendaftaran lengkap **$name**, silakan kunjungi halaman ini:\n\n👉 [**Buka Halaman Detail & Cara Daftar**]($url)\n\nAtau langsung ke website resmi: " . ($selected['url'] ?? '-');
                 break;
             case 'detail':
-                $ans = "Berikut ringkasan informasi untuk **$name**:\n\n" .
-                       "📍 **Negara**: " . ($selected['negara'] ?? '-') . "\n" .
-                       "🎓 **Jenjang**: " . ($selected['jenjang'] ?? '-') . "\n" .
-                       "📅 **Deadline**: " . ($selected['deadline'] ?? '-') . "\n" .
-                       "💰 **Pendanaan**: " . ($selected['kategori'] ?? '-') . "\n\n" .
-                       "Detail apa lagi yang ingin Anda ketahui? (Ketik: **Benefit**, **Syarat**, atau **Cara Daftar**)";
+                $ans = "Berikut ringkasan **$name**:\n\n" .
+                       "📍 **Negara**: " . ($selected['negara'] ?? '-') . " " .
+                       "🎓 **Jenjang**: " . ($selected['jenjang'] ?? '-') . " " .
+                       "🗓️ **Deadline**: " . ($selected['deadline'] ?? '-') . " " .
+                       "💰 **Pendanaan**: " . ($selected['kategori'] ?? '-') . " " .
+                       "📚 **Jurusan**: " . ($selected['bidang'] ?? 'Semua jurusan') . "\n\n" .
+                       "Ketik **Benefit**, **Syarat**, **Cara Daftar**, atau **Link** untuk info lebih lanjut.";
                 break;
         }
         return $this->finalizeResponse($ans, $normalizedData);
@@ -691,7 +730,7 @@ class ChatbotController extends Controller
             $resp .= $displayNumber . "\. **{$namaBeasiswa}** - " . ($s['negara'] ?? 'Luar Negeri') . " (" . ($s['jenjang'] ?? '-') . ")\n\n";
         }
 
-        if (count($allResults) > $startIndex + 5) {
+        if (count($allResults) > $startIndex + 10) {
             $resp .= "Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya, atau silakan pilih nomor beasiswa untuk melihat detail.";
         } else {
             $resp .= "Silakan pilih nomor beasiswa untuk melihat detail seperti benefit, syarat, deadline, atau cara daftar.";
@@ -700,26 +739,33 @@ class ChatbotController extends Controller
         return $this->finalizeResponse($resp, $normalizedData);
     }
 
-    private function handleSearch($rawText, $message, $normalizedData)
+    private function handleSearch($rawText, $message, $normalizedData, $forcedLocation = null)
     {
         $criteria = $this->extractCriteria($message);
+        if ($forcedLocation) $criteria['lokasi_tipe'] = $forcedLocation;
+        if ($forcedLocation === 'dalam' && empty($criteria['negara'])) $criteria['negara'][] = 'indonesia';
 
-        // CONTEXT MERGING: Jika kriteria baru minim, gunakan kriteria dari pencarian sebelumnya
+        // Pengecekan Tahun (Poin Tambahan)
+        if (!empty($criteria['tahun'])) {
+            $is2026 = in_array('2026', $criteria['tahun']);
+            if (!$is2026) {
+                return $this->finalizeResponse("Mohon maaf, ScholarBot hanya menyediakan data 2026 untuk saat ini, terima kasih 😊", $normalizedData);
+            }
+        }
+
+        // CONTEXT MERGING: Jika kriteria baru minim, gunakan kriteria dari pencarian sebelumnya (Point 9)
+        // CONTEXT MERGING & RESET (Point 9)
         if (session()->has('last_search_criteria')) {
             $lastCriteria = session()->get('last_search_criteria');
             
-            // JIKA ada JURUSAN baru atau JENJANG baru yang spesifik, RESET negara lama agar tidak "nyangkut"
-            $isNewMajor = !empty($criteria['bidang']);
-            $isNewLevel = !empty($criteria['jenjang']);
-            $isNewCountry = !empty($criteria['negara']) || !empty($criteria['benua']);
-
-            // Cek apakah ini kemungkinan follow-up (pesan sangat pendek)
-            $isFollowUp = strlen($message) < 20 || preg_match('/\b(doang|cuma|hanya|berapa|itu|tadi|lagi|aja|saja)\b/i', $message);
+            // JIKA user menyebutkan kriteria baru yang kuat (Negara/Jurusan/Tahun), 
+            // maka kita RESET kriteria lama agar tidak campur aduk.
+            $hasNewStrongCriteria = !empty($criteria['negara']) || !empty($criteria['bidang']) || !empty($criteria['tahun']);
             
-            if ($isFollowUp && !$isNewMajor && !$isNewLevel && !$isNewCountry) {
-                if (empty($criteria['negara']) && empty($criteria['benua']) && !empty($lastCriteria['negara'])) {
+            if (!$hasNewStrongCriteria) {
+                // Gunakan memori lama jika tidak ada kriteria baru
+                if (empty($criteria['negara']) && !empty($lastCriteria['negara'])) {
                     $criteria['negara'] = $lastCriteria['negara'];
-                    $criteria['negara_ori'] = $lastCriteria['negara_ori'];
                 }
                 if (empty($criteria['jenjang']) && !empty($lastCriteria['jenjang'])) {
                     $criteria['jenjang'] = $lastCriteria['jenjang'];
@@ -734,12 +780,62 @@ class ChatbotController extends Controller
             $searchQuery = "beasiswa " . implode(' ', $criteria['negara']);
         }
 
-        $embedding = $this->generateEmbedding($searchQuery);
-        $rawResults = DB::select("SELECT * FROM hybrid_search(?::text, ?::vector, ?::int)", [
-            $searchQuery, '[' . implode(',', $embedding) . ']', 1000
-        ]);
+        if (preg_match('/\b(paling dekat|deadline dekat|mepet|terdekat)\b/i', $message)) {
+            $criteria['sort_deadline'] = true;
+        }
 
-        $filtered = $this->applyStrictFilters($rawResults, $criteria);
+        $vStart = microtime(true);
+        $embedding = $this->generateEmbedding($searchQuery);
+        $searchIds = DB::select("SELECT id FROM hybrid_search(?::text, ?::vector, ?::int)", [
+            $searchQuery, '[' . implode(',', $embedding) . ']', 100
+        ]);
+        $this->vectorSearchTime += (microtime(true) - $vStart);
+        
+        $ids = array_map(fn($r) => $r->id, $searchIds);
+        
+        if (empty($ids)) {
+            $rawResults = [];
+        } else {
+            // Ambil data lengkap dengan cara yang lebih ringan
+            $rawResults = DB::table('scholarships')
+                ->whereIn('id', $ids)
+                ->get()
+                ->all();
+            
+            // Urutkan kembali di level PHP
+            $idMap = array_flip($ids);
+            usort($rawResults, function($a, $b) use ($idMap, $criteria) {
+                // JIKA USER MINTA DEADLINE TERDEKAT
+                if (!empty($criteria['sort_deadline'])) {
+                    $dA = strtotime($a->deadline ?? '9999-12-31');
+                    $dB = strtotime($b->deadline ?? '9999-12-31');
+                    return $dA - $dB;
+                }
+                return ($idMap[$a->id] ?? 999) - ($idMap[$b->id] ?? 999);
+            });
+        }
+
+        $filteredRaw = $this->applyStrictFilters($rawResults, $criteria);
+
+        // Filter Tambahan Manual untuk memastikan (Double Check)
+        $filtered = [];
+        if (!empty($criteria['lokasi_tipe'])) {
+            $isMintaDalam = ($criteria['lokasi_tipe'] === 'dalam');
+            foreach ($filteredRaw as $r) {
+                $neg = strtolower($r->negara ?? '');
+                $isIndo = str_contains($neg, 'indonesia');
+                
+                if ($isMintaDalam && $isIndo) $filtered[] = $r;
+                if (!$isMintaDalam && !$isIndo) $filtered[] = $r;
+            }
+        } else {
+            $filtered = $filteredRaw;
+        }
+
+        // VARIASI DATA: Jika pencarian sangat umum
+        if (empty($criteria['negara']) && empty($criteria['benua']) && empty($criteria['bidang'])) {
+            shuffle($filtered);
+        }
 
         if (empty($filtered)) {
             if (!empty($criteria['negara'])) {
@@ -748,11 +844,7 @@ class ChatbotController extends Controller
             return $this->finalizeResponse("Maaf, saya tidak menemukan beasiswa yang sesuai dengan pencarian tersebut.", $normalizedData);
         }
 
-        if (!empty($criteria['benua']) && empty($criteria['negara'])) {
-            shuffle($filtered);
-        }
-
-        $limitedResults = array_slice($filtered, 0, 5);
+        $limitedResults = array_slice($filtered, 0, 5); // Tampil 5 data per halaman
         
         session()->put('last_search_all_results', $filtered);
         session()->put('last_search_criteria', $criteria);
@@ -764,38 +856,33 @@ class ChatbotController extends Controller
         $count = count($filtered);
         $isQuantification = $this->isQuantificationQuery($message);
 
+        // Point 13: Format khusus untuk bulan
+        $isMonthSearch = !empty($criteria['bulan']);
+
         if ($isQuantification) {
-            if (preg_match('/\b(hanya|cuma|doang)\b/i', $message)) {
-                $resp = "Iya, benar. Saat ini data yang saya miliki untuk beasiswa{$locContext} memang hanya **$count** saja. 😊\n\n";
-            } else {
-                $resp = "Total beasiswa yang ditemukan{$locContext} adalah **$count** beasiswa.\n\n";
-            }
-            
-            if ($count > 0) {
-                $resp .= "Berikut rinciannya:\n\n";
-            }
+            $resp = "Total beasiswa yang ditemukan{$locContext} adalah **$count** beasiswa.\n\nBerikut rinciannya:\n\n";
         } else {
             $headerParts = [];
             if (!empty($criteria['bidang'])) $headerParts[] = "jurusan " . implode(', ', array_map('ucwords', $criteria['bidang']));
             if (!empty($criteria['jenjang'])) $headerParts[] = "jenjang " . implode('/', $criteria['jenjang']);
-            
             if (!empty($criteria['negara'])) $headerParts[] = "di " . implode(', ', array_map('ucwords', $criteria['negara']));
-            elseif (!empty($criteria['benua'])) $headerParts[] = "di wilayah " . ucwords($criteria['benua'][0]);
-            elseif (!empty($criteria['lokasi_tipe'])) {
-                $headerParts[] = ($criteria['lokasi_tipe'] === 'luar') ? "khusus di Luar Negeri" : "khusus di Dalam Negeri";
-            }
-
-            $resp = "Berikut beberapa beasiswa " . implode(' ', $headerParts) . ":\n\n";
+            
+            $resp = "Berikut daftar beasiswa " . implode(' ', $headerParts) . ":\n\n";
         }
 
         foreach ($limitedResults as $i => $s) {
             $s = (array) $s;
             $namaBeasiswa = trim($s['nama_beasiswa']);
-            $resp .= ($i + 1) . "\. **{$namaBeasiswa}** - " . ($s['negara'] ?? 'Luar Negeri') . " (" . ($s['jenjang'] ?? '-') . ")\n\n";
+            if ($isMonthSearch) {
+                // Point 13: Nama Beasiswa - Deadline
+                $resp .= ($i + 1) . ". **{$namaBeasiswa}** - " . ($s['deadline'] ?? '-') . "\n\n";
+            } else {
+                $resp .= ($i + 1) . ". **{$namaBeasiswa}** - " . ($s['negara'] ?? 'Luar Negeri') . " (" . ($s['jenjang'] ?? '-') . ")\n\n";
+            }
         }
 
-        if (count($filtered) > 5) {
-            $resp .= "Masih ada beberapa beasiswa lainnya. Ketik **'yang lain'** untuk melihat selanjutnya, atau silakan pilih nomor beasiswa untuk melihat detail.";
+        if (count($filtered) > 10) {
+            $resp .= "Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.";
         } elseif ($count > 0) {
             $resp .= "Silakan pilih nomor beasiswa untuk melihat detail seperti benefit, syarat, deadline, atau cara daftar.";
         }
@@ -810,13 +897,23 @@ class ChatbotController extends Controller
             'benua' => [], 
             'jenjang' => [], 
             'bulan' => [], 
+            'tahun' => [],
+            'semester' => null,
             'funding' => null, 
             'negara_ori' => null, 
             'bidang' => [],
             'lokasi_tipe' => null // 'luar' atau 'dalam'
         ];
         
-        // 1. Deteksi Jurusan/Bidang Studi
+        // 0. Deteksi Tahun (Menangkap 2000 - 2099)
+        if (preg_match_all('/\b(20[0-9]{2})\b/', $text, $yearMatches)) {
+            $c['tahun'] = $yearMatches[0];
+        }
+
+        // 0.1 Deteksi Semester
+        if (preg_match('/\bsemester\s+([0-9]|akhir)\b/i', $text, $semMatches)) {
+            $c['semester'] = $semMatches[1];
+        }
         $majors = [
             'matematika', 'statistika', 'fisika', 'kimia', 'biologi', 'kedokteran', 'farmasi',
             'teknik', 'arsitektur', 'komputer', 'informatika', 'hukum', 'ekonomi', 'akuntansi',
@@ -910,10 +1007,17 @@ class ChatbotController extends Controller
             $c['lokasi_tipe'] = 'luar';
         } elseif (preg_match('/\b(dalam negeri|domestic|local|indonesia|indo)\b/i', $lowerText)) {
             $c['lokasi_tipe'] = 'dalam';
+            $c['negara'][] = 'indonesia'; // Paksa tambah indonesia agar filter akurat
         }
 
         // 5. Deteksi Jenjang, Bulan, dan Funding
+        if (preg_match('/\b(bulan ini|saat ini|sekarang|belum lewat|masih buka)\b/i', $lowerText)) {
+            $currentMonth = strtolower(now()->translatedFormat('F')); 
+            $c['bulan'][] = $currentMonth;
+        }
+
         foreach (['s1', 's2', 's3', 'd3', 'd4'] as $l) if (str_contains($text, $l)) $c['jenjang'][] = strtoupper($l);
+        
         $months = [
             'januari' => ['januari', 'jan'],
             'februari' => ['februari', 'pebruari', 'febuari', 'pebuari', 'feb', 'peb'],
@@ -935,11 +1039,22 @@ class ChatbotController extends Controller
                     break;
                 }
             }
-        } if (str_contains($text, 'fully funded')) {
+        } 
+        
+        // PENDANAAN
+        if (preg_match('/\b(gratis full|full gratis|dana penuh|fully funded|biaya penuh)\b/i', $text)) {
             $c['funding'] = 'Fully Funded';
-        } elseif (str_contains($text, 'partially funded')) {
+        } elseif (preg_match('/\b(ukt doang|sebagian|partially funded|biaya sebagian)\b/i', $text)) {
             $c['funding'] = 'Partially Funded';
         }
+
+        // KEYWORD KHUSUS
+        if (preg_match('/\b(tanpa toefl|tanpa ielts|no toefl|no ielts)\b/i', $text)) $c['no_test'] = true;
+        if (preg_match('/\b(kurang mampu|miskin|ekonomi lemah|kip)\b/i', $text)) $c['ekonomi'] = true;
+        if (preg_match('/\b(perempuan|wanita|khusus cewek)\b/i', $text)) $c['gender'] = 'perempuan';
+        if (preg_match('/\b(fresh graduate|lulusan baru)\b/i', $text)) $c['fresh_grad'] = true;
+        if (preg_match('/\b(tanpa wawancara|no interview)\b/i', $text)) $c['no_interview'] = true;
+        if (preg_match('/\b(gpa di bawah 3|ipk rendah|ipk di bawah 3)\b/i', $text)) $c['low_gpa'] = true;
 
         return $c;
     }
@@ -947,26 +1062,31 @@ class ChatbotController extends Controller
     private function applyStrictFilters($results, $criteria)
     {
         $filtered = array_filter($results, function($r) use ($criteria) {
-            $r = (array)$r;
-            $rowNegara = strtolower($r['negara'] ?? '');
+            // Filter Khusus (Check Deskripsi & Persyaratan)
+            $content = strtolower(($r->nama_beasiswa ?? '') . ' ' . ($r->persyaratan ?? '') . ' ' . ($r->deskripsi ?? ''));
+            
+            if (!empty($criteria['no_test']) && (str_contains($content, 'toefl') || str_contains($content, 'ielts'))) {
+                if (!str_contains($content, 'tanpa toefl') && !str_contains($content, 'tanpa ielts') && !str_contains($content, 'tidak wajib toefl')) return false;
+            }
+            if (!empty($criteria['gender']) && $criteria['gender'] === 'perempuan' && !str_contains($content, 'perempuan') && !str_contains($content, 'wanita')) return false;
+            if (!empty($criteria['ekonomi']) && !str_contains($content, 'kurang mampu') && !str_contains($content, 'ekonomi') && !str_contains($content, 'kip')) return false;
+            if (!empty($criteria['fresh_grad']) && !str_contains($content, 'fresh graduate') && !str_contains($content, 'lulusan baru')) return false;
+            if (!empty($criteria['no_interview']) && str_contains($content, 'wawancara')) {
+                if (!str_contains($content, 'tanpa wawancara')) return false;
+            }
 
             // Filter Tipe Lokasi (Luar/Dalam Negeri) - MAXIMUM STRICTION
             if (!empty($criteria['lokasi_tipe'])) {
-                // Indonesia dianggap dalam negeri jika mengandung kata "indonesia" atau "dalam negeri"
-                $isIndo = str_contains($rowNegara, 'indonesia') || str_contains($rowNegara, 'dalam negeri');
+                $negaraLower = strtolower($r->negara ?? '');
+                $isActuallyDalam = str_contains($negaraLower, 'indonesia');
                 
-                if ($criteria['lokasi_tipe'] === 'luar') {
-                    // JIKA USER MINTA LUAR NEGERI, HARAM ADA INDONESIA
-                    if ($isIndo) return false;
-                } elseif ($criteria['lokasi_tipe'] === 'dalam') {
-                    // JIKA USER MINTA DALAM NEGERI, HARUS ADA INDONESIA
-                    if (!$isIndo) return false;
-                }
+                if ($criteria['lokasi_tipe'] === 'dalam' && !$isActuallyDalam) return false;
+                if ($criteria['lokasi_tipe'] === 'luar' && $isActuallyDalam) return false;
             }
 
             if (!empty($criteria['negara'])) {
                 $m = false;
-                $rowNegara = strtolower($r['negara'] ?? '');
+                $rowNegara = strtolower($r->negara ?? '');
                 foreach ($criteria['negara'] as $c) {
                     if (preg_match('/\b' . preg_quote($c, '/') . '\b/i', $rowNegara)) {
                         $m = true;
@@ -977,10 +1097,8 @@ class ChatbotController extends Controller
             }
             if (!empty($criteria['benua'])) {
                 $m = false;
-                $rowBenua = strtolower($r['benua'] ?? '');
+                $rowBenua = strtolower($r->benua ?? '');
                 foreach ($criteria['benua'] as $c) {
-                    // Cek keberadaan benua dengan regex agar lebih presisi
-                    // Mendukung padanan bahasa Inggris di database (e.g. amerika -> america)
                     $searchTerms = [$c];
                     if ($c === 'amerika') $searchTerms[] = 'america';
                     if ($c === 'eropa') $searchTerms[] = 'europe';
@@ -998,7 +1116,7 @@ class ChatbotController extends Controller
             if (!empty($criteria['jenjang'])) {
                 $m = false;
                 foreach ($criteria['jenjang'] as $l) {
-                    if (str_contains(strtoupper($r['jenjang'] ?? ''), $l)) {
+                    if (str_contains(strtoupper($r->jenjang ?? ''), $l)) {
                         $m = true;
                         break;
                     }
@@ -1021,33 +1139,60 @@ class ChatbotController extends Controller
                     'november' => ['november', 'nopember', 'nov'],
                     'desember' => ['desember', 'des']
                 ];
-                
-                foreach ($criteria['bulan'] as $m_key) {
-                    $rowDeadline = strtolower($r['deadline'] ?? '');
-                    $variants = $monthsConfig[$m_key] ?? [$m_key];
-                    foreach ($variants as $v) {
-                        if (str_contains($rowDeadline, $v)) {
-                            $m = true;
-                            break 2;
+
+                $deadlineStr = strtolower($r->deadline ?? '');
+                foreach ($monthsConfig as $m_key => $variants) {
+                    if (in_array($m_key, $criteria['bulan'])) {
+                        foreach ($variants as $v) {
+                            if (str_contains($deadlineStr, $v)) {
+                                $m = true;
+                                break 2;
+                            }
                         }
                     }
                 }
                 if (!$m) return false;
             }
+
             if (!empty($criteria['funding'])) {
-                $target = strtolower($criteria['funding']); // "fully funded" atau "partially funded"
-                $actual = strtolower($r['kategori'] ?? '');
+                $target = strtolower($criteria['funding']); 
+                $actual = strtolower($r->kategori ?? '');
                 
-                // Cek apakah kategori mengandung kata kunci funding (mentoleransi typo seperti Partiallyly)
                 if ($target === 'partially funded') {
                     if (!str_contains($actual, 'partially')) return false;
                 } else {
                     if ($actual !== $target) return false;
                 }
             }
+
+            // Filter Tahun (Hanya jika kolom deadline mengandung tahun tersebut)
+            if (!empty($criteria['tahun'])) {
+                $matchYear = false;
+                $deadlineStr = $r->deadline ?? '';
+                $nameStr = $r->nama_beasiswa ?? '';
+                foreach ($criteria['tahun'] as $y) {
+                    if (str_contains($deadlineStr, $y) || str_contains($nameStr, $y)) {
+                        $matchYear = true;
+                        break;
+                    }
+                }
+            }
+
             return true;
         });
-        return array_values($filtered); 
+
+        // DEDUPLIKASI: Hapus beasiswa dengan nama yang sama (Case Insensitive)
+        $uniqueResults = [];
+        $seenNames = [];
+        foreach ($filtered as $r) {
+            $name = strtolower(trim($r->nama_beasiswa ?? ''));
+            if (!in_array($name, $seenNames)) {
+                $seenNames[] = $name;
+                $uniqueResults[] = $r;
+            }
+        }
+
+        return $uniqueResults; 
     }
 
     private function generateEmbedding($text)
@@ -1190,7 +1335,11 @@ class ChatbotController extends Controller
                 
                 // Tambahkan context beasiswa ke prompt
                 $context = $this->getScholarshipContext($message);
-                $systemPrompt .= "\n\nContext Beasiswa dari Dataset:\n" . $context;
+                $systemPrompt .= "\n\nContext Beasiswa dari Dataset Kami:\n" . $context;
+                $systemPrompt .= "\n\nINSTRUKSI PENTING: 
+                - Jika pertanyaan user adalah tentang tahun di masa depan (seperti 2026, 2030) dan data di context kami tidak ada, jelaskan bahwa data resmi belum rilis tapi berikan estimasi berdasarkan jadwal tahunan beasiswa tersebut.
+                - Jika user bertanya hal yang tidak mungkin (Hogwarts, Mars, NASA untuk SMP), jawablah dengan sopan bahwa itu tidak tersedia atau hanya fiksi, tetap dengan gaya bahasa asisten beasiswa yang ramah.
+                - Jika data context kosong, tetaplah membantu menjawab menggunakan pengetahuan umum Anda asalkan tetap bertema Beasiswa/Pendidikan.";
             } else {
                 $systemPrompt .= 'Saat ini Anda beroperasi dalam MODE STANDAR (General AI). 
                 Jawablah pertanyaan user secara bebas dan ramah tentang TOPIK APAPUN. 
@@ -1349,17 +1498,38 @@ class ChatbotController extends Controller
             }
         }
         
-        return $this->finalizeResponse("Maaf, saya tidak yakin beasiswa mana yang Anda maksud untuk pertanyaan pendanaan tersebut. Silakan pilih nomor beasiswa terlebih dahulu atau tanyakan spesifik seperti 'beasiswa no 1 fully funded ngga?'.", $normalizedData);
+        return $this->finalizeResponse("Maaf, saya tidak yakin beasiswa mana yang Anda maksud untuk pertanyaan pendanaan tersebut. Silakan pilih nomor beasiswa terlebih dahulu.", $normalizedData);
     }
+
     private function getOutOfTopicResponse()
     {
         $responses = [
-            "Mohon maaf, saat ini chatbot ini hanya memberikan informasi seputar **beasiswa**. Jika ingin bertanya di luar topik tersebut, silakan nonaktifkan toggle RAG di atas ya. Terima kasih! 🙏",
-            "Waduh maaf ya, saya hanya bisa membantu menjawab pertanyaan terkait **info beasiswa**. Untuk pertanyaan umum lainnya, bisa matikan Mode RAG di atas. Terima kasih banyak! 🙏✨",
-            "Mohon maaf sekali, pertanyaan Anda di luar topik beasiswa. ScholarBot fokus pada bantuan biaya studi dan universitas. Jika ingin bertanya hal lain, silakan off-kan toggle di atas. Terima kasih! 🙏😊",
-            "Maaf ya, karena Mode RAG aktif, saya hanya bisa menjawab seputar **beasiswa**. Silakan matikan Mode RAG jika ingin bertanya hal umum lainnya. Terima kasih! 🙏",
-            "Mohon maaf, untuk saat ini saya hanya melayani tanya-jawab seputar **beasiswa**. Jika Anda ingin bertanya hal di luar itu, silakan nonaktifkan Mode RAG di atas ya. Terima kasih! 🙏✨"
+            "Mohon maaf, chatbot kami tidak menerima pertanyaan diluar informasi beasiswa, jika ingin bertanya hal tersebut bisa anda off kan toggle diatas dan silahkan ulangi pertanyaannya.",
+            "Mohon maaf, saat ini chatbot ini hanya memberikan informasi seputar beasiswa. Jika ingin bertanya di luar topik tersebut, silakan nonaktifkan toggle RAG di atas ya. Terima kasih! 🙏",
+            "Mohon maaf sekali, pertanyaan Anda di luar topik beasiswa. ScholarBot fokus pada bantuan informasi mengenai beasiswa"
         ];
         return $responses[array_rand($responses)];
+    }
+
+    private function getScholarshipContext($query)
+    {
+        $vStart = microtime(true);
+        try {
+            $embedding = $this->generateEmbedding($query);
+            $results = DB::select("SELECT nama_beasiswa, negara, jenjang, bidang, deskripsi, persyaratan, benefit, deadline, url, url_asli 
+                                   FROM hybrid_search(?::text, ?::vector, ?::int) 
+                                   LIMIT 5", [$query, '[' . implode(',', $embedding) . ']', 5]);
+            $this->vectorSearchTime += (microtime(true) - $vStart);
+            
+            $context = "";
+            foreach ($results as $r) {
+                $r = (array)$r;
+                $context .= "Beasiswa: {$r['nama_beasiswa']}\nNegara: {$r['negara']}\nJenjang: {$r['jenjang']}\nDeadline: {$r['deadline']}\nDeskripsi: {$r['deskripsi']}\nBenefit: {$r['benefit']}\nSyarat: {$r['persyaratan']}\nLink Daftar: {$r['url']}\nLink Resmi: {$r['url_asli']}\n---\n";
+            }
+            return $context ?: "Tidak ada data spesifik di database yang cocok dengan pertanyaan ini.";
+        } catch (\Exception $e) {
+            Log::error("Context Retrieval Error: " . $e->getMessage());
+            return "Gagal mengambil data dari database.";
+        }
     }
 }
