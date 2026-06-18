@@ -16,23 +16,24 @@ Route::get('/scholarship', function (Illuminate\Http\Request $request) {
     
     if ($request->has('destination')) {
         if ($request->destination == 'domestic') {
-            $query->where('negara', 'like', '%Indonesia%');
+            $query->where('negara', 'ilike', '%Indonesia%');
         } elseif ($request->destination == 'international') {
-            $query->where('negara', 'not like', '%Indonesia%');
+            $query->where('negara', 'not ilike', '%Indonesia%');
         }
     }
 
     if ($request->has('search') && $request->search != '') {
         $searchTerm = $request->search;
         $query->where(function($q) use ($searchTerm) {
-            $q->where('nama_beasiswa', 'like', "%{$searchTerm}%")
-              ->orWhere('negara', 'like', "%{$searchTerm}%")
-              ->orWhere('benua', 'like', "%{$searchTerm}%");
+            $q->where('nama_beasiswa', 'ilike', "%{$searchTerm}%")
+              ->orWhere('negara', 'ilike', "%{$searchTerm}%")
+              ->orWhere('benua', 'ilike', "%{$searchTerm}%")
+              ->orWhere('jenjang', 'ilike', "%{$searchTerm}%");
         });
     }
 
     if ($request->has('degree') && $request->degree != '') {
-        $query->where('jenjang', 'like', "%{$request->degree}%");
+        $query->where('jenjang', 'ilike', "%{$request->degree}%");
     }
 
     $scholarships = $query->orderBy('id', 'desc')->paginate(12);
@@ -68,23 +69,25 @@ Route::get('/dashboard', function (Illuminate\Http\Request $request) {
     if ($request->has('search') && $request->search != '') {
         $searchTerm = $request->search;
         $query->where(function($q) use ($searchTerm) {
-            $q->where('nama_beasiswa', 'like', "%{$searchTerm}%")
-              ->orWhere('negara', 'like', "%{$searchTerm}%");
+            $q->where('nama_beasiswa', 'ilike', "%{$searchTerm}%")
+              ->orWhere('negara', 'ilike', "%{$searchTerm}%")
+              ->orWhere('benua', 'ilike', "%{$searchTerm}%")
+              ->orWhere('jenjang', 'ilike', "%{$searchTerm}%");
         });
     }
 
     // Filter Destination
     if ($request->has('destination') && $request->destination != '') {
         if ($request->destination == 'domestic') {
-            $query->where('negara', 'like', '%Indonesia%');
+            $query->where('negara', 'ilike', '%Indonesia%');
         } elseif ($request->destination == 'international') {
-            $query->where('negara', 'not like', '%Indonesia%');
+            $query->where('negara', 'not ilike', '%Indonesia%');
         }
     }
 
     // Filter Degree
     if ($request->has('degree') && $request->degree != '') {
-        $query->where('jenjang', 'like', "%{$request->degree}%");
+        $query->where('jenjang', 'ilike', "%{$request->degree}%");
     }
 
     // Filter Status

@@ -1,0 +1,2051 @@
+==================================================================
+LAPORAN PENGUJIAN CHATBOT SCHOLARBOT (MODE RAG ON)
+Tanggal: 2026-06-17 07:59:52
+Berisi: pertanyaan pengujian + jawaban asli dari chatbot
+==================================================================
+
+
+#############################################################
+## KATEGORI 1: Filter Berdasarkan Negara Tujuan
+#############################################################
+
+[1] Q: Beasiswa S1 di Jepang
+A: Berikut daftar beasiswa jenjang S1 di Jepang:
+
+1. **Musashino University Global Leader Scholarship** (Luar Negeri (Jepang) - S1)
+
+2. **Nagoya University Global 30 Undergraduate Scholarship** (Luar Negeri (Jepang) - S1)
+
+3. **Meiji University Meiji University Special Grant For Privately Financed International Students** (Luar Negeri (Jepang) - S1)
+
+4. **Soka University Undergraduate English Medium Program Scholarship** (Luar Negeri (Jepang) - S1)
+
+5. **Nagoya University Of Commerce Business Nucb Nucb Tuition Reduction Scholarship** (Luar Negeri (Jepang) - S1)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[2] Q: Beasiswa S2 di Korea Selatan
+A: Berikut daftar beasiswa jenjang S2 di Korea, Korea Selatan:
+
+1. **Ulsan National Institute Of Science And Technology Unist Scholarship** (Luar Negeri (Korea Selatan) - S2)
+
+2. **Korea Advanced Institute Of Science Technology Kaist Kaist Scholarship** (Luar Negeri (Korea Selatan) - S2)
+
+3. **Gwangju Institute Of Science And Technology Gist Gist Scholarships** (Luar Negeri (Korea Selatan) - S2, S3)
+
+4. **Lee Kuan Yew Scholarship** (Luar Negeri (Korea Selatan, Hong Kong, New Zealand, Arab Saudi, Afrika Selatan, Inggris, Amerika Serikat, Australia, Taiwan, Jepang, Korea, Belanda, Jerman, Swiss, Singapura, Malaysia, Turki, Kanada, Perancis, Qatar, China, Swedia, Belgia, Austria, Norwegia, Denmark, Finlandia, Italia, Spanyol, Portugal, Brasil, Meksiko, Rusia, Hungaria, Yunani, Irlandia) - S2)
+
+5. **Baldwin Fellowship** (Luar Negeri (Korea Selatan, Hong Kong, New Zealand, Arab Saudi, Afrika Selatan, Inggris, Amerika Serikat, Australia, Taiwan, Jepang, Korea, Belanda, Jerman, Swiss, Singapura, Malaysia, Turki, Kanada, Perancis, Qatar, China, Swedia, Belgia, Austria, Norwegia, Denmark, Finlandia, Italia, Spanyol, Portugal, Brasil, Meksiko, Rusia, Hungaria, Yunani, Irlandia) - S2, S3)
+
+Silakan pilih nomor beasiswa untuk melihat **detail** seperti **benefit**, **syarat**, **deadline**, atau **cara daftar**.
+------------------------------------------------------------
+
+[3] Q: Beasiswa S3 di Australia
+A: Berikut daftar beasiswa jenjang S3 di Australia:
+
+1. **Beasiswa Australia Awards Scholarship** (Luar Negeri (Australia) - S2, S3)
+
+2. **Research Training Program International Rtpi Scholarship University Of New South Wales** (Luar Negeri (Australia) - S3)
+
+3. **Australian National University Anu Hdr Fee Merit Scholarship** (Luar Negeri (Australia) - S2, S3)
+
+4. **Monash University Research Training Program Rtp Fees Offset** (Luar Negeri (Australia) - S2, S3)
+
+5. **Adelaide University Research Scholarships Aurs And Research Training Program Scholarships Rtps** (Luar Negeri (Australia) - S2, S3)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[4] Q: Beasiswa sarjana turki
+A: Berikut daftar beasiswa jenjang S1 di Turki:
+
+1. **Bilkent University Scholarships For International Students** (Luar Negeri (Turki) - S1)
+
+2. **Beasiswa Indonesia Bangkit (BIB) - Program Beasiswa Unggulan Keagamaan S1** (Luar Negeri (Bahrain, Iran, Irak, Kuwait, Lebanon, Oman, Palestina, State Of, Qatar, Arab Saudi, Mesir, Turki, Suriah, Uni Emirat Arab) & Dalam Negeri (Indonesia) - S1)
+
+3. **Social Service Scholarship** (Luar Negeri (Korea Selatan, Hong Kong, New Zealand, Arab Saudi, Afrika Selatan, Inggris, Amerika Serikat, Australia, Taiwan, Jepang, Korea, Belanda, Jerman, Swiss, Singapura, Malaysia, Turki, Kanada, Perancis, Qatar, China, Swedia, Belgia, Austria, Norwegia, Denmark, Finlandia, Italia, Spanyol, Portugal, Brasil, Meksiko, Rusia, Hungaria, Yunani, Irlandia) - S1)
+
+4. **Htx Home Team Science Technology Agency Scholarship** (Luar Negeri (Korea Selatan, Hong Kong, New Zealand, Arab Saudi, Afrika Selatan, Inggris, Amerika Serikat, Australia, Taiwan, Jepang, Korea, Belanda, Jerman, Swiss, Singapura, Malaysia, Turki, Kanada, Perancis, Qatar, China, Swedia, Belgia, Austria, Norwegia, Denmark, Finlandia, Italia, Spanyol, Portugal, Brasil, Meksiko, Rusia, Hungaria, Yunani, Irlandia) - S1)
+
+5. **Gic Scholarship Programme** (Luar Negeri (Korea Selatan, New Zealand, Inggris, Amerika Serikat, Australia, Taiwan, Korea, Belanda, Swiss, Singapura, Malaysia, Turki, Kanada, Perancis, China, Swedia, Belgia, Spanyol, Thailand, Vietnam, Filipina) | Dalam Negeri (Indonesia) - S1)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[5] Q: Beasiswa master Indonesia
+A: Berikut daftar beasiswa jenjang S2 di Indonesia, Indonesia:
+
+1. **Beasiswa The Future Leader (TFL) Scholarship Batch 18** (Dalam Negeri (Indonesia) - S2)
+
+2. **Beasiswa Indonesia Bangkit (BIB) Akselerasi Sarjana Lanjut Magister** (Dalam Negeri (Indonesia) - S1, S2)
+
+3. **Universitas Andalas International Scholarships** (Dalam Negeri (Indonesia) - S1, S2)
+
+4. **UPNVJT Scholarship for International Students** (Dalam Negeri (Indonesia) - S1, S2, S3)
+
+5. **Beasiswa Indonesia Bangkit (BIB) Double Degree Magister (S2)** (Luar Negeri (Inggris), Dalam Negeri (Indonesia) - S2)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[6] Q: Beasiswa phd irlandia
+A: Berikut daftar beasiswa jenjang S3 di Irlandia:
+
+1. **University Of Galway Hardiman Phd Scholarship** (Luar Negeri (Irlandia) - S3)
+
+2. **Baldwin Fellowship** (Luar Negeri (Korea Selatan, Hong Kong, New Zealand, Arab Saudi, Afrika Selatan, Inggris, Amerika Serikat, Australia, Taiwan, Jepang, Korea, Belanda, Jerman, Swiss, Singapura, Malaysia, Turki, Kanada, Perancis, Qatar, China, Swedia, Belgia, Austria, Norwegia, Denmark, Finlandia, Italia, Spanyol, Portugal, Brasil, Meksiko, Rusia, Hungaria, Yunani, Irlandia) - S2, S3)
+
+Silakan pilih nomor beasiswa untuk melihat **detail** seperti **benefit**, **syarat**, **deadline**, atau **cara daftar**.
+------------------------------------------------------------
+
+[7] Q: Beasiswa ke Jerman yang masih buka
+A: Mohon maaf, saya belum memiliki data beasiswa untuk lokasi/negara tersebut. 😊
+------------------------------------------------------------
+
+[8] Q: Beasiswa ke Inggris fully funded
+A: Berikut daftar beasiswa di Inggris:
+
+1. **The A S Hornby Educational Trust** (Luar Negeri (Inggris) - Fully Funded)
+
+2. **Oxford University Skoll Scholarships** (Luar Negeri (Inggris) - Fully Funded)
+
+3. **University Of Oxford Reach Oxford Scholarship** (Luar Negeri (Inggris) - Fully Funded)
+
+4. **University Of Stirling Karen Napier Scholarship Msc Investment Analysis** (Luar Negeri (Inggris) - Fully Funded)
+
+5. **Saf Engineering Scholarship Male Applicants** (Luar Negeri (Inggris, Amerika Serikat) - Fully Funded)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+
+#############################################################
+## KATEGORI 2: Filter Berdasarkan Jurusan
+#############################################################
+
+[9] Q: Beasiswa jurusan Informatika
+A: Berikut daftar beasiswa jurusan Informatika:
+
+1. **Beasiswa Berani Cerdas** (Dalam Negeri (Indonesia) - D3, D4, S1)
+
+2. **Beasiswa Program Afirmasi Putra Putri Petani IKN 2026** (Dalam Negeri (Indonesia) - S1)
+
+3. **The University Of Western Australia Global Excellence Scholarship** (Luar Negeri (Australia) - S1)
+
+4. **Htx Home Team Science Technology Agency Scholarship** (Luar Negeri (Korea Selatan, Hong Kong, New Zealand, Arab Saudi, Afrika Selatan, Inggris, Amerika Serikat, Australia, Taiwan, Jepang, Korea, Belanda, Jerman, Swiss, Singapura, Malaysia, Turki, Kanada, Perancis, Qatar, China, Swedia, Belgia, Austria, Norwegia, Denmark, Finlandia, Italia, Spanyol, Portugal, Brasil, Meksiko, Rusia, Hungaria, Yunani, Irlandia) - S1)
+
+5. **Axel Adler Scholarship University Of Gothenburg** (Luar Negeri (Swedia) - S2)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[10] Q: Beasiswa jurusan Kedokteran
+A: Berikut daftar beasiswa jurusan Kedokteran:
+
+1. **Manchester Metropolitan University Vice Chancellor S International Regional Scholarship** (Luar Negeri (Inggris) - S1)
+
+2. **Swinburne University Of Technology George Swinburne International Excellence Scholarships** (Luar Negeri (Australia) - S1)
+
+3. **Beasiswa Masuk PTN BAZNAS Tanah Datar 2026** (Dalam Negeri (Indonesia) - S1)
+
+4. **Beasiswa ADARO Universitas Gadjah Mada** (Dalam Negeri (Indonesia) - D4, S1)
+
+5. **University Of Sheffield International Undergraduate Scholarship** (Luar Negeri (Inggris) - S1)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[11] Q: Beasiswa jurusan Hukum
+A: Berikut daftar beasiswa jurusan Hukum:
+
+1. **University Of Tasmania Tasmanian International Scholarship** (Luar Negeri (Australia) - S1, S2)
+
+2. **The Indonesian AID Scholarship (TIAS)** (Dalam Negeri (Indonesia) - D3, D4, S1)
+
+3. **Peking University Peking University Scholarship Undergraduate Program Without Written Examination Chinese Taught** (Luar Negeri (China) - S1)
+
+4. **Swinburne University Of Technology Swinburne International Scholarship** (Luar Negeri (Australia) - S1)
+
+5. **Clark University Presidential Scholarship** (Luar Negeri (Amerika Serikat) - S1)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[12] Q: Beasiswa jurusan Teknik Informatika di Jepang
+A: Berikut daftar beasiswa jurusan Teknik Informatika, Teknik, Informatika di Jepang:
+
+1. **Shizuoka University Asia Bridge Program Abp Scholarship** (Luar Negeri (Jepang))
+
+2. **Mext University Recommendation Sess Gecha Program The Graduate School Of Informatics And Engineering University Of Elect** (Luar Negeri (Jepang))
+
+3. **Waseda University Waseda University Scholarship Faculty Of Science And Engineering** (Luar Negeri (Jepang))
+
+4. **Mext University Recommendation International Joint Education Program For Science And Technology Ijep Kumamoto University** (Luar Negeri (Jepang))
+
+5. **Kyoto University Of Advanced Science Kuas Super Kuas E Scholarship** (Luar Negeri (Jepang))
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[13] Q: Beasiswa S2 Data Science
+A: Berikut daftar beasiswa jenjang S2:
+
+1. **Zhejiang University Zju Chinese Government Scholarship Youth Of Excellence Scheme Of China Yes China** (S2)
+
+2. **Erasmus European Master In Global Studies Emgs** (S2)
+
+3. **Asian Development Bank Japan Scholarship Program Adb Jsp Lahore University Of Management Sciences** (S2)
+
+4. **National Dong Hwa University Ndhu Ndhu International Student Scholarship** (S2)
+
+5. **Ku Leuven Ku Leuven Asean Scholarship** (S2)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+
+#############################################################
+## KATEGORI 3: Filter Berdasarkan Status Pendanaan
+#############################################################
+
+[14] Q: Beasiswa dengan uang saku
+A: Berikut daftar beasiswa :
+
+1. **Erasmus Architectural And Urban Contemporary Heritage Arurcohe Programme** (Luar Negeri (Italia, Spanyol) - S2)
+
+2. **Education University Of Hong Kong Scholarship** (Luar Negeri (Hong Kong) - S1)
+
+3. **Zhejiang University Zju Lead Scholarship For New Mbbs Students International School Of Medicine Zhejiang University Zju** (Luar Negeri (China) - S1)
+
+4. **Beasiswa Gerak Tumbuh 2026** (Dalam Negeri (Indonesia) - S1,S2,S3)
+
+5. **Erasmus Economic Policies For The Global Bifurcation Epog** (Luar Negeri (Afrika Selatan, Jerman, Perancis, Austria, Italia) - S2)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[15] Q: Beasiswa pendanaan project
+A: Berikut daftar beasiswa :
+
+1. **Erasmus Mundus Joint Master Degree In Data Engineering And Artificial Intelligence Deai** (Luar Negeri (Perancis, Austria, Italia) - S2)
+
+2. **Beasiswa Berani Cerdas** (Dalam Negeri (Indonesia) - D3, D4, S1)
+
+3. **Australia Awards Scholarship** (Luar Negeri (Australia) - S2)
+
+4. **BEASISWA BINTANG MANDIRI ANGKATAN 6 - UNTUK MAHASISWA AKTIF S1 DI SELURUH Indonesia** (Dalam Negeri (Indonesia) - S1)
+
+5. **Ritsumeikan Asia Pacific University Apu Apu Tuition Fee Reduction Scholarship** (Luar Negeri (Jepang) - S1)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[16] Q: Beasiswa yang menanggung tiket pesawat
+A: Berikut daftar beasiswa :
+
+1. **Erasmus Mundus Master Of Science In Public Sector Innovation And E Governance Pioneer** (Luar Negeri (Jerman, Belgia) - S2)
+
+2. **Southern Taiwan University Of Science And Technology The Stust Scholarship For International Students** (Luar Negeri (Taiwan) - S3)
+
+3. **Erasmus Mundus Joint Master Degree In Data Engineering And Artificial Intelligence Deai** (Luar Negeri (Perancis, Austria, Italia) - S2)
+
+4. **Great Scholarships Postgraduate Anglia Ruskin Univeristy** (Luar Negeri (Inggris) - S2)
+
+5. **Erasmus Mundus Joint Master S In European Environmental Economics And Policy M3Ep** (Luar Negeri (Ceko, Jerman, Denmark, Italia, Polandia) - S2)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[17] Q: Beasiswa yang menanggung biaya hidup
+A: Berikut daftar beasiswa :
+
+1. **Nl Scholarships University Of Utrecht** (Pendanaan Sebagian (Parsial))
+
+2. **Middle East Technical University Metu Ankara Campus Scholarship For International Graduate Students** (Pendanaan Sebagian (Parsial))
+
+3. **University Central Lancashire Excellence Scholarhip** (Pendanaan Sebagian (Parsial))
+
+4. **Queensland University Of Technology International Merit Scholarship** (Pendanaan Sebagian (Parsial))
+
+5. **La Trobe University La Trobe High Achiever Scholarship** (Pendanaan Sebagian (Parsial))
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[18] Q: Beasiswa yang menanggung biaya kuliah saja
+A: Berikut daftar beasiswa :
+
+1. **Bilkent University S2 S3** (Pendanaan Penuh (Full Gratis))
+
+2. **Erasmus Mundus Joint Master Functional Advanced Materials Engineering With Artificial Intelligence For Sustainability Fa** (Pendanaan Penuh (Full Gratis))
+
+3. **Beasiswa SEMEN Indonesia Batch 2** (Pendanaan Penuh (Full Gratis))
+
+4. **Chinese Government Scholarship (CSC) – Belt and Road Program (Type B)** (Pendanaan Penuh (Full Gratis))
+
+5. **Danish Government Scholarship Aalborg University** (Pendanaan Penuh (Full Gratis))
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+
+#############################################################
+## KATEGORI 4: Filter Berdasarkan Tujuan Studi
+#############################################################
+
+[19] Q: Beasiswa dalam negeri
+A: Berikut daftar beasiswa di Indonesia:
+
+1. **Beasiswa S2 Kominfo Dalam Negeri Tahun 2024 untuk Masyarakat Umum dan PNS/TNI/POLRI** (Dalam Negeri (Indonesia))
+
+2. **Beasiswa CIMB Niaga** (Dalam Negeri (Indonesia))
+
+3. **Beasiswa Progam Pendidikan Kebanksentralan** (Dalam Negeri (Indonesia))
+
+4. **Beasiswa Prima Bankaltimtara 2026** (Dalam Negeri (Indonesia))
+
+5. **Beasiswa Mandiri Muda Scholarship Batch 2** (Dalam Negeri (Indonesia))
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[20] Q: Beasiswa luar negeri
+A: Berikut daftar beasiswa :
+
+1. **Wesleyan University Freeman Asian Scholarship Program** (Luar Negeri (Amerika Serikat))
+
+2. **Singapore Land Authority Sla Undergraduate Scholarship** (Luar Negeri (Korea Selatan, Hong Kong, New Zealand, Arab Saudi, Afrika Selatan, Inggris, Amerika Serikat, Australia, Taiwan, Jepang, Korea, Belanda, Jerman, Swiss, Singapura, Malaysia, Turki, Kanada, Perancis, Qatar, China, Swedia, Belgia, Austria, Norwegia, Denmark, Finlandia, Italia, Spanyol, Portugal, Brasil, Meksiko, Rusia, Hungaria, Yunani, Irlandia))
+
+3. **National Library Board Nlb Scholarship** (Luar Negeri (Korea Selatan, Hong Kong, New Zealand, Arab Saudi, Afrika Selatan, Inggris, Amerika Serikat, Australia, Taiwan, Jepang, Korea, Belanda, Jerman, Swiss, Singapura, Malaysia, Turki, Kanada, Perancis, Qatar, China, Swedia, Belgia, Austria, Norwegia, Denmark, Finlandia, Italia, Spanyol, Portugal, Brasil, Meksiko, Rusia, Hungaria, Yunani, Irlandia))
+
+4. **Ritsumeikan University Tuition Reduction Scholarship For International Students College Of Global Liberal Arts Gla** (Luar Negeri (Jepang))
+
+5. **Vlir Uos Scholarship Advanced Master Of Governance And Development University Of Antwerp** (Luar Negeri (Belgia))
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[21] Q: Beasiswa pertukaran pelajar
+A: Berikut daftar beasiswa :
+
+1. **David Sainsbury Scholarships in Global Plant Health** (Luar Negeri (Inggris) - S2)
+
+2. **Erasmus Mundus Joint Master In Global Environment And Development Merged** (Luar Negeri (Denmark, Italia, Polandia) - S2)
+
+3. **University Of Luxembourg Guillaume Dupaix International Master S Scholarship** (Luar Negeri (Luxembourg) - S2)
+
+4. **Beasiswa Peduli Orangutan** (Dalam Negeri (Indonesia) - S1)
+
+5. **Stipendium Hungaricum Scholarship Program Phillipines** (Luar Negeri (Hungaria) - S1, S2, S3)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[22] Q: Beasiswa short course
+A: Berikut daftar beasiswa :
+
+1. **Erasmus Masters Journalism Media And Globalisation Mundus Journalism Emma Mundus Journalism Consortium Scholarships** (Luar Negeri (Afrika Selatan, Ceko, Inggris, Amerika Serikat, Australia, Belanda, Jerman, China, Denmark) - S2)
+
+2. **Beasiswa Malaysia International Scholarship (MIS)** (Luar Negeri (Malaysia) - S2, S3)
+
+3. **Middle East United Arab Emirates University Uaeu Chancellor S Scholarship For Outsanding Students** (Luar Negeri (Arab Saudi) - S1)
+
+4. **Beasiswa Prima Bankaltimtara 2026** (Dalam Negeri (Indonesia) - D3, D4, S1)
+
+5. **James Cook University International Excellence Scholarship** (Luar Negeri (Australia) - S1)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[23] Q: Beasiswa double degree
+A: Berikut daftar beasiswa :
+
+1. **Beasiswa Mahasiswa Berprestasi 2026** (Dalam Negeri (Indonesia) - D3, S1)
+
+2. **University Of Bonn Deutschlandstipendium Scholarship** (Luar Negeri (Jerman) - S1, S2)
+
+3. **Beasiswa Pendidikan Pemprov Kepulauan Riau** (Dalam Negeri (Indonesia) - D3, D4, S1, S2)
+
+4. **Beasiswa FIFGROUP Young Leader (FYL)** (Dalam Negeri (Indonesia) - S1)
+
+5. **Asean Undergraduate Scholarship Singapore Management University Smu** (Luar Negeri (Singapura) - S1)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+
+#############################################################
+## KATEGORI 5: Filter Berdasarkan Persyaratan Bahasa
+#############################################################
+
+[24] Q: Beasiswa tanpa IELTS
+A: Ada beberapa beasiswa yang tidak mewajibkan TOEFL/IELTS, seperti beasiswa Turkiye Burslari (Turki), GKS (Korea - jalur tertentu), atau beasiswa Pemerintah Rusia. Beberapa beasiswa dalam negeri juga banyak yang tidak memerlukan sertifikat bahasa Inggris. Mau saya carikan yang spesifik? 😊
+------------------------------------------------------------
+
+[25] Q: Beasiswa tanpa TOEFL
+A: Ada beberapa beasiswa yang tidak mewajibkan TOEFL/IELTS, seperti beasiswa Turkiye Burslari (Turki), GKS (Korea - jalur tertentu), atau beasiswa Pemerintah Rusia. Beberapa beasiswa dalam negeri juga banyak yang tidak memerlukan sertifikat bahasa Inggris. Mau saya carikan yang spesifik? 😊
+------------------------------------------------------------
+
+[26] Q: Beasiswa dengan IELTS 6.0
+A: IELTS (International English Language Testing System) dan TOEFL (Test of English as a Foreign Language) adalah tes standar internasional untuk mengukur kemampuan bahasa Inggris yang sering menjadi syarat utama pendaftaran beasiswa luar negeri.
+------------------------------------------------------------
+
+[27] Q: Beasiswa yang menerima Duolingo
+A: Berikut daftar beasiswa :
+
+1. **Beasiswa Prima Bankaltimtara 2026** (Dalam Negeri (Indonesia) - D3, D4, S1)
+
+2. **Oxford University Oxford Pershing Square Graduate Scholarships 1 1 Mba Programme** (Luar Negeri (Inggris) - S2)
+
+3. **Beasiswa LPDP - Australia Awards Scholarships (AAS)** (Luar Negeri (Australia) - S2)
+
+4. **Asean Undergraduate Scholarship Singapore Management University Smu Singapore Cambridge Gce A Level** (Luar Negeri (Singapura) - S1)
+
+5. **Umea University Ume University Scholarship For International Students** (Luar Negeri (Swedia) - S1)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+
+#############################################################
+## KATEGORI 6: Filter Berdasarkan Waktu
+#############################################################
+
+[28] Q: Beasiswa yang buka bulan Januari
+A: Berikut daftar beasiswa :
+
+1. **Rmit University Academic Merit Scholarship** - 2 Januari 2026
+
+2. **University College London Research Excellence Scholarship** - 9 Januari 2026
+
+3. **University Of Reading Vice Chancellor S Global Scholarship Awards** - 14 Januari 2026
+
+4. **Gwangju Institute Of Science And Technology Gist** - 23 Januari 2026
+
+5. **University Of Science And Technology Of China Ustc Fellowship For Master S Programs** - 31 Januari 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[29] Q: Beasiswa yang buka bulan Februari
+A: Berikut daftar beasiswa :
+
+1. **Vlir Uos Scholarship Advanced Master Of Governance And Development University Of Antwerp** - 1 Februari 2026
+
+2. **Beasiswa Telkom University** - 20 Februari 2026
+
+3. **Vlir Uos Scholarship Master Of Transportation Sciences Road Safety 2 Years Hasselt University** - 1 Februari 2026
+
+4. **China Aun Scholarship** - 16 Februari 2026
+
+5. **Icp Connect Scholarship Vliruos Master In Sustainable Development 2 Years Ku Leuven** - 1 Februari 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[30] Q: Beasiswa yang buka tahun 2027
+A: Berikut beasiswa tahun 2027 (menampilkan 5 dari 5 data secara acak):
+
+1. **Beasiswa Sapienza University of Rome 2026-2027** - Luar Negeri (Italia) (S2, S3)
+
+2. **Beasiswa Swedish Institute Scholarships for Global Professional** - Luar Negeri (Swedia) (S2)
+
+3. **Boustany Foundation Scholarship Mba Harvard University** - Luar Negeri (Amerika Serikat) (S2)
+
+4. **International Scholarship Program 2026/2027 Universitas Islam Negeri Raden Mas Said Surakarta** - Dalam Negeri (Indonesia) (S1)
+
+5. **Beasiswa Erasmus Mundus Joint Master** - Luar Negeri (Jerman, Prancis, Italia, Belanda)
+ (S2)
+
+Silakan ketik nomor beasiswa (misal: **pilih no 3**) untuk melihat **detail** seperti **benefit**, **syarat**, **deadline**, atau **cara daftar**.
+------------------------------------------------------------
+
+[31] Q: Beasiswa yang dibuka setiap tahun
+A: Berikut daftar beasiswa :
+
+1. **University Of Macau International Student Scholarship** (Luar Negeri (Macau) - S1)
+
+2. **Erasmus European Master In Public Health Europubhealth** (Luar Negeri (Inggris, Belanda, Perancis, Belgia, Italia, Spanyol, Polandia) - S2)
+
+3. **Rmit University Academic Merit Scholarship** (Luar Negeri (Australia) - S1)
+
+4. **Daad Epos International Education Management Inema Ph Ludwigsburg Helwan University** (Luar Negeri (Jerman, Mesir) - S2)
+
+5. **Mext University Recommendation Sess Gecha Program The Graduate School Of Informatics And Engineering University Of Elect** (Luar Negeri (Jepang) - S2, S3)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+
+#############################################################
+## KATEGORI 7: Filter Deadline Terdekat
+#############################################################
+
+[32] Q: Beasiswa deadline terdekat apa saja?
+A: Berikut daftar beasiswa :
+
+1. **Beasiswa Amartha STEAM Fellowship** - 21 Juni 2026
+
+2. **Beasiswa Garuda - KEMDIKTISAINTEK** - Gelombang II : 25 Juni 2026
+
+3. **Monash University Monash International Merit Scholarship** - 30 Juni 2026
+
+4. **Queensland University Of Technology International Merit Scholarship** - 30 Juni 2026
+
+5. **Queensland University Of Technology Qut Excellence Scholarship Academic** - 30 Juni 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[33] Q: Beasiswa yang akan tutup dalam waktu dekat
+A: Berikut daftar beasiswa :
+
+1. **Asean Undergraduate Scholarship National University Of Singapore Nus Kurikulum Nasional** (Luar Negeri (Singapura)) - 23 Februari 2026
+
+2. **Sciencespo The Emile Boutmy Scholarship** (Luar Negeri (Perancis)) - 20 Januari 2026
+
+3. **Great Scholarships Postgraduate University Of York** (Luar Negeri (Inggris)) - 11 Mei 2026
+
+4. **National Cheng Kung University Ncku Distinguished International Student Scholarship** (Luar Negeri (Taiwan)) - 10 September 2026
+
+5. **Beasiswa Pelajar Bontang BESCA 2026 dari Badak LNG** (Dalam Negeri (Indonesia)) - 11 Februari 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[34] Q: Beasiswa yang segera ditutup
+A: Berikut daftar beasiswa :
+
+1. **Saf Engineering Scholarship Male Applicants** (Luar Negeri (Inggris, Amerika Serikat) - S1)
+
+2. **Chang Gung University Cgu Scholarships For International Master S Students** (Luar Negeri (Taiwan) - S2)
+
+3. **Beasiswa Indonesian Gold Generation Scholarship** (Dalam Negeri (Indonesia) - SMA, S1)
+
+4. **Beasiswa KSE (Karya Salemba Empat)** (Dalam Negeri (Indonesia) - D4, S1)
+
+5. **Mcmaster University Entrance Scholarship** (Luar Negeri (Kanada) - S1)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[35] Q: Beasiswa yang pendaftarannya akan berakhir
+A: Berikut daftar beasiswa :
+
+1. **Lingnan University Non Local Student Scholarships** (Luar Negeri (Hong Kong) - S1)
+
+2. **OIST Research Internship Program 2026** (Luar Negeri (Jepang) - S1, S2)
+
+3. **Fudan University International Students Scholarship Global Bachelor Of Fintech Gbf English Taught** (Luar Negeri (China) - S1)
+
+4. **Beasiswa SHARE (Social, Humanities, Art for People, Religious Studies, Economics)** (Dalam Negeri (Indonesia) - S2,S3)
+
+5. **University Of Macau International Student Scholarship** (Luar Negeri (Macau) - S1)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[36] Q: Deadline beasiswa terdekat
+A: Berikut daftar beasiswa :
+
+1. **Beasiswa Amartha STEAM Fellowship** - 21 Juni 2026
+
+2. **Beasiswa Garuda - KEMDIKTISAINTEK** - Gelombang II : 25 Juni 2026
+
+3. **Monash University Monash International Merit Scholarship** - 30 Juni 2026
+
+4. **Queensland University Of Technology International Merit Scholarship** - 30 Juni 2026
+
+5. **Queensland University Of Technology Qut Excellence Scholarship Academic** - 30 Juni 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[37] Q: Beasiswa yang tutup minggu ini
+A: Berikut daftar beasiswa :
+
+1. **Erasmus Mundus Joint Master International Law Of Global Security Peace And Development Ilgspd Erasmus Mundus Scholarship** - 1 Februari 2026
+
+2. **Ajinomoto Scholarship** - 5 Maret 2026
+
+3. **University Of Waterloo President S Scholarships** - 15 Januari 2026
+
+4. **Edith Cowan University International Undergraduate Scholarship** - 8 Agustus 2026
+
+5. **Beasiswa Universitas Islam Madinah** - 01 Des 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[38] Q: Beasiswa yang tutup bulan ini
+A: Mohon maaf, saya tidak menemukan beasiswa yang sesuai dengan pencarian tersebut. 😊
+------------------------------------------------------------
+
+
+#############################################################
+## KATEGORI 8: Filter Deadline Bulan
+#############################################################
+
+[39] Q: Beasiswa yang tutup bulan Januari
+A: Berikut daftar beasiswa :
+
+1. **Nanyang Technology University Ntu Ntu Research Scholarship** - 31 Januari 2026
+
+2. **Asian Development Bank Japan Scholarship Program Adb Jsp National University Of Singapore Master Of Business Administrat** - 15 Januari 2026
+
+3. **Erasmus Excellence In Analytical Chemistry Each** - 5 Januari 2026
+
+4. **Mcgill University One Year Entrance Scholarships** - 15 Januari 2026
+
+5. **Mext University Recommendation Sess Gecha Program The Graduate School Of Informatics And Engineering University Of Elect** - 7 Januari 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[40] Q: Beasiswa yang tutup bulan Februari
+A: Berikut daftar beasiswa :
+
+1. **Erasmus Mundus Joint Master International Law Of Global Security Peace And Development Ilgspd Erasmus Mundus Scholarship** - 1 Februari 2026
+
+2. **University Of Saskatchewan International Excellence Award** - 15 Februari 2026
+
+3. **Master Mind Scholarship University Of Antwerp** - 1 Februari 2026
+
+4. **Icp Connect Scholarship Vliruos Advanced Mater Of Cultural Antropology And Development Studies Cades 1 Year Ku Leuven** - 1 Februari 2026
+
+5. **Tsinghua University Institutional Scholarship** - 28 Februari 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[41] Q: Beasiswa yang tutup bulan Maret
+A: Berikut daftar beasiswa :
+
+1. **Singapore Management University Smu Dato Kho Hui Meng Scholarship** - 19 Maret 2026
+
+2. **Middle East United Arab Emirates University Uaeu Phd Fellowship** - 31 Maret 2026
+
+3. **Beasiswa EVE – Politeknik Negeri Jakarta** - 07 Maret 2026
+
+4. **University Of Luxembourg Guillaume Dupaix International Master S Scholarship** - 31 Maret 2026
+
+5. **Asean Undergraduate Scholarship Singapore University Of Technology And Design Sutd** - 2 Maret 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[42] Q: Beasiswa yang tutup bulan April
+A: Berikut daftar beasiswa :
+
+1. **University Of Macau International Student Scholarship** - 9 April 2026
+
+2. **Beasiswa Pemerintah Latvia** - 01 Apr 2026
+
+3. **Tianjin University Chinese Government Scholarship Silk Road Program Chinese Taught** - 1 April 2026
+
+4. **National Dong Hwa University Ndhu Ndhu International Student Scholarship** - 14 April 2026
+
+5. **Beasiswa Data Print Periode 1** - 05 Apr 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[43] Q: Beasiswa yang dibuka bulan Januari
+A: Berikut daftar beasiswa :
+
+1. **Erasmus International Master In Technology And Management For Circular Economy Imatec** - 31 Januari 2026
+
+2. **Erasmus Managing Art And Cultural Heritage In Global Markets Magma** - 19 Januari 2026
+
+3. **Oxford University Oxford Pershing Square Graduate Scholarships 1 1 Mba Programme** - 7 Januari 2026
+
+4. **Copenhagen Business School Cbs Scholarship** - 15 Januari 2026
+
+5. **University Helsinki University Of Helsinki Scholarship Programme** - 16 Januari 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[44] Q: Beasiswa yang dibuka bulan Juni
+A: Berikut daftar beasiswa :
+
+1. **Beasiswa SMARTPATH 2026** - 15 Juni 2026
+
+2. **Universiti Teknologi Petronas Utp Graduate Assistantship Scheme Ga** - 30 Juni 2026
+
+3. **Beasiswa Al-Qasimia University Uni Emirat Arab** - 30 Jun 2026
+
+4. **After Enrollment International Human Resource Network Organization Foundation Ihno Scholarship** - 1 Juni 2026
+
+5. **Manchester Metropolitan University Vice Chancellor S International Regional Scholarship** - 30 Juni 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[45] Q: Beasiswa yang dibuka bulan September
+A: Berikut daftar beasiswa :
+
+1. **Curtin University Curtin Global Merit Scholarship** - 1 September 2026
+
+2. **Chang Gung University Cgu Scholarships For International Doctoral Students** - 25 September 2026
+
+3. **Chang Gung University Cgu Scholarships For International Master S Students** - 25 September 2026
+
+4. **National Taiwan Normal University Ntnu Ntnu International Student Scholarship** - 14 September 2026
+
+5. **Deakin University International Scholarship** - 25 September 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[46] Q: Beasiswa S1 yang tutup bulan Mei
+A: Berikut daftar beasiswa jenjang S1:
+
+1. **Hong Kong Baptist University Admission Scholarship Scheme For Overseas Applicants** (S1) - 31 Mei 2026
+
+2. **Beasiswa Indonesia Bangkit (BIB) Akselerasi Sarjana Lanjut Magister** (S1, S2) - 31 Mei 2026
+
+3. **Beasiswa Cendekia BAZNAS Albukhary International University** (S1) - 25 Mei 2026
+
+4. **University Of Bonn Deutschlandstipendium Scholarship** (S1, S2) - 18 Mei 2026
+
+5. **Inha University Scholarship System For Freshman Students Sgcs Students** (S1) - 13 Mei 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[47] Q: Beasiswa luar negeri yang deadline bulan Juni
+A: Berikut daftar beasiswa :
+
+1. **Queensland University Of Technology International Merit Scholarship** (Luar Negeri (Australia)) - 30 Juni 2026
+
+2. **Jiangsu University Jsu Presidential Scholarship** (Luar Negeri (China)) - 30 Juni 2026
+
+3. **After Enrollment International Human Resource Network Organization Foundation Ihno Scholarship** (Luar Negeri (Jepang)) - 1 Juni 2026
+
+4. **The University Of Western Australia Uwa International Student Award** (Luar Negeri (Australia)) - 8 Juni 2026
+
+5. **Universiti Teknologi Petronas Utp Graduate Assistantship Scheme Ga** (Luar Negeri (Malaysia)) - 30 Juni 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[48] Q: Beasiswa master yang deadline bulan September
+A: Berikut daftar beasiswa jenjang S2:
+
+1. **Curtin University John Curtin Global Excellence Scholarship** (S1, S2) - 1 September 2026
+
+2. **Chang Gung University Cgu Scholarships For International Master S Students** (S2) - 25 September 2026
+
+3. **Curtin University Curtin Global Merit Scholarship** (S1, S2) - 1 September 2026
+
+4. **Deakin University International Scholarship** (S1, S2) - 25 September 2026
+
+5. **Deakin University Vice Chancellor S International Scholarship** (S1, S2) - 25 September 2026
+
+Silakan pilih nomor beasiswa untuk melihat **detail** seperti **benefit**, **syarat**, **deadline**, atau **cara daftar**.
+------------------------------------------------------------
+
+
+#############################################################
+## KATEGORI 9: Berdasarkan Tahun
+#############################################################
+
+[49] Q: Beasiswa yang tutup tahun 2026
+A: Berikut beasiswa tahun 2026 (menampilkan 5 dari 105 data secara acak):
+
+1. **Middle East United Arab Emirates University Uaeu Chancellor S Scholarship For Talented Students** - Luar Negeri (Arab Saudi) (S1)
+
+2. **Nl Scholarships Universities Of Applied Sciences** - Luar Negeri (Belanda) (S2)
+
+3. **Beasiswa ILF 2026 Bantuan Biaya Kuliah untuk Calon Mahasiswa Kristen dan Katolik ** - Dalam Negeri (Indonesia) (S1)
+
+4. **Vlir Uos Scholarship Master Of Aquaculture Imaqua 2 Years Ghent University** - Luar Negeri (Belgia) (S2)
+
+5. **Leeds Beckett University Global Award Scholarship** - Luar Negeri (Inggris) (S2)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya, atau ketik nomor beasiswa (misal: **pilih no 3**) untuk melihat **detail**.
+------------------------------------------------------------
+
+[50] Q: Beasiswa yang masih buka tahun 2026
+A: Berikut beasiswa tahun 2026 (menampilkan 5 dari 105 data secara acak):
+
+1. **Beasiswa Chevening** - Luar Negeri (Inggris) (S2)
+
+2. **Chinese Government Scholarship China Indonesia Scholarship In Higher Education Program** - Luar Negeri (China) (S3)
+
+3. **Ontario Graduate Scholarship Ogs Program University Of Guelph** - Luar Negeri (Kanada) (S2, S3)
+
+4. **Chang Gung University Academic Scholarship For Outstanding Students Undergraduate Programs** - Luar Negeri (Taiwan) (S1)
+
+5. **Chulalongkorn University Ise Scholarship For Foreign Students** - Luar Negeri (Thailand) (S1)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya, atau ketik nomor beasiswa (misal: **pilih no 3**) untuk melihat **detail**.
+------------------------------------------------------------
+
+[51] Q: Beasiswa tahun 2027 yang sudah dibuka
+A: Berikut beasiswa tahun 2027 (menampilkan 5 dari 5 data secara acak):
+
+1. **Beasiswa Swedish Institute Scholarships for Global Professional** - Luar Negeri (Swedia) (S2)
+
+2. **Beasiswa Erasmus Mundus Joint Master** - Luar Negeri (Jerman, Prancis, Italia, Belanda)
+ (S2)
+
+3. **Beasiswa Sapienza University of Rome 2026-2027** - Luar Negeri (Italia) (S2, S3)
+
+4. **Boustany Foundation Scholarship Mba Harvard University** - Luar Negeri (Amerika Serikat) (S2)
+
+5. **International Scholarship Program 2026/2027 Universitas Islam Negeri Raden Mas Said Surakarta** - Dalam Negeri (Indonesia) (S1)
+
+Silakan ketik nomor beasiswa (misal: **pilih no 3**) untuk melihat **detail** seperti **benefit**, **syarat**, **deadline**, atau **cara daftar**.
+------------------------------------------------------------
+
+
+#############################################################
+## KATEGORI 10: Deadline Belum Lewat
+#############################################################
+
+[52] Q: Beasiswa yang masih buka
+A: Berikut daftar beasiswa :
+
+1. **Jiangsu University Jsu Presidential Scholarship** - 30 Juni 2026
+
+2. **Queensland University Of Technology International Merit Scholarship** - 30 Juni 2026
+
+3. **Charles Darwin University Cdu Global Merit Scholarship** - 9 Oktober 2026
+
+4. **Beasiswa Bayan Peduli** - 2026-09-15 00:00:00
+
+5. **National Taiwan Normal University Ntnu Ntnu International Student Scholarship** - 14 September 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[53] Q: Beasiswa yang masih menerima pendaftaran
+A: Berikut daftar beasiswa :
+
+1. **University Of Science And Technology Of China Ustc Fellowship For Master S Programs** (Luar Negeri (China) - S2)
+
+2. **Walailak University Master S Degree Cholarship** (Luar Negeri (Thailand) - S2)
+
+3. **Beasiswa GrabScholar** (Dalam Negeri (Indonesia) - SMP,SMA, D4, S1)
+
+4. **University Of Waterloo Merit Scholarship** (Luar Negeri (Kanada) - S1)
+
+5. **University Of Colorado Denver Merit Scholarship** (Luar Negeri (Amerika Serikat) - S1)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[54] Q: Beasiswa yang deadlinenya belum lewat
+A: Berikut daftar beasiswa :
+
+1. **Beasiswa Mahasiswi Kabupaten Sragen Tahun 2026** - 31 Agustus 2026
+
+2. **Boustany Foundation Scholarship Mba Harvard University** - 31 Mei 2027
+
+3. **Charles Sturt University Vice Chancellor International Excellence Scholarship** - 30 Juni 2026
+
+4. **Beasiswa Pendidikan Indonesia untuk Guru dan Calon Guru GRATIS Kuliah D4/S1 Tahun 2026** - 2026-09-27 00:00:00
+
+5. **Beasiswa Universitas Islam Madinah** - 01 Des 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[55] Q: Beasiswa yang masih aktif
+A: Berikut daftar beasiswa :
+
+1. **University Of Wollongong University Excellence Scholarships** - 5 September 2026
+
+2. **Peking University Peking University Scholarship Undergraduate Program Without Written Examination Chinese Taught** - 10 Juli 2026
+
+3. **Charles Darwin University Cdu Global Merit Scholarship** - 9 Oktober 2026
+
+4. **Beasiswa Master of Commerce Scholarship** - 31 Agt 2026
+
+5. **Great Scholarships Postgraduate Buckinghamshire New University** - 1 Agustus 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[56] Q: Beasiswa yang sedang dibuka
+A: Berikut daftar beasiswa :
+
+1. **Peking University Beijing Government Scholarship For International Students Undergraduate Program Entrance Examination C** (Luar Negeri (China) - S1)
+
+2. **Smart Nation Scholarship** (Semua Negara - S1)
+
+3. **National Taiwan Normal University Ntnu Ntnu International Student Scholarship** (Luar Negeri (Taiwan) - S1)
+
+4. **Harbin Institute Of Technology Shenzen Hitsz Entrance Scholarship** (Luar Negeri (China) - S1)
+
+5. **Vlir Uos Scholarship Advanced Master Of Governance And Development University Of Antwerp** (Luar Negeri (Belgia) - S2)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[57] Q: Beasiswa yang open registration
+A: Berikut daftar beasiswa :
+
+1. **Tianjin University Scholarship For Chemical Engineering And Technology Program Tjuscet** (Luar Negeri (China) - S1)
+
+2. **Nanyang Technology University Ntu Ntu Research Scholarship** (Luar Negeri (Singapura) - S2, S3)
+
+3. **Erasmus Master In Law Data And Artificial Intelligence Emildai** (Luar Negeri (Perancis, Italia, Spanyol, Irlandia) - S2)
+
+4. **University Of Manchester Global Futures Scholarships** (Luar Negeri (Inggris) - S2)
+
+5. **University College London Research Excellence Scholarship** (Luar Negeri (Inggris) - S3)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+
+#############################################################
+## KATEGORI 11: Filter Berdasarkan Jenjang
+#############################################################
+
+[58] Q: Deadline beasiswa S1
+A: Berikut daftar beasiswa jenjang S1:
+
+1. **Mcgill University Major Entrance Scholarships** (S1) - 15 Januari 2026
+
+2. **Cape Breton University Entrance Scholarship** (S1) - 15 April 2026
+
+3. **Rikkyo University Rikkyo Promising Future Scholarship Rpfs** (S1) - 2 Februari 2026
+
+4. **Monash University Monash International Leadership Scholarship** (S1) - 30 Juni 2026
+
+5. **Sciencespo The Emile Boutmy Scholarship** (S1) - 20 Januari 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[59] Q: Deadline beasiswa S2
+A: Berikut daftar beasiswa jenjang S2:
+
+1. **Shizuoka University Asia Bridge Program Abp Scholarship** (S2) - 13 Maret 2026
+
+2. **Asian Development Bank Japan Scholarship Program Adb Jsp Asian Institute Of Technology** (S2) - 31 Maret 2026
+
+3. **Adelaide University Research Scholarships Aurs And Research Training Program Scholarships Rtps** (S2, S3) - 1 Februari 2026
+
+4. **David Sainsbury Scholarships in Global Plant Health** (S2) - 31 Mei 2026
+
+5. **Sophia University New Student Scholarships Benefactors Adachi Scholarship Graduate Programs Global Environmental Studies** (S2) - 8 April 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[60] Q: Deadline beasiswa S3
+A: Berikut daftar beasiswa jenjang S3:
+
+1. **Beasiswa S1, S2 & S3 Toeti Heraty** (S1, S2, S3) - 08 Apr 2026
+
+2. **Indonesia Austria Scholarship Programme Iasp** (S3) - 1 Maret 2026
+
+3. **Beasiswa Skoltech University Russia** (S2, S3) - 27 Apr 2026
+
+4. **Beasiswa MOFCOM Program ISSCAD (Program Magister & Doktor)** (S2, S3) - 24 Apr 2026
+
+5. **Middle East United Arab Emirates University Uaeu Phd Fellowship** (S3) - 31 Maret 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[61] Q: Beasiswa sarjana yang masih buka
+A: Berikut daftar beasiswa jenjang S1:
+
+1. **beasiswa kartu indonesia pintar kuliah (KIP Kuliah)** (D3, D4,S1) - 31 oktober 2026
+
+2. **Beasiswa Amartha STEAM Fellowship** (S1) - 21 Juni 2026
+
+3. **Curtin University John Curtin Global Excellence Scholarship** (S1, S2) - 1 September 2026
+
+4. **Monash University Monash International Merit Scholarship** (S1) - 30 Juni 2026
+
+5. **University Of Wollongong University Excellence Scholarships** (S1) - 5 September 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[62] Q: Beasiswa master yang masih buka
+A: Berikut daftar beasiswa jenjang S2:
+
+1. **Universiti Teknologi Petronas Utp Graduate Assistantship Scheme Ga** (S2) - 30 Juni 2026
+
+2. **Beasiswa Swedish Institute Scholarships for Global Professional** (S2) - 20 Feb 2027
+
+3. **Deakin University Vice Chancellor S International Scholarship** (S1, S2) - 25 September 2026
+
+4. **Chang Gung University Cgu Scholarships For International Master S Students** (S2) - 25 September 2026
+
+5. **Beasiswa Unggulan - Mahasiswa & Masyakarat berprestasi** (S1, S2, SMA) - 27 Jul 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[63] Q: Beasiswa doktor yang masih buka
+A: Berikut daftar beasiswa jenjang S3:
+
+1. **Southern Taiwan University Of Science And Technology The Stust Scholarship For International Students** (S3) - 30 November 2026
+
+2. **University Of Glasgow Engineering Physical Sciences Research Council Epsrc Doctoral Landscape Scholarships** (S3) - 30 Juni 2026
+
+3. **Beasiswa Program 5000 Doktor** (S3) - 2026-09-05 00:00:00
+
+4. **Feng Chia University Fcu International Student Scholarship** (S1, S2, S3) - 8 Juli 2026
+
+5. **Monash University Research Training Program Rtp Fees Offset** (S2, S3) - 31 Agustus 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+
+#############################################################
+## KATEGORI 12: Filter Berdasarkan Lokasi
+#############################################################
+
+[64] Q: Deadline beasiswa luar negeri
+A: Berikut daftar beasiswa :
+
+1. **YTL Foundation Scholarship Programme** (Luar Negeri (Malaysia)) - 30 Apr 2026
+
+2. **Deakin University Vice Chancellor S International Scholarship** (Luar Negeri (Australia)) - 25 September 2026
+
+3. **Nagoya University Global 30 Undergraduate Scholarship** (Luar Negeri (Jepang)) - 29 Januari 2026
+
+4. **Erasmus Mundus Joint Master In Education Policies For Global Development Globed** (Luar Negeri (Inggris, Jerman, Spanyol)) - 12 Februari 2026
+
+5. **The University Of Sydney Vice Chancellor S International Scholarships** (Luar Negeri (Australia)) - 4 Mei 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[65] Q: Deadline beasiswa dalam negeri
+A: Berikut daftar beasiswa di Indonesia:
+
+1. **Beasiswa Talenta Indonesia** (Dalam Negeri (Indonesia)) - 02 Mei 2026
+
+2. **Beasiswa APERTI BUMN** (Dalam Negeri (Indonesia)) - 16 Juni 2026
+
+3. **Beasiswa indonesian gold generation scholarship** (Dalam Negeri (Indonesia)) - 2026-04-13 00:00:00
+
+4. **Beasiswa The Future Leader (TFL) Scholarship Batch 18** (Dalam Negeri (Indonesia)) - 28 Mei 2026
+
+5. **Beasiswa Mahaghora** (Dalam Negeri (Indonesia)) - 28 Juli 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[66] Q: Beasiswa luar negeri yang tutup bulan ini
+A: Mohon maaf, saya tidak menemukan beasiswa yang sesuai dengan pencarian tersebut. 😊
+------------------------------------------------------------
+
+[67] Q: Beasiswa dalam negeri yang masih buka
+A: Berikut daftar beasiswa di Indonesia:
+
+1. **Beasiswa Mahaghora** (Dalam Negeri (Indonesia)) - 28 Juli 2026
+
+2. **Beasiswa GrabScholar** (Dalam Negeri (Indonesia)) - 08 Agustus 2026
+
+3. **Beasiswa BRIGHT Scholarship Batch 12** (Dalam Negeri (Indonesia)) - 10 Agsutus 2026
+
+4. **Beasiswa Program 5000 Doktor** (Dalam Negeri (Indonesia)) - 2026-09-05 00:00:00
+
+5. **Beasiswa Bayan Peduli** (Dalam Negeri (Indonesia)) - 2026-09-15 00:00:00
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+
+#############################################################
+## KATEGORI 13: Filter Deadline per Negara
+#############################################################
+
+[68] Q: Deadline beasiswa Jepang
+A: Berikut daftar beasiswa di Jepang:
+
+1. **Beasiswa Monbukagakusho (MEXT) Pemerintah Jepang** (Luar Negeri (Jepang)) - 22 Apr 2026
+
+2. **Shizuoka University Asia Bridge Program Abp Scholarship** (Luar Negeri (Jepang)) - 13 Maret 2026
+
+3. **Nagoya University Global 30 Undergraduate Scholarship** (Luar Negeri (Jepang)) - 29 Januari 2026
+
+4. **Asian Development Bank Japan Scholarship Program Adb Jsp Graduate School Of System Design And Management Keio University** (Luar Negeri (Jepang)) - 15 Januari 2026
+
+5. **Tohoku University Future Global Leadership** (Luar Negeri (Jepang)) - 15 Januari 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[69] Q: Deadline beasiswa Korea Selatan
+A: Berikut daftar beasiswa di Korea, Korea Selatan:
+
+1. **Korea Advanced Institute Of Science Technology Kaist Kaist International Student Scholarship** (Luar Negeri (Korea Selatan)) - 6 Januari 2026
+
+2. **Inha University Scholarship System For Freshman Students Sgcs Students** (Luar Negeri (Korea Selatan)) - 13 Mei 2026
+
+3. **Underwood International College Yonsei University Admissions Scholarship** (Luar Negeri (Korea Selatan)) - 3 April 2026
+
+4. **Jeju National University International Student Scholarship** (Luar Negeri (Korea Selatan)) - 29 Mei 2026
+
+5. **Ulsan National Institute Of Science And Technology Unist Scholarship** (Luar Negeri (Korea Selatan)) - 15 April 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[70] Q: Deadline beasiswa Australia
+A: Berikut daftar beasiswa di Australia:
+
+1. **Beasiswa Australia Awards Scholarship** (Luar Negeri (Australia)) - 30 Apr 2026
+
+2. **Australia Awards Scholarship** (Luar Negeri (Australia)) - 30 April 2026
+
+3. **The University Of Western Australia Uwa International Student Award** (Luar Negeri (Australia)) - 8 Juni 2026
+
+4. **Australian National University Anu Chancellor S International Scholarship** (Luar Negeri (Australia)) - 15 Mei 2026
+
+5. **Monash University Vice Chancellor S Asean Awards** (Luar Negeri (Australia)) - 18 Februari 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[71] Q: Deadline beasiswa Inggris
+A: Berikut daftar beasiswa di Inggris:
+
+1. **The A S Hornby Educational Trust** (Luar Negeri (Inggris)) - 9 Februari 2026
+
+2. **Oxford University Skoll Scholarships** (Luar Negeri (Inggris)) - 7 Januari 2026
+
+3. **International Undergraduate Scholarship University Of St Andrews** (Luar Negeri (Inggris)) - 26 Januari 2026
+
+4. **Great Scholarships Postgraduate Birkbeck University Of London** (Luar Negeri (Inggris)) - 7 Juni 2026
+
+5. **University Of Reading Vice Chancellor S Global Scholarship Awards** (Luar Negeri (Inggris)) - 14 Januari 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[72] Q: Deadline beasiswa Jerman
+A: Berikut daftar beasiswa di Jerman:
+
+1. **Beasiswa DAAD Jerman** (Luar Negeri (Jerman)) - 18 Okt 2026
+
+2. **Daad Helmut Schmidt Programme Universit T Duisburg Essen Master Of Development And Governance** (Luar Negeri (Jerman)) - 31 Juli 2026
+
+3. **Daad Epos Sustainable Development Management Hs Rhein Waal** (Luar Negeri (Jerman)) - 1 Juni 2026
+
+4. **Hertie School Full And Partial Scholarships** (Luar Negeri (Jerman)) - 15 Januari 2026
+
+5. **Daad Epos International Media Studies Hs Bonn Rhein Sieg Dw Akademie U Bonn** (Luar Negeri (Jerman)) - 15 Maret 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+
+#############################################################
+## KATEGORI 14: Filter Deadline per Pendanaan
+#############################################################
+
+[73] Q: Deadline beasiswa fully funded
+A: Berikut daftar beasiswa :
+
+1. **Beasiswa S1 Jentera Sekolah Tinggi Hukum Tahun 2026 untuk Lulusan SMA/Sederajat** (Fully Funded) - 29 Juli 2026
+
+2. **Beasiswa Program Afirmasi Putra Putri Petani IKN 2026** (Fully Funded) - 17 Apr 2026
+
+3. **Chang Gung University Cgu Scholarships For International Doctoral Students** (Fully Funded) - 25 September 2026
+
+4. **Monash University Master Of Commerce Sir John Monash Fee Scholarship** (Fully Funded) - 31 Agustus 2026
+
+5. **Ministry Of National Development Mnd Edge Scholarship** (Fully Funded) - 13 Maret 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[74] Q: Deadline beasiswa partially funded
+A: Berikut daftar beasiswa :
+
+1. **Montana State University International Undergraduate Merit Based Scholarship** (Partially Funded) - 15 Maret 2026
+
+2. **UPNVJT Scholarship for International Students** (Fully & Partially Funded) - 01 Apr 2026
+
+3. **Beasiswa Amartha STEAM Fellowship** (Partially Funded) - 21 Juni 2026
+
+4. **Fudan University International Students Scholarship International Organizations And Global Governance Iogg Bachelor Of L** (Partially Funded) - 6 Maret 2026
+
+5. **Ontario Graduate Scholarship Ogs Program University Of Guelph** (Partially Funded) - 6 Februari 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[75] Q: Beasiswa fully funded yang masih buka
+A: Berikut daftar beasiswa :
+
+1. **Beasiswa Universitas Islam Madinah** (Fully Funded) - 01 Des 2026
+
+2. **Beasiswa FPU 2026** (Fully Funded) - 01 Agustus 2026
+
+3. **Beasiswa Unggulan - Mahasiswa & Masyakarat berprestasi** (Fully Funded) - 27 Jul 2026
+
+4. **Southern Taiwan University Of Science And Technology The Stust Scholarship For International Students** (Fully Funded) - 30 November 2026
+
+5. **University Of Auckland University Of Auckland Doctoral Scholarships Uoads** (Fully Funded) - 1 Agustus 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[76] Q: Beasiswa partially funded yang akan tutup bulan ini
+A: Mohon maaf, saya tidak menemukan beasiswa yang sesuai dengan pencarian tersebut. 😊
+------------------------------------------------------------
+
+
+#############################################################
+## KATEGORI 15: Filter Berdasarkan Benua
+#############################################################
+
+[77] Q: Beasiswa S1 di Eropa
+A: Berikut daftar beasiswa jenjang S1:
+
+1. **Newcastle University Vice Chancellor S International Scholarships Undergraduate 2025** (Luar Negeri (Inggris) - S1)
+
+2. **Singapore Geomatics Scholarship** (Luar Negeri (Korea Selatan, Hong Kong, New Zealand, Arab Saudi, Afrika Selatan, Inggris, Amerika Serikat, Australia, Taiwan, Jepang, Korea, Belanda, Jerman, Swiss, Singapura, Malaysia, Turki, Kanada, Perancis, Qatar, China, Swedia, Belgia, Austria, Norwegia, Denmark, Finlandia, Italia, Spanyol, Portugal, Brasil, Meksiko, Rusia, Hungaria, Yunani, Irlandia) - S1)
+
+3. **National Library Board Nlb Scholarship** (Luar Negeri (Korea Selatan, Hong Kong, New Zealand, Arab Saudi, Afrika Selatan, Inggris, Amerika Serikat, Australia, Taiwan, Jepang, Korea, Belanda, Jerman, Swiss, Singapura, Malaysia, Turki, Kanada, Perancis, Qatar, China, Swedia, Belgia, Austria, Norwegia, Denmark, Finlandia, Italia, Spanyol, Portugal, Brasil, Meksiko, Rusia, Hungaria, Yunani, Irlandia) - S1)
+
+4. **Ministry Of National Development Mnd Edge Scholarship** (Luar Negeri (Korea Selatan, Hong Kong, New Zealand, Arab Saudi, Afrika Selatan, Inggris, Amerika Serikat, Australia, Taiwan, Jepang, Korea, Belanda, Jerman, Swiss, Singapura, Malaysia, Turki, Kanada, Perancis, Qatar, China, Swedia, Belgia, Austria, Norwegia, Denmark, Finlandia, Italia, Spanyol, Portugal, Brasil, Meksiko, Rusia, Hungaria, Yunani, Irlandia) - S1)
+
+5. **Universiteit Leiden Luc Financial Support Programme** (Luar Negeri (Belanda) - S1)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[78] Q: Beasiswa S2 di Asia
+A: Berikut daftar beasiswa jenjang S2:
+
+1. **After Enrollment International Human Resource Network Organization Foundation Ihno Scholarship** (Luar Negeri (Jepang) - S1, S2, S3)
+
+2. **National Taiwan University Of Science And Technology Ntust Scholarship Fall Intake** (Luar Negeri (Taiwan) - S2, S3)
+
+3. **LPS Call for Research** (Dalam Negeri (Indonesia) - D4, S1, S2)
+
+4. **Beasiswa Kuliah S1–S2 Universitas Paramadina Tahun 2026 untuk Jurnalis, Guru, Anak Guru dan Anak Jurnalis** (Dalam Negeri (Indonesia) - S1,S2)
+
+5. **Beasiswa S2 Manajemen tahun 2026 oleh PPM School of Management FULL Scholarship** (Dalam Negeri (Indonesia) - S2)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[79] Q: Beasiswa S3 benua Amerika
+A: Berikut daftar beasiswa jenjang S3:
+
+1. **Ontario Graduate Scholarship Ogs Program University Of Guelph** (Luar Negeri (Kanada) - S2, S3)
+
+2. **James Buchanan Fellowship** (Luar Negeri (Amerika Serikat) - S3)
+
+3. **Ontario Graduate Scholarship Ogs Program University Of Toronto** (Luar Negeri (Kanada) - S2, S3)
+
+4. **Ontario Graduate Scholarship Ogs Program Toronto Metropolitan University** (Luar Negeri (Kanada) - S2, S3)
+
+5. **Fulbright Scholarship For Filipino** (Luar Negeri (Amerika Serikat) - S2, S3)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[80] Q: Beasiswa sarjana Benua Australia
+A: Berikut daftar beasiswa jenjang S1:
+
+1. **Ministry Of National Development Mnd Edge Scholarship** (Luar Negeri (Korea Selatan, Hong Kong, New Zealand, Arab Saudi, Afrika Selatan, Inggris, Amerika Serikat, Australia, Taiwan, Jepang, Korea, Belanda, Jerman, Swiss, Singapura, Malaysia, Turki, Kanada, Perancis, Qatar, China, Swedia, Belgia, Austria, Norwegia, Denmark, Finlandia, Italia, Spanyol, Portugal, Brasil, Meksiko, Rusia, Hungaria, Yunani, Irlandia) - S1)
+
+2. **Monash University Monash International Leadership Scholarship** (Luar Negeri (Australia) - S1)
+
+3. **Deakin University International Scholarship** (Luar Negeri (Australia) - S1, S2)
+
+4. **James Cook University International Excellence Scholarship** (Luar Negeri (Australia) - S1)
+
+5. **University Of Auckland International Student Excellence Scholarship** (Luar Negeri (New Zealand) - S1, S2)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[81] Q: Beasiswa fully funded Eropa
+A: Berikut daftar beasiswa :
+
+1. **Beasiswa S1, S2 & S3 Pemerintah Kazakhstan** (Luar Negeri (Kazakhstan) - Fully Funded)
+
+2. **Vlir Uos Scholarship Advance Master Of Globalisation And Development 1 Year University Of Antwerp** (Luar Negeri (Belgia) - Fully Funded)
+
+3. **Beasiswa Talenta Indonesia** (Luar Negeri (Australia, Italia, Malaysia, Amerika Serikat, Asean) & Dalam Negeri (Indonesia) - Fully Funded)
+
+4. **Erasmus Bio Pharmaceutical Materials Science Biopham** (Luar Negeri (Perancis, Italia, Spanyol, Polandia) - Fully Funded)
+
+5. **Erasmus Mundus Master Of Science In Public Sector Innovation And E Governance Pioneer** (Luar Negeri (Jerman, Belgia) - Fully Funded)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[82] Q: Beasiswa master di Asia
+A: Berikut daftar beasiswa jenjang S2:
+
+1. **National Cheng Kung University Moe Elite Scholarship** (Luar Negeri (Taiwan) - S2, S3)
+
+2. **Beasiswa SHARE (Social, Humanities, Art for People, Religious Studies, Economics)** (Dalam Negeri (Indonesia) - S2,S3)
+
+3. **Asian Development Bank Japan Scholarship Program Adb Jsp Asian Institute Of Technology** (Luar Negeri (Thailand) - S2)
+
+4. **China Aun Scholarship** (Luar Negeri (China) - S2)
+
+5. **National Tsing Hua University Nthu International Student Scholarship Fall Intake** (Luar Negeri (Taiwan) - S2)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[83] Q: Beasiswa doktor di Amerika Utara
+A: Mohon maaf, saya belum memiliki data beasiswa untuk lokasi/negara tersebut. 😊
+------------------------------------------------------------
+
+
+#############################################################
+## KATEGORI 18: Kriteria Khusus
+#############################################################
+
+[84] Q: Beasiswa untuk mahasiswa kurang mampu
+A: Untuk mahasiswa kurang mampu, pilihan utamanya adalah KIP Kuliah (untuk dalam negeri) atau beasiswa yang berbasis 'Need-based Financial Aid' untuk luar negeri. Kami memiliki beberapa data bantuan kuliah tersebut di database.
+------------------------------------------------------------
+
+[85] Q: Beasiswa KIP
+A: Untuk mahasiswa kurang mampu, pilihan utamanya adalah KIP Kuliah (untuk dalam negeri) atau beasiswa yang berbasis 'Need-based Financial Aid' untuk luar negeri. Kami memiliki beberapa data bantuan kuliah tersebut di database.
+------------------------------------------------------------
+
+[86] Q: Beasiswa untuk dhuafa
+A: Berikut daftar beasiswa :
+
+1. **SingCham Uplifting Scholarship 2026** (Dalam Negeri (Indonesia) - D3, D4, S1)
+
+2. **Beasiswa Progam Pendidikan Kebanksentralan** (Dalam Negeri (Indonesia) - D3, D4, S1)
+
+3. **Beasiswa Pendidikan Pemprov Kepulauan Riau** (Dalam Negeri (Indonesia) - D3, D4, S1, S2)
+
+4. **Beasiswa AFRINA 2026** (Dalam Negeri (Indonesia) - S1)
+
+5. **Beasiswa Program Afirmasi Putra Putri Petani IKN 2026** (Dalam Negeri (Indonesia) - S1)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[87] Q: Beasiswa khusus perempuan
+A: Berikut daftar beasiswa :
+
+1. **Beasiswa Glow and Lovely 2026 Kuliah S1 untuk Lulusan SMA/Sederajat dan mahasiswi On Going** (Dalam Negeri (Indonesia) - S1)
+
+2. **Beasiswa S1, S2 & S3 Toeti Heraty** (Dalam Negeri (Indonesia) - S1, S2, S3)
+
+3. **Beasiswa Amartha STEAM Fellowship** (Dalam Negeri (Indonesia) - S1)
+
+4. **Beasiswa S3 UNHAN 2026** (Dalam Negeri (Indonesia) - S3)
+
+5. **Beasiswa DJITU PROFESI untuk Bidang Apoteker, Bidan, Fisioterapi, Gizi, Perawat, Fisikawan Medis dan Psikologi Klinis** (Dalam Negeri (Indonesia) - S1)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[88] Q: Beasiswa khusus wanita
+A: Berikut daftar beasiswa :
+
+1. **Beasiswa D3 UNHAN 2026** (Dalam Negeri (Indonesia) - D3)
+
+2. **Beasiswa S3 UNHAN 2026** (Dalam Negeri (Indonesia) - S3)
+
+3. **Beasiswa S1, S2 & S3 Toeti Heraty** (Dalam Negeri (Indonesia) - S1, S2, S3)
+
+4. **Beasiswa S2 UNHAN 2026** (Dalam Negeri (Indonesia) - S2)
+
+5. **Beasiswa ASEAN Women in STEM** (Luar Negeri (Inggris) - S2)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[89] Q: Beasiswa untuk fresh graduate
+A: Tentu! Banyak beasiswa S2 luar negeri yang sangat terbuka untuk fresh graduate tanpa syarat pengalaman kerja, seperti beasiswa Erasmus+ (Eropa), MEXT (Jepang), atau beasiswa dari universitas di Taiwan.
+------------------------------------------------------------
+
+[90] Q: Beasiswa s2 bagi lulusan baru
+A: Mohon maaf, saya belum memiliki data beasiswa untuk target/kategori sasaran tersebut. 😊
+------------------------------------------------------------
+
+[91] Q: Beasiswa tanpa wawancara
+A: Beasiswa tanpa wawancara biasanya fokus pada seleksi berkas dan nilai akademik. Contohnya beberapa beasiswa bantuan UKT atau beasiswa dari yayasan swasta tertentu. Namun mayoritas beasiswa bergengsi biasanya tetap menyertakan tahap wawancara.
+------------------------------------------------------------
+
+[92] Q: Beasiswa S1 tanpa tes wawancara
+A: Beasiswa tanpa wawancara biasanya fokus pada seleksi berkas dan nilai akademik. Contohnya beberapa beasiswa bantuan UKT atau beasiswa dari yayasan swasta tertentu. Namun mayoritas beasiswa bergengsi biasanya tetap menyertakan tahap wawancara.
+------------------------------------------------------------
+
+[93] Q: Beasiswa untuk IPK di bawah 3
+A: Mohon maaf, saya belum memiliki data beasiswa untuk target/kategori sasaran tersebut. 😊
+------------------------------------------------------------
+
+[94] Q: Beasiswa IPK kecil
+A: Berikut daftar beasiswa :
+
+1. **Beasiswa MNC University MNCU Future Leader Scholarship Kuliah S1 Tahun 2026** (Dalam Negeri (Indonesia) - S1)
+
+2. **SingCham Uplifting Scholarship 2026** (Dalam Negeri (Indonesia) - D3, D4, S1)
+
+3. **Baldwin Fellowship** (Luar Negeri (Korea Selatan, Hong Kong, New Zealand, Arab Saudi, Afrika Selatan, Inggris, Amerika Serikat, Australia, Taiwan, Jepang, Korea, Belanda, Jerman, Swiss, Singapura, Malaysia, Turki, Kanada, Perancis, Qatar, China, Swedia, Belgia, Austria, Norwegia, Denmark, Finlandia, Italia, Spanyol, Portugal, Brasil, Meksiko, Rusia, Hungaria, Yunani, Irlandia) - S2, S3)
+
+4. **Technical University Of Denmark Dtu Tuition Fee Waivers For International Non Eu Eea Msc Students** (Luar Negeri (Denmark) - S2)
+
+5. **Paragon Scholarship Program** (Dalam Negeri (Indonesia) - D3, D4,S1)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+
+#############################################################
+## KATEGORI 19: Kombinasi Multiple Filter
+#############################################################
+
+[95] Q: Beasiswa S2 di benua Eropa untuk jurusan kedokteran yang fully funded
+A: Mohon maaf, saya belum memiliki data beasiswa untuk lokasi/negara tersebut. 😊
+------------------------------------------------------------
+
+[96] Q: Beasiswa S1 luar negeri jurusan IT yang tutup bulan depan
+A: Mohon maaf, saya tidak menemukan beasiswa yang sesuai dengan pencarian tersebut. 😊
+------------------------------------------------------------
+
+[97] Q: Beasiswa master di Australia tanpa IELTS
+A: Ada beberapa beasiswa yang tidak mewajibkan TOEFL/IELTS, seperti beasiswa Turkiye Burslari (Turki), GKS (Korea - jalur tertentu), atau beasiswa Pemerintah Rusia. Beberapa beasiswa dalam negeri juga banyak yang tidak memerlukan sertifikat bahasa Inggris. Mau saya carikan yang spesifik? 😊
+------------------------------------------------------------
+
+
+#############################################################
+## TAMBAHAN: Data per Tahun & Funding-Lokasi
+#############################################################
+
+[98] Q: Berikan data beasiswa 2026
+A: Berikut beasiswa tahun 2026 (menampilkan 5 dari 105 data secara acak):
+
+1. **National Library Board Nlb Scholarship** - Luar Negeri (Korea Selatan, Hong Kong, New Zealand, Arab Saudi, Afrika Selatan, Inggris, Amerika Serikat, Australia, Taiwan, Jepang, Korea, Belanda, Jerman, Swiss, Singapura, Malaysia, Turki, Kanada, Perancis, Qatar, China, Swedia, Belgia, Austria, Norwegia, Denmark, Finlandia, Italia, Spanyol, Portugal, Brasil, Meksiko, Rusia, Hungaria, Yunani, Irlandia) (S1)
+
+2. **The University Of Hong Kong Hku Hku Belt And Road Scholarship** - Luar Negeri (Hong Kong) (S1)
+
+3. **Central European University Ceu Financial Aid** - Luar Negeri (Austria) (S1)
+
+4. **Mext University Recommendation Tokyo University Of Foreign Studies Master S Program Peace And Conflict Studies Course** - Luar Negeri (Jepang) (S2)
+
+5. **Beasiswa Pendidikan Indonesia Emas – UMM** - Dalam Negeri (Indonesia) (D3, D4, S1)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya, atau ketik nomor beasiswa (misal: **pilih no 3**) untuk melihat **detail**.
+------------------------------------------------------------
+
+[99] Q: Ada beasiswa S1 tahun 2026?
+A: Berikut daftar beasiswa jenjang S1:
+
+1. **Korea Advanced Institute Of Science Technology Kaist Kaist International Student Scholarship** (S1)
+
+2. **Hong Kong Baptist University Admission Scholarship Scheme For Overseas Applicants** (S1)
+
+3. **University Of Waterloo International Student Entrance Scholarship** (S1)
+
+4. **Beasiswa SayaUISI 2026** (S1)
+
+5. **The University Of Western Australia Global Excellence Scholarship** (S1)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[100] Q: Beasiswa s1 yang tutup bulan mei
+A: Berikut daftar beasiswa jenjang S1:
+
+1. **Beasiswa Dokter Universitas Ahmad Dahlan (UAD)** (S1) - 15 Mei 2026
+
+2. **The University Of Queensland International High Achievers Scholarship** (S1) - 31 Mei 2026
+
+3. **Beasiswa Jenius Pemerintah Provinsi Jawa Barat (Pemprov Jabar) 2026** (D4, S1) - 01 Mei 2026
+
+4. **Inha University Scholarship System For Freshman Students Sgcs Students** (S1) - 13 Mei 2026
+
+5. **Program Beasiswa Santri Berprestasi (Program Santri Beasiswa Pesantren)** (S1) - 31 Mei 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[101] Q: Beasiswa s1 luar negeri yang tutup bulan juni
+A: Berikut daftar beasiswa jenjang S1:
+
+1. **Queensland University Of Technology International Merit Scholarship** (Luar Negeri (Australia) - S1) - 30 Juni 2026
+
+2. **Charles Sturt University Vice Chancellor International Excellence Scholarship** (Luar Negeri (Australia) - S1) - 30 Juni 2026
+
+3. **University Of Sheffield International Undergraduate Scholarship** (Luar Negeri (Inggris) - S1) - 3 Juni 2026
+
+4. **After Enrollment International Human Resource Network Organization Foundation Ihno Scholarship** (Luar Negeri (Jepang) - S1, S2, S3) - 1 Juni 2026
+
+5. **Queensland University Of Technology Qut Excellence Scholarship Academic** (Luar Negeri (Australia) - S1) - 30 Juni 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[102] Q: Beasiswa yang masih buka bulan ini
+A: Mohon maaf, saya tidak menemukan beasiswa yang sesuai dengan pencarian tersebut. 😊
+------------------------------------------------------------
+
+[103] Q: Beasiswa yang deadlinenya belum lewat apa saja
+A: Berikut daftar beasiswa :
+
+1. **Saf Engineering Scholarship Female Applicants** - 31 Agustus 2026
+
+2. **Eth Zurich Excellence Scholarship Opportunity Programme Esop** - 30 November 2026
+
+3. **Beasiswa JNT (J&T) untuk Mahasiswa Tahun 2026** - 06 Agustus 2026
+
+4. **Beasiswa Tahfidz Universitas Nahdlatul Ulama Yogyakarta (UNU Jogja)** - 2026-09-14 00:00:00
+
+5. **Monash University Monash International Leadership Scholarship** - 30 Juni 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[104] Q: Beasiswa fully funded luar negeri apa saja?
+A: Berikut daftar beasiswa :
+
+1. **Icp Connect Scholarship Vliruos Advanced Master Of Human Settlements 1 Year Ku Leuven** (Luar Negeri (Belgia) - Fully Funded)
+
+2. **Asean Undergraduate Scholarship National University Of Singapore Nus A Level** (Luar Negeri (Singapura) - Fully Funded)
+
+3. **University Of Galway Hardiman Phd Scholarship** (Luar Negeri (Irlandia) - Fully Funded)
+
+4. **Erasmus Master Of Science In Sustainable And Innovative Natural Resource Management Sinrem** (Luar Negeri (Jerman, Swedia, Belgia) - Fully Funded)
+
+5. **Erasmus Mundus Joint Masters Scholarships Masters In Environmental Sciences Policy And Management Mespom** (Luar Negeri (Inggris, Swedia, Austria, Yunani) - Fully Funded)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[105] Q: beasiswa fully funded dalam negeri apa saja?
+A: Berikut daftar beasiswa di Indonesia:
+
+1. **Beasiswa APERTI BUMN** (Dalam Negeri (Indonesia) - Fully & Partially Funded)
+
+2. **Beasiswa Talenta Indonesia** (Dalam Negeri (Indonesia) - Fully Funded)
+
+3. **Beasiswa GrabScholar** (Dalam Negeri (Indonesia) - Fully Funded)
+
+4. **Beasiswa The Future Leader (TFL) Scholarship Batch 18** (Dalam Negeri (Indonesia) - Fully Funded)
+
+5. **Beasiwa Sofyan Tan Scholarship** (Dalam Negeri (Indonesia) - Fully Funded)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[106] Q: beasiswa partially funded dalam negeri?
+A: Berikut daftar beasiswa di Indonesia:
+
+1. **Beasiswa APERTI BUMN** (Dalam Negeri (Indonesia) - Fully & Partially Funded)
+
+2. **beasiswa kartu indonesia pintar kuliah (KIP Kuliah)** (Dalam Negeri (Indonesia) - Fully & Partially Funded)
+
+3. **Beasiswa KDM (Kang Dedi Mulyadi)** (Dalam Negeri (Indonesia) - Partially Funded)
+
+4. **UPNVJT Scholarship for International Students** (Dalam Negeri (Indonesia) - Fully & Partially Funded)
+
+5. **Beasiswa Program 5000 Doktor** (Dalam Negeri (Indonesia) - Partially Funded)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[107] Q: beasiswa partially funded luar negeri?
+A: Berikut daftar beasiswa :
+
+1. **University Of Sheffield International Undergraduate Scholarship** (Luar Negeri (Inggris) - Partially Funded)
+
+2. **Monash University Vice Chancellor S Asean Awards** (Luar Negeri (Australia) - Partially Funded)
+
+3. **The University Of Sydney Vice Chancellor S International Scholarships** (Luar Negeri (Australia) - Partially Funded)
+
+4. **The University Of Western Australia Global Excellence Scholarship** (Luar Negeri (Australia) - Partially Funded)
+
+5. **University Of Tasmania Tasmanian International Scholarship** (Luar Negeri (Australia) - Partially Funded)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[108] Q: Beasiswa master partially funded irlandia
+A: Berikut daftar beasiswa jenjang S2 di Irlandia:
+
+1. **Erasmus Master In Law Data And Artificial Intelligence Emildai** (Luar Negeri (Perancis, Italia, Spanyol, Irlandia) - S2 - Partially Funded)
+
+2. **Baldwin Fellowship** (Luar Negeri (Korea Selatan, Hong Kong, New Zealand, Arab Saudi, Afrika Selatan, Inggris, Amerika Serikat, Australia, Taiwan, Jepang, Korea, Belanda, Jerman, Swiss, Singapura, Malaysia, Turki, Kanada, Perancis, Qatar, China, Swedia, Belgia, Austria, Norwegia, Denmark, Finlandia, Italia, Spanyol, Portugal, Brasil, Meksiko, Rusia, Hungaria, Yunani, Irlandia) - S2, S3 - Partially Funded)
+
+Silakan pilih nomor beasiswa untuk melihat **detail** seperti **benefit**, **syarat**, **deadline**, atau **cara daftar**.
+------------------------------------------------------------
+
+[109] Q: beasiswa sarjana partially funded amerika
+A: Berikut daftar beasiswa jenjang S1 di Amerika Serikat:
+
+1. **Berklee College Of Music Merit Based Scholarships** (Luar Negeri (Amerika Serikat) - S1 - Partially Funded)
+
+2. **University Of Colorado Denver Merit Scholarship** (Luar Negeri (Amerika Serikat) - S1 - Partially Funded)
+
+3. **Suffolk University Boston Merit Scholarship** (Luar Negeri (Amerika Serikat) - S1 - Partially Funded)
+
+4. **University Of Massachusetts Boston Merit Scholarship** (Luar Negeri (Amerika Serikat) - S1 - Partially Funded)
+
+5. **Colorado School Of Mines Grewcock Presidential Scholarship Program** (Luar Negeri (Amerika Serikat) - S1 - Partially Funded)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[110] Q: beasiswa phd partially funded Indonesia
+A: Berikut daftar beasiswa jenjang S3 di Indonesia, Indonesia:
+
+1. **Beasiswa Program 5000 Doktor** (Dalam Negeri (Indonesia) - S3 - Partially Funded)
+
+2. **UPNVJT Scholarship for International Students** (Dalam Negeri (Indonesia) - S1, S2, S3 - Fully & Partially Funded)
+
+3. **Bantuan Penyelesaian Studi PTN/PTS Luar Baru** (Dalam Negeri (Indonesia) - S1, S2, S3 - Partially Funded)
+
+4. **Beasiswa Pemerintah Provinsi Sulawesi Barat (Pemprov Sulbar) 2026** (Dalam Negeri (Indonesia) - S1, S2, S3 - Partially Funded)
+
+5. **Beasiswa Gerak Tumbuh 2026** (Dalam Negeri (Indonesia) - S1,S2,S3 - Partially Funded)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[111] Q: beasiswa sarjana fully funded turki
+A: Berikut daftar beasiswa jenjang S1 di Turki:
+
+1. **Social Service Scholarship** (Luar Negeri (Korea Selatan, Hong Kong, New Zealand, Arab Saudi, Afrika Selatan, Inggris, Amerika Serikat, Australia, Taiwan, Jepang, Korea, Belanda, Jerman, Swiss, Singapura, Malaysia, Turki, Kanada, Perancis, Qatar, China, Swedia, Belgia, Austria, Norwegia, Denmark, Finlandia, Italia, Spanyol, Portugal, Brasil, Meksiko, Rusia, Hungaria, Yunani, Irlandia) - S1 - Fully Funded)
+
+2. **Htx Home Team Science Technology Agency Scholarship** (Luar Negeri (Korea Selatan, Hong Kong, New Zealand, Arab Saudi, Afrika Selatan, Inggris, Amerika Serikat, Australia, Taiwan, Jepang, Korea, Belanda, Jerman, Swiss, Singapura, Malaysia, Turki, Kanada, Perancis, Qatar, China, Swedia, Belgia, Austria, Norwegia, Denmark, Finlandia, Italia, Spanyol, Portugal, Brasil, Meksiko, Rusia, Hungaria, Yunani, Irlandia) - S1 - Fully Funded)
+
+3. **Beasiswa Indonesia Bangkit (BIB) - Program Beasiswa Unggulan Keagamaan S1** (Luar Negeri (Bahrain, Iran, Irak, Kuwait, Lebanon, Oman, Palestina, State Of, Qatar, Arab Saudi, Mesir, Turki, Suriah, Uni Emirat Arab) & Dalam Negeri (Indonesia) - S1 - Fully Funded)
+
+4. **Gic Scholarship Programme** (Luar Negeri (Korea Selatan, New Zealand, Inggris, Amerika Serikat, Australia, Taiwan, Korea, Belanda, Swiss, Singapura, Malaysia, Turki, Kanada, Perancis, China, Swedia, Belgia, Spanyol, Thailand, Vietnam, Filipina) | Dalam Negeri (Indonesia) - S1 - Fully Funded)
+
+5. **Public Service Commission Psc Scholarship** (Luar Negeri (Korea Selatan, Hong Kong, New Zealand, Arab Saudi, Afrika Selatan, Inggris, Amerika Serikat, Australia, Taiwan, Jepang, Korea, Belanda, Jerman, Swiss, Singapura, Malaysia, Turki, Kanada, Perancis, Qatar, China, Swedia, Belgia, Austria, Norwegia, Denmark, Finlandia, Italia, Spanyol, Portugal, Brasil, Meksiko, Rusia, Hungaria, Yunani, Irlandia) - S1 - Fully Funded)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[112] Q: beasiswa master fully funded rusia
+A: Berikut daftar beasiswa jenjang S2 di Rusia:
+
+1. **Beasiswa Skoltech University Russia** (Luar Negeri (Malaysia, Rusia) & Dalam Negeri (Indonesia) - S2, S3 - Fully Funded)
+
+2. **Lee Kuan Yew Scholarship** (Luar Negeri (Korea Selatan, Hong Kong, New Zealand, Arab Saudi, Afrika Selatan, Inggris, Amerika Serikat, Australia, Taiwan, Jepang, Korea, Belanda, Jerman, Swiss, Singapura, Malaysia, Turki, Kanada, Perancis, Qatar, China, Swedia, Belgia, Austria, Norwegia, Denmark, Finlandia, Italia, Spanyol, Portugal, Brasil, Meksiko, Rusia, Hungaria, Yunani, Irlandia) - S2 - Fully Funded)
+
+Silakan pilih nomor beasiswa untuk melihat **detail** seperti **benefit**, **syarat**, **deadline**, atau **cara daftar**.
+------------------------------------------------------------
+
+[113] Q: beasiswa phd fully funded italia
+A: Berikut daftar beasiswa jenjang S3 di Italia:
+
+1. **Beasiswa Sapienza University of Rome 2026-2027** (Luar Negeri (Italia) - S2, S3 - Fully Funded)
+
+Silakan pilih nomor beasiswa untuk melihat **detail** seperti **benefit**, **syarat**, **deadline**, atau **cara daftar**.
+------------------------------------------------------------
+
+[114] Q: Beasiswa deadline terdekat luar negeri?
+A: Berikut daftar beasiswa :
+
+1. **Monash University Monash International Merit Scholarship** (Luar Negeri (Australia)) - 30 Juni 2026
+
+2. **Queensland University Of Technology International Merit Scholarship** (Luar Negeri (Australia)) - 30 Juni 2026
+
+3. **Queensland University Of Technology Qut Excellence Scholarship Academic** (Luar Negeri (Australia)) - 30 Juni 2026
+
+4. **Monash University Monash International Leadership Scholarship** (Luar Negeri (Australia)) - 30 Juni 2026
+
+5. **Manchester Metropolitan University Vice Chancellor S International Regional Scholarship** (Luar Negeri (Inggris)) - 30 Juni 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[115] Q: Beasiswa deadline terdekat dalam negeri?
+A: Berikut daftar beasiswa di Indonesia:
+
+1. **Beasiswa Amartha STEAM Fellowship** (Dalam Negeri (Indonesia)) - 21 Juni 2026
+
+2. **Beasiswa Garuda - KEMDIKTISAINTEK** (Dalam Negeri (Indonesia)) - Gelombang II : 25 Juni 2026
+
+3. **Beasiswa Kementerian Pertanian RI 2026 Kuliah Gratis di Kampus Kedinasan Pertanian** (Dalam Negeri (Indonesia)) - 30 Juni 2026
+
+4. **Beasiswa Amartha Cendekia Bantuan Rp 3 Juta per Tahun untuk Pelajar Kelas 11 SMA/SMK/Sederajat/S1** (Dalam Negeri (Indonesia)) - 30 Juni 2026
+
+5. **Beasiswa S2 UGM Tahun 2026 Potongan Biaya UKT hingga 75% untuk Lulusan S1 PTN/PTS** (Dalam Negeri (Indonesia)) - 30 Juni 2026
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+
+#############################################################
+## TAMBAHAN: Singkatan Jenjang + LN/DN
+#############################################################
+
+[116] Q: Beasiswa S1 LN
+A: Berikut daftar beasiswa jenjang S1:
+
+1. **National Yang Ming Chiao Tung University Nycu International Student Scholarship Taiwan** (Luar Negeri (Taiwan) - S1)
+
+2. **University Of Waikato Vice Chancellor S International Excellence Scholarship For South East Asia** (Luar Negeri (New Zealand) - S1)
+
+3. **The University Of New South Wales Unsw Unsw Scholarships For International Students** (Luar Negeri (Australia) - S1)
+
+4. **Yamanashi Gakuin University International College Of Liberal Arts Icla Merit Based Scholarships** (Luar Negeri (Jepang) - S1)
+
+5. **Stipendium Hungaricum Scholarship Program Pakistan** (Luar Negeri (Hungaria) - S1, S2, S3)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[117] Q: Beasiswa S2 LN
+A: Berikut daftar beasiswa jenjang S2:
+
+1. **Bilkent University S2 S3** (Luar Negeri (Turki) - S2, S3)
+
+2. **Link Ping University Liu Liu International Scholarship** (Luar Negeri (Swedia) - S2)
+
+3. **Erasmus Advanced Structural Analysis And Design Using Composite Materials Frp** (Luar Negeri (Perancis, Italia, Spanyol, Portugal) - S2)
+
+4. **University Of Science And Technology Of China Ustc Fellowship For Master S Programs** (Luar Negeri (China) - S2)
+
+5. **University Of Bonn Deutschlandstipendium Scholarship** (Luar Negeri (Jerman) - S1, S2)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[118] Q: Beasiswa S3 LN
+A: Berikut daftar beasiswa jenjang S3:
+
+1. **Beasiswa Monbukagakusho (MEXT) Pemerintah Jepang** (Luar Negeri (Jepang) - S2, S3)
+
+2. **Chinese Government Scholarship (CSC) – Belt and Road Program (Type B)** (Luar Negeri (China) - S2, S3)
+
+3. **Xiamen University New International Students Scholarships** (Luar Negeri (China) - S2, S3)
+
+4. **Baldwin Fellowship** (Luar Negeri (Korea Selatan, Hong Kong, New Zealand, Arab Saudi, Afrika Selatan, Inggris, Amerika Serikat, Australia, Taiwan, Jepang, Korea, Belanda, Jerman, Swiss, Singapura, Malaysia, Turki, Kanada, Perancis, Qatar, China, Swedia, Belgia, Austria, Norwegia, Denmark, Finlandia, Italia, Spanyol, Portugal, Brasil, Meksiko, Rusia, Hungaria, Yunani, Irlandia) - S2, S3)
+
+5. **Manaaki New Zealand Scholarship** (Luar Negeri (New Zealand) - S2, S3)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[119] Q: Beasiswa S1 DN
+A: Berikut daftar beasiswa jenjang S1 di Indonesia:
+
+1. **Beasiswa Guru S1** (Dalam Negeri (Indonesia) - S1)
+
+2. **Beasiswa Pendidikan Pertanian S1** (Dalam Negeri (Indonesia) - S1)
+
+3. **Beasiswa Indonesia Bangkit (BIB) - Program Beasiswa Unggulan Keagamaan S1** (Dalam Negeri (Indonesia) - S1)
+
+4. **Beasiswa MNC University MNCU Future Leader Scholarship Kuliah S1 Tahun 2026** (Dalam Negeri (Indonesia) - S1)
+
+5. **Beasiswa BESTRO S1-D4 2026** (Dalam Negeri (Indonesia) - S1, D4)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[120] Q: Beasiswa S2 DN
+A: Berikut daftar beasiswa jenjang S2 di Indonesia:
+
+1. **Beasiswa S2 Kominfo Dalam Negeri Tahun 2024 untuk Masyarakat Umum dan PNS/TNI/POLRI** (Dalam Negeri (Indonesia) - S2)
+
+2. **Beasiswa S2 UGM Tahun 2026 Potongan Biaya UKT hingga 75% untuk Lulusan S1 PTN/PTS** (Dalam Negeri (Indonesia) - S2)
+
+3. **Beasiswa S2 UNHAN 2026** (Dalam Negeri (Indonesia) - S2)
+
+4. **Beasiswa S2 & S3 Universitas Pertahanan RI** (Dalam Negeri (Indonesia) - S2, S3)
+
+5. **Beasiswa Indonesia Bangkit (BIB) Double Degree Magister (S2)** (Luar Negeri (Inggris), Dalam Negeri (Indonesia) - S2)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[121] Q: Beasiswa S3 DN
+A: Berikut daftar beasiswa jenjang S3 di Indonesia:
+
+1. **Beasiswa S3 UNHAN 2026** (Dalam Negeri (Indonesia) - S3)
+
+2. **Beasiswa S1, S2 & S3 Toeti Heraty** (Dalam Negeri (Indonesia) - S1, S2, S3)
+
+3. **Beasiswa S2 & S3 Universitas Pertahanan RI** (Dalam Negeri (Indonesia) - S2, S3)
+
+4. **Beasiswa SHARE (Social, Humanities, Art for People, Religious Studies, Economics)** (Dalam Negeri (Indonesia) - S2,S3)
+
+5. **Beasiswa Program 5000 Doktor** (Dalam Negeri (Indonesia) - S3)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[122] Q: Beasiswa dn
+A: Berikut daftar beasiswa di Indonesia:
+
+1. **Beasiswa S2 Kominfo Dalam Negeri Tahun 2024 untuk Masyarakat Umum dan PNS/TNI/POLRI** (Dalam Negeri (Indonesia))
+
+2. **Beasiswa CIMB Niaga** (Dalam Negeri (Indonesia))
+
+3. **Beasiswa Progam Pendidikan Kebanksentralan** (Dalam Negeri (Indonesia))
+
+4. **Beasiswa Prima Bankaltimtara 2026** (Dalam Negeri (Indonesia))
+
+5. **Beasiswa Mandiri Muda Scholarship Batch 2** (Dalam Negeri (Indonesia))
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[123] Q: Beasiswa ln
+A: Berikut daftar beasiswa :
+
+1. **Asian Development Bank Japan Scholarship Program Adb Jsp International University Of Japan** (Luar Negeri (Jepang))
+
+2. **Underwood International College Yonsei University Admissions Scholarship** (Luar Negeri (Korea Selatan))
+
+3. **Icp Connect Scholarship Vliruos Advanced Mater Of Cultural Antropology And Development Studies Cades 1 Year Ku Leuven** (Luar Negeri (Belgia))
+
+4. **University Of Luxembourg Guillaume Dupaix International Master S Scholarship** (Luar Negeri (Luxembourg))
+
+5. **University Of Sheffield International Undergraduate Scholarship** (Luar Negeri (Inggris))
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[124] Q: Berikan beasiswa sarjana ln
+A: Berikut daftar beasiswa jenjang S1:
+
+1. **Deakin University Vice Chancellor S International Scholarship** (Luar Negeri (Australia) - S1, S2)
+
+2. **University College London Ucl Ucl Global Undergraduate Scholarship** (Luar Negeri (Inggris) - S1)
+
+3. **American University Au Emerging Global Leader Scholarship Au Egls** (Luar Negeri (Amerika Serikat) - S1)
+
+4. **Dr Goh Keng Swee Scholarship National University Of Singapore Nus** (Luar Negeri (Singapura) - S1)
+
+5. **Edith Cowan University International Undergraduate Scholarship** (Luar Negeri (Australia) - S1)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[125] Q: Berikan beasiswa sarjana dn
+A: Berikut daftar beasiswa jenjang S1 di Indonesia:
+
+1. **Beasiwa Sofyan Tan Scholarship** (Dalam Negeri (Indonesia) - SMA, S1)
+
+2. **Beasiswa Mandiri Muda Scholarship Batch 2** (Dalam Negeri (Indonesia) - S1)
+
+3. **Beasiswa GrabScholar** (Dalam Negeri (Indonesia) - SMP,SMA, D4, S1)
+
+4. **beasiswa kartu indonesia pintar kuliah (KIP Kuliah)** (Dalam Negeri (Indonesia) - D3, D4,S1)
+
+5. **Beasiswa APERTI BUMN** (Dalam Negeri (Indonesia) - SMA, Gap year, S1)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[126] Q: Berikan beasiswa phd dn
+A: Berikut daftar beasiswa jenjang S3 di Indonesia:
+
+1. **Beasiswa Program 5000 Doktor** (Dalam Negeri (Indonesia) - S3)
+
+2. **Beasiswa SHARE (Social, Humanities, Art for People, Religious Studies, Economics)** (Dalam Negeri (Indonesia) - S2,S3)
+
+3. **Beasiswa Indonesia Bangkit (BIB) - Beasiswa Unggulan Keagamaan (Magister & Doktor)** (Dalam Negeri (Indonesia) - S2, S3)
+
+4. **UPNVJT Scholarship for International Students** (Dalam Negeri (Indonesia) - S1, S2, S3)
+
+5. **Program Beasiswa Santri Berprestasi (Program Santri Beasiswa Pesantren Magister & Doktor)** (Luar Negeri (Bahrain, Iran, Irak, Israel, Kuwait, Lebanon, Oman, Palestina, State Of, Qatar, Arab Saudi, Siprus, Mesir, Turki, Suriah, Yordania, Uni Emirat Arab, Yaman) & Dalam Negeri (Indonesia) - S2, S3)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[127] Q: Berikan beasiswa phd ln
+A: Berikut daftar beasiswa jenjang S3:
+
+1. **Research Training Program International Rtpi Scholarship University Of New South Wales** (Luar Negeri (Australia) - S3)
+
+2. **Shanghai Summer School Sustainable Aquaculture Program 2026** (Luar Negeri (China) - S1, S2, S3)
+
+3. **Stipendium Hungaricum Scholarship Program Indonesia** (Luar Negeri (Hungaria) - S1, S2, S3)
+
+4. **Chinese Government Scholarship China Indonesia Scholarship In Higher Education Program** (Luar Negeri (China) - S3)
+
+5. **Stipendium Hungaricum Scholarship Program Phillipines** (Luar Negeri (Hungaria) - S1, S2, S3)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[128] Q: Berikan beasiswa master dn
+A: Berikut daftar beasiswa jenjang S2 di Indonesia:
+
+1. **UPNVJT Scholarship for International Students** (Dalam Negeri (Indonesia) - S1, S2, S3)
+
+2. **Beasiswa S2 & S3 Universitas Pertahanan RI** (Dalam Negeri (Indonesia) - S2, S3)
+
+3. **Beasiswa SHARE (Social, Humanities, Art for People, Religious Studies, Economics)** (Dalam Negeri (Indonesia) - S2,S3)
+
+4. **Beasiswa Indonesia Bangkit (BIB) Akselerasi Sarjana Lanjut Magister** (Dalam Negeri (Indonesia) - S1, S2)
+
+5. **Universitas Andalas International Scholarships** (Dalam Negeri (Indonesia) - S1, S2)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[129] Q: Berikan beasiswa master ln
+A: Berikut daftar beasiswa jenjang S2:
+
+1. **Daad Helmut Schmidt Programme Universit T Duisburg Essen Master Of Development And Governance** (Luar Negeri (Jerman) - S2)
+
+2. **Beasiswa International Chinese Language Teachers Scholarship (ICLTS)** (Luar Negeri (China) - S2)
+
+3. **Great Scholarships Postgraduate University Of York** (Luar Negeri (Inggris) - S2)
+
+4. **Middle East United Arab Emirates University Uaeu Chancellor S Fellowship For Graduate Students** (Luar Negeri (Arab Saudi) - S2)
+
+5. **University Of Eastern Finland Uef Scholarship** (Luar Negeri (Finlandia) - S2)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+
+#############################################################
+## KATEGORI 16 & 17: Follow-up Detail & Pagination (Stateful)
+#############################################################
+
+[130] Q (SEED): Beasiswa S2 di Jepang
+A: Berikut daftar beasiswa jenjang S2 di Jepang:
+
+1. **Ajinomoto Scholarship** (Luar Negeri (Jepang) - S2)
+
+2. **Beasiswa Monbukagakusho (MEXT) Pemerintah Jepang** (Luar Negeri (Jepang) - S2, S3)
+
+3. **Shizuoka University Asia Bridge Program Abp Scholarship** (Luar Negeri (Jepang) - S2)
+
+4. **Joint Japan World Bank Graduate Scholarship Program** (Luar Negeri (Amerika Serikat, Jepang, Belanda) - S2)
+
+5. **Mext University Recommendation International Joint Education Program For Science And Technology Ijep Kumamoto University** (Luar Negeri (Jepang) - S2, S3)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya.
+------------------------------------------------------------
+
+[131] Q (lanjutan): Pilih nomor 1
+A: Anda telah memilih **Ajinomoto Scholarship**.
+
+Detail apa yang ingin Anda ketahui? 👉 Ketik: **Benefit, Syarat, Deadline, Cara Daftar**, atau **Detail**
+------------------------------------------------------------
+
+[132] Q (lanjutan): Apa benefit beasiswa tersebut?
+A: Benefit **Ajinomoto Scholarship**:
+Berikut adalah informasi beasiswa yang telah dirapikan:
+
+**Cakupan Beasiswa**
+
+*   Biaya ujian, biaya masuk, dan biaya kuliah: ditanggung penuh.
+*   Tunjangan hidup:
+    *   ¥150.000/bulan (untuk Mahasiswa Riset selama 1 tahun).
+    *   ¥180.000/bulan (untuk Mahasiswa Magister selama 2 tahun).
+*   Tiket pesawat dari Indonesia ke Jepang.
+*   Bantuan orientasi kampus.
+*   Biaya tes psikologi (bagi pelamar yang lolos tahap tes psikologi).
+*   Akomodasi perjalanan dan hotel (bagi pelamar yang lolos tahap wawancara).
+
+*(Terjemahan Otomatis)*
+------------------------------------------------------------
+
+[133] Q (lanjutan): Apa persyaratannya?
+A: Persyaratan **Ajinomoto Scholarship**:
+**Persyaratan Usia**
+*   Usia maksimal: 35 tahun
+
+**Persyaratan Akademik**
+*   IPK minimal: 3.5 dari 4.00
+
+**Persyaratan Bahasa Inggris**
+*   IELTS: minimal 6.0
+*   TOEFL iBT: minimal 80
+
+**Persyaratan Bahasa Lain**
+*   JLPT: N3
+
+**Persyaratan Dokumen**
+*   Formulir pendaftaran (unduh dari https://www.ajinomoto.co.id/en/scholarship)
+*   Formulir Bidang Studi dan Program Studi
+*   Formulir Rekomendasi (dua surat rekomendasi)
+*   Transkrip akademik yang dikeluarkan oleh universitas atau sekolah pascasarjana yang dihadiri (atau salinan transkrip yang dilegalisir dari universitas, jika universitas tidak mengeluarkan salinan transkrip)
+*   Fotokopi dokumen yang membuktikan kemahiran berbahasa Jepang pelamar (seperti hasil JLPT, EJU, dan tes lain yang disediakan oleh institusi pelatihan Jepang) jika disyaratkan oleh Universitas.
+*   Skor TOEFL dan GRE jika disyaratkan oleh sekolah pascasarjana yang ingin dimasuki pelamar.
+
+**Catatan Penting**
+*   Semua dokumen harus dibubuhi tanda tangan basah pelamar. Tanda tangan elektronik tidak diterima.
+
+*(Terjemahan Otomatis)*
+------------------------------------------------------------
+
+[134] Q (lanjutan): Minta link pendaftarannya
+A: Berikut adalah link resmi untuk mendaftar beasiswa **Ajinomoto Scholarship**:
+
+👉 [**Website Resmi Beasiswa**](https://www.ajinomoto.co.id/en/scholarship)
+------------------------------------------------------------
+
+[135] Q (lanjutan): Bagaimana cara mendaftarnya?
+A: Untuk melihat cara pendaftaran lengkap **Ajinomoto Scholarship**, silakan kunjungi halaman ini:
+
+👉 [**Buka Halaman Detail & Cara Daftar**](http://localhost/scholarship/201)
+
+Atau langsung ke website resmi: https://www.ajinomoto.co.id/en/scholarship
+------------------------------------------------------------
+
+[136] Q (lanjutan): Tampilkan yang lain
+A: Berikut daftar beasiswa selanjutnya:
+
+6\. **Asian Development Bank Japan Scholarship Program Adb Jsp International University Of Japan** - Luar Negeri (Jepang) (S2)
+
+7\. **Asian Development Bank Japan Scholarship Program Adb Jsp Graduate School Of System Design And Management Keio University** - Luar Negeri (Jepang) (S2)
+
+8\. **Kansai University Scholarship For International Students International Students Entrance Examination For Science And Eng** - Luar Negeri (Jepang) (S2)
+
+9\. **Asian Development Bank Japan Scholarship Program Adb Jsp Kobe University Special Course For Development Policy Graduate** - Luar Negeri (Jepang) (S2)
+
+10\. **Asian Development Bank Japan Scholarship Program Adb Jsp Kyoto University Graduate School Of Agriculture** - Luar Negeri (Jepang) (S2)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya, atau silakan pilih nomor beasiswa untuk melihat **detail**.
+------------------------------------------------------------
+
+[137] Q (lanjutan): Ada lagi nggak?
+A: Berikut daftar beasiswa selanjutnya:
+
+11\. **Sophia University New Student Scholarships Benefactors Adachi Scholarship Graduate Programs Global Environmental Studies** - Luar Negeri (Jepang) (S2)
+
+12\. **Asian Development Bank Japan Scholarship Program Adb Jsp Lahore University Of Management Sciences** - Luar Negeri (Jepang) (S2)
+
+13\. **After Enrollment International Human Resource Network Organization Foundation Ihno Scholarship** - Luar Negeri (Jepang) (S1, S2, S3)
+
+14\. **Mext University Recommendation Nagoya City University** - Luar Negeri (Jepang) (S2, S3)
+
+15\. **Sophia University New Student Scholarships Benefactors Adachi Scholarship Graduate Programs Language Linguistics Human S** - Luar Negeri (Jepang) (S2)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya, atau silakan pilih nomor beasiswa untuk melihat **detail**.
+------------------------------------------------------------
+
+[138] Q (lanjutan): Selanjutnya
+A: Berikut daftar beasiswa selanjutnya:
+
+16\. **Beasiswa Joint Japan/World Bank Graduate Scholarship Program (JJ/WBGSP) 2026** - Luar Negeri (Jepang) (S2)
+
+17\. **Mext University Recommendation Akita University Graduate School Of Engineering Science International Program For Green S** - Luar Negeri (Jepang) (S2, S3)
+
+18\. **Mext University Recommendation Yokohama National University Special Program For The Department Of Mechanical Engineering** - Luar Negeri (Jepang) (S2, S3)
+
+19\. **Mext University Recommendation Tokyo University Of Foreign Studies Master S Program Peace And Conflict Studies Course** - Luar Negeri (Jepang) (S2)
+
+20\. **Mext University Recommendation Yokohama National University Special Program For The Department Of Chemistry And Life Sci** - Luar Negeri (Jepang) (S2, S3)
+
+Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya, atau silakan pilih nomor beasiswa untuk melihat **detail**.
+------------------------------------------------------------
+
+
+=== SELESAI: total 138 pertanyaan diuji ===

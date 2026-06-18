@@ -96,7 +96,14 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             'search_path' => 'public',
-            'sslmode' => 'prefer',
+            'sslmode' => env('DB_SSLMODE', 'require'),
+            // Supabase Transaction Pooler (pgBouncer, port 6543) tidak mendukung
+            // prepared statements asli. Emulasi prepares mencegah error koneksi
+            // putus mendadak (SQLSTATE[08006] / SSL SYSCALL error: EOF detected).
+            'options' => extension_loaded('pdo_pgsql') ? [
+                PDO::ATTR_EMULATE_PREPARES => true,
+                PDO::ATTR_PERSISTENT => false,
+            ] : [],
         ],
 
         'sqlsrv' => [

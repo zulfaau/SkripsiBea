@@ -38,13 +38,13 @@ def find_column(df, possible_names):
 def main():
     # 1. CEK CACHE DULU (Biar hemat API)
     if os.path.exists(CACHE_FILE):
-        print(f"📦 Menemukan cache {CACHE_FILE}. Menggunakan data yang sudah ada...")
+        print(f"[CACHE] Menemukan cache {CACHE_FILE}. Menggunakan data yang sudah ada...")
         with open(CACHE_FILE, 'r') as f:
             data_to_insert = json.load(f)
     else:
         # Proses Embedding seperti biasa
         if not os.path.exists(EXCEL_FILE):
-            print("❌ File Excel tidak ada!")
+            print("[ERROR] File Excel tidak ada!")
             return
         
         df = pd.read_excel(EXCEL_FILE)
@@ -82,12 +82,12 @@ def main():
                     embedding
                 ])
             except Exception as e:
-                print(f"❌ Error row {index+1}: {e}")
+                print(f"[ERROR] Error row {index+1}: {e}")
         
         # Simpan ke JSON
         with open(CACHE_FILE, 'w') as f:
             json.dump(data_to_insert, f)
-        print(f"💾 Data disimpan ke {CACHE_FILE}")
+        print(f"[SUCCESS] Data disimpan ke {CACHE_FILE}")
 
     # 2. UPLOAD KE DATABASE
     print(f" mencoba menghubungkan ke database {DB_HOST}...")
@@ -103,12 +103,12 @@ def main():
         )
         cur = conn.cursor()
         print("Clearing old data...")
-        cur.execute("TRUNCATE TABLE scholarships;")
+        cur.execute("TRUNCATE TABLE scholarships CASCADE;")
         
         query = """INSERT INTO scholarships (nama_beasiswa, benua, negara, jenjang, deskripsi, deadline, kategori, jurusan, benefit, persyaratan, sumber, url, url_asli, embedding) VALUES %s"""
         execute_values(cur, query, data_to_insert)
         conn.commit()
-        print(f"✅ BERHASIL! {len(data_to_insert)} data masuk ke Supabase.")
+        print(f"[SUCCESS] {len(data_to_insert)} data masuk ke Supabase.")
         
         # Hapus cache kalau sudah sukses
         os.remove(CACHE_FILE)
@@ -116,8 +116,8 @@ def main():
         cur.close()
         conn.close()
     except Exception as e:
-        print(f"\n❌ DATABASE MASIH ERROR: {e}")
-        print("\n💡 SARAN:")
+        print(f"\n[ERROR] DATABASE MASIH ERROR: {e}")
+        print("\n[INFO] SARAN:")
         print(f"1. Cek Dashboard Supabase -> Settings -> Database")
         print(f"2. Pastikan DB_HOST di .env sudah benar (biasanya formatnya: db.xxxx.supabase.co)")
         print(f"3. Jika kamu pakai Transaction Mode (Pooler), gunakan port 6543.")

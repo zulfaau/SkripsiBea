@@ -12,52 +12,65 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // 1. Pastikan ekstensi vector aktif di PostgreSQL
-        DB::statement('CREATE EXTENSION IF NOT EXISTS vector');
+        $isSqlite = DB::getDriverName() === 'sqlite';
+
+        if (!$isSqlite) {
+            // 1. Pastikan ekstensi vector aktif di PostgreSQL
+            DB::statement('CREATE EXTENSION IF NOT EXISTS vector');
+        }
 
         // 2. Buat tabel scholarships sesuai 13 kolom dataset
-        Schema::create('scholarships', function (Blueprint $table) {
+        Schema::create('scholarships', function (Blueprint $table) use ($isSqlite) {
             $table->id();
-            $table->string('name');             // Nama Beasiswa
-            $table->string('continent')->nullable(); // Benua
-            $table->string('country')->nullable();   // Negara
-            $table->string('level')->nullable();     // Jenjang
-            $table->text('description')->nullable(); // Deskripsi
-            $table->string('deadline')->nullable();  // Deadline
-            $table->string('category')->nullable();  // Kategori
-            $table->text('major')->nullable();       // Jurusan
+            $table->text('nama_beasiswa');     // Nama Beasiswa
+            $table->text('benua')->nullable(); // Benua
+            $table->text('negara')->nullable();   // Negara
+            $table->text('jenjang')->nullable();     // Jenjang
+            $table->text('deskripsi')->nullable(); // Deskripsi
+            $table->text('deadline')->nullable();  // Deadline
+            $table->text('kategori')->nullable();  // Kategori
+            $table->text('jurusan')->nullable();       // Jurusan
             $table->text('benefit')->nullable();     // Benefit
-            $table->text('requirements')->nullable();// Persyaratan
-            $table->string('source')->nullable();    // Sumber
-            $table->string('url')->nullable();       // URL
-            $table->string('original_url')->nullable(); // URL ASLI
+            $table->text('persyaratan')->nullable();// Persyaratan
+            $table->text('sumber')->nullable();    // Sumber
+            $table->text('url')->nullable();       // URL
+            $table->text('url_asli')->nullable(); // URL ASLI
             $table->timestamps();
+
+            if ($isSqlite) {
+                $table->text('embedding')->nullable();
+                $table->text('fts_content')->nullable();
+            }
         });
 
-        // 3. Tambahkan kolom embedding (vector 1536) & Full Text Search (tsvector)
-        DB::statement('ALTER TABLE scholarships ADD COLUMN embedding vector(1536)');
-        DB::statement('ALTER TABLE scholarships ADD COLUMN fts tsvector');
+        if (!$isSqlite) {
+            // 3. Tambahkan kolom embedding (vector 1536) & Full Text Search (tsvector)
+            DB::statement('ALTER TABLE scholarships ADD COLUMN embedding vector(1536)');
+            DB::statement('ALTER TABLE scholarships ADD COLUMN fts_content tsvector');
 
-        // 4. Tambahkan index
-        DB::statement('CREATE INDEX ON scholarships USING hnsw (embedding vector_cosine_ops)');
-        DB::statement('CREATE INDEX scholarships_fts_idx ON scholarships USING gin (fts)');
+            // 4. Tambahkan index
+            DB::statement('CREATE INDEX ON scholarships USING hnsw (embedding vector_cosine_ops)');
+            DB::statement('CREATE INDEX scholarships_fts_idx ON scholarships USING gin (fts_content)');
 
-        // 5. Trigger untuk otomatis update FTS
-        DB::statement("
-            CREATE OR REPLACE FUNCTION scholarships_update_fts() RETURNS trigger AS $$
-            BEGIN
-              new.fts :=
-                setweight(to_tsvector('indonesian', coalesce(new.name, '')), 'A') ||
-                setweight(to_tsvector('indonesian', coalesce(new.description, '')), 'B');
-              RETURN new;
-            END
-            $$ LANGUAGE plpgsql;
-        ");
+            // 5. Trigger untuk otomatis update FTS
+            DB::statement("
+                CREATE OR REPLACE FUNCTION scholarships_update_fts() RETURNS trigger AS $$
+                BEGIN
+                  new.fts_content :=
+                    setweight(to_tsvector('indonesian', coalesce(new.nama_beasiswa, '')), 'A') ||
+                    setweight(to_tsvector('indonesian', coalesce(new.benua, '')), 'B') ||
+                    setweight(to_tsvector('indonesian', coalesce(new.negara, '')), 'B') ||
+                    setweight(to_tsvector('indonesian', coalesce(new.deskripsi, '')), 'C');
+                  RETURN new;
+                END
+                $$ LANGUAGE plpgsql;
+            ");
 
-        DB::statement("
-            CREATE TRIGGER scholarships_fts_update BEFORE INSERT OR UPDATE
-            ON scholarships FOR EACH ROW EXECUTE FUNCTION scholarships_update_fts();
-        ");
+            DB::statement("
+                CREATE TRIGGER scholarships_fts_update BEFORE INSERT OR UPDATE
+                ON scholarships FOR EACH ROW EXECUTE FUNCTION scholarships_update_fts();
+            ");
+        }
     }
 
     /**
