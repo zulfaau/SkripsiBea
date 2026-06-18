@@ -489,7 +489,7 @@ class ChatbotController extends Controller
      * "N. **Nama** (Luar Negeri (Negara) - Jenjang - Pendanaan) - Deadline: ..."
      * Dipakai di semua tampilan daftar (search, paginasi, kembali ke list).
      */
-    private function formatScholarshipLine($s, $number, $englishFunding = false)
+    private function formatScholarshipLine($s, $number, $englishFunding = false, $jurusanNote = '')
     {
         $s = (array) $s;
         $nama = trim($s['nama_beasiswa'] ?? 'Beasiswa');
@@ -516,7 +516,38 @@ class ChatbotController extends Controller
         // Pendanaan
         $attrs[] = $this->getKategoriDisplay($s['kategori'] ?? '', $englishFunding);
 
-        return $number . ". **{$nama}** - " . implode(' - ', $attrs) . " - Deadline: " . ($s['deadline'] ?? '-');
+        return $number . ". **{$nama}** - " . implode(' - ', $attrs) . " - Deadline: " . ($s['deadline'] ?? '-') . $jurusanNote;
+    }
+
+    /**
+     * Apakah baris beasiswa menyebut SECARA EKSPLISIT salah satu jurusan yang dicari user?
+     * "Semua Jurusan / all major" (atau kosong) dianggap GENERIK (terbuka untuk semua jurusan),
+     * bukan match eksplisit — dipakai untuk pemeringkatan & pelabelan (Opsi 1).
+     */
+    private function bidangMatchesExplicitly($s, array $bidangList): bool
+    {
+        $s = (array) $s;
+        $rowBidang = strtolower($s['jurusan'] ?? '');
+        $isGeneric = $rowBidang === '' || $rowBidang === '-'
+            || str_contains($rowBidang, 'semua') || str_contains($rowBidang, 'all') || str_contains($rowBidang, 'any');
+        if ($isGeneric) return false;
+
+        $hay = $rowBidang . ' ' . strtolower($s['deskripsi'] ?? '') . ' ' . strtolower($s['persyaratan'] ?? '');
+        foreach ($bidangList as $b) {
+            if ($b !== '' && str_contains($hay, $b)) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Label transparan untuk daftar saat user mencari jurusan tertentu:
+     * beasiswa yang cocok HANYA karena terbuka untuk semua jurusan diberi penanda,
+     * sedangkan yang menyebut jurusan secara eksplisit tidak diberi penanda.
+     */
+    private function jurusanNote($s, array $bidangList): string
+    {
+        if (empty($bidangList)) return '';
+        return $this->bidangMatchesExplicitly($s, $bidangList) ? '' : ' _(terbuka untuk semua jurusan)_';
     }
 
     /**
@@ -551,10 +582,11 @@ class ChatbotController extends Controller
         $startIndex = ($page - 1) * 5;
         session()->forget('selected_scholarship');
 
+        $bidangList = session()->get('last_search_criteria')['bidang'] ?? [];
         $resp = "Berikut kembali daftar beasiswa sebelumnya:\n\n";
         foreach ($results as $i => $s) {
             $num = $startIndex + $i + 1;
-            $resp .= $this->formatScholarshipLine($s, $num) . "\n\n";
+            $resp .= $this->formatScholarshipLine($s, $num, false, $this->jurusanNote($s, $bidangList)) . "\n\n";
         }
         $resp .= "Silakan ketik nomor beasiswa untuk melihat detailnya kembali.";
         return $this->finalizeResponse($resp);
@@ -577,10 +609,11 @@ class ChatbotController extends Controller
         session()->put('last_search_results', $limitedResults);
         session()->forget('selected_scholarship');
 
+        $bidangList = session()->get('last_search_criteria')['bidang'] ?? [];
         $resp = "Berikut daftar beasiswa selanjutnya:\n\n";
         foreach ($limitedResults as $i => $s) {
             $displayNumber = $startIndex + $i + 1;
-            $resp .= $this->formatScholarshipLine($s, $displayNumber) . "\n\n";
+            $resp .= $this->formatScholarshipLine($s, $displayNumber, false, $this->jurusanNote($s, $bidangList)) . "\n\n";
         }
 
         if (count($allResults) > $startIndex + 5) {
@@ -877,6 +910,18 @@ class ChatbotController extends Controller
             shuffle($filtered);
         }
 
+        // OPSI 1 - Pemeringkatan jurusan: dahulukan beasiswa yang menyebut jurusan
+        // secara EKSPLISIT, baru kemudian yang "Semua Jurusan" (tetap ditampilkan).
+        // Sort stabil (PHP 8+) sehingga urutan/acak di dalam tiap tier dipertahankan.
+        if (!empty($criteria['bidang']) && empty($criteria['sort_deadline'])) {
+            $bidangList = $criteria['bidang'];
+            usort($filtered, function ($a, $b) use ($bidangList) {
+                $ea = $this->bidangMatchesExplicitly($a, $bidangList) ? 0 : 1;
+                $eb = $this->bidangMatchesExplicitly($b, $bidangList) ? 0 : 1;
+                return $ea <=> $eb;
+            });
+        }
+
         if (empty($filtered)) {
             if (!empty($criteria['negara']) || !empty($criteria['mentioned_location'])) {
                 return $this->finalizeResponse("Mohon maaf, saya belum memiliki data beasiswa untuk negara/kategori tersebut. 😊", $normalizedData);
@@ -928,8 +973,17 @@ class ChatbotController extends Controller
         }
 
         $isEnglishQuery = (bool) preg_match('/\b(fully|partially|partial|fund)\b/i', $message);
+        $bidangList = $criteria['bidang'] ?? [];
+        $hasGenericJurusan = false;
         foreach ($limitedResults as $i => $s) {
-            $resp .= $this->formatScholarshipLine($s, $i + 1, $isEnglishQuery) . "\n\n";
+            $note = $this->jurusanNote($s, $bidangList);
+            if ($note !== '') $hasGenericJurusan = true;
+            $resp .= $this->formatScholarshipLine($s, $i + 1, $isEnglishQuery, $note) . "\n\n";
+        }
+
+        // Penjelasan label "terbuka untuk semua jurusan" (Opsi 1) saat user mencari jurusan tertentu.
+        if (!empty($bidangList) && $hasGenericJurusan) {
+            $resp .= "ℹ️ Beasiswa bertanda _(terbuka untuk semua jurusan)_ menerima semua bidang studi. Namun, beasiswa ini tidak menyebut jurusan **" . implode(', ', array_map('ucwords', $bidangList)) . "** secara spesifik, jadi sebaiknya **cek langsung ke website resmi/universitas tujuan** untuk memastikan jurusan tersebut benar-benar dibuka di sana ya. 😊\n\n";
         }
 
         if (count($filtered) > 5) {
