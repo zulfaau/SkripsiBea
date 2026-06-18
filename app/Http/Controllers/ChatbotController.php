@@ -95,18 +95,15 @@ class ChatbotController extends Controller
                 $selectedNumber = (int)$mNum[1];
             }
 
+            // Sinyal user ingin MENCARI beasiswa baru (bukan menanyakan detail item terpilih).
+            // Mencegah pesan seperti "beasiswa yang tutup sampai akhir tahun" terbajak jadi
+            // permintaan deadline beasiswa yang sedang dipilih.
+            $looksLikeNewSearch = $isExplicitSearch || preg_match('/\bbeasiswa\b/i', $msg);
+
             // Detail beasiswa yang sudah dipilih (mis. "benefit", "syarat", "cara daftar")
-            if ($detailIntent && session()->has('selected_scholarship') && !$selectedNumber && !$isExplicitSearch) {
+            if ($detailIntent && session()->has('selected_scholarship') && !$selectedNumber && !$looksLikeNewSearch) {
                 $this->currentIntent = 'detail';
                 return $this->handleDetailRequest($detailIntent, null);
-            }
-
-            // Detail diminta TAPI belum ada beasiswa yang dipilih, padahal list sedang aktif.
-            // Jangan jatuh ke pencarian (yang malah men-dump ulang list); minta user pilih nomor dulu.
-            if ($detailIntent && !session()->has('selected_scholarship') && session()->has('last_search_all_results')
-                && !$selectedNumber && !$isExplicitSearch) {
-                $this->currentIntent = 'detail';
-                return $this->finalizeResponse("Silakan ketik **nomor** beasiswa dari daftar di atas terlebih dahulu ya untuk melihat detailnya 😊 (contoh: ketik **1**).");
             }
 
             // Eksekusi pemilihan nomor
@@ -134,13 +131,6 @@ class ChatbotController extends Controller
             if (preg_match('/^(kembali|balik|list( sebelumnya)?|daftar sebelumnya|beasiswa sebelumnya)$/i', trim($msg)) && session()->has('last_search_results')) {
                 $this->currentIntent = 'back_to_list';
                 return $this->showLastList();
-            }
-
-            // FAQ kurasi (LPDP/Erasmus/MEXT/definisi) - deterministik & murah
-            $faqAnswer = $this->handleFAQ($msg);
-            if ($faqAnswer) {
-                $this->currentIntent = 'faq';
-                return $this->finalizeResponse($faqAnswer);
             }
 
             // =================================================================
@@ -198,15 +188,24 @@ class ChatbotController extends Controller
                 }
             }
 
-            // Detail via LLM (mis. typo berat "bnefit" yang lolos fast-path)
-            if ($intent === 'detail' && !empty($llm['detail_type'])) {
+            // Detail / pemilihan beasiswa via LLM.
+            // Menangani: typo berat ("bnefit") DAN pemilihan item daftar dengan kata
+            // bilangan/urutan ("satu", "dua", "pertama", "yang ketiga") yang lolos
+            // fast-path regex (regex hanya menangkap angka digit).
+            if ($intent === 'detail' && ($refNumber || session()->has('selected_scholarship'))) {
                 if ($refNumber) {
                     $results = session()->get('last_search_all_results', []);
-                    if (isset($results[$refNumber - 1])) session()->put('selected_scholarship', (array)$results[$refNumber - 1]);
+                    if (isset($results[$refNumber - 1])) {
+                        session()->put('selected_scholarship', (array)$results[$refNumber - 1]);
+                    } else {
+                        $this->currentIntent = 'detail';
+                        return $this->finalizeResponse("Maaf, nomor tersebut tidak valid atau tidak ada dalam daftar pencarian terakhir Anda.");
+                    }
                 }
                 if (session()->has('selected_scholarship')) {
                     $this->currentIntent = 'detail';
-                    return $this->handleDetailRequest($llm['detail_type'], null);
+                    $detailType = (!empty($llm['detail_type']) && $llm['detail_type'] !== 'null') ? $llm['detail_type'] : 'detail';
+                    return $this->handleDetailRequest($detailType, null);
                 }
             }
 
@@ -406,65 +405,6 @@ class ChatbotController extends Controller
         return $locContext;
     }
 
-    private function handleFAQ($message)
-    {
-        $m = strtolower($message);
-
-        // Hanya trigger FAQ statis jika bertanya "apakah ada" atau "adakah"
-        if (preg_match('/\b(apakah ada|adakah)\b/i', $m) && preg_match('/\b(tanpa toefl|tanpa ielts|tanpa syarat|tanpa persyaratan)\b/i', $m)) {
-            return "Ada beberapa beasiswa yang tidak mewajibkan TOEFL/IELTS, seperti beasiswa Turkiye Burslari (Turki), GKS (Korea - jalur tertentu), atau beasiswa Pemerintah Rusia. Beberapa beasiswa dalam negeri juga banyak yang tidak memerlukan sertifikat bahasa Inggris.";
-        }
-
-        // List pertanyaan titipan user (Possibility)
-        if (str_contains($m, 'lpdp')) {
-            if (str_contains($m, 'cara')) {
-                return "Cara mendaftar beasiswa LPDP secara umum meliputi registrasi online di situs resmi LPDP, mengisi formulir pendaftaran, mengunggah berkas syarat (seperti LoA, TOEFL/IELTS, surat rekomendasi, esai), dan mengikuti seleksi administrasi, bakat skolastik, serta wawancara. 😊";
-            }
-            return "Beasiswa LPDP biasanya dibuka dalam 2 tahap setiap tahunnya (sekitar bulan Januari-Februari untuk Tahap 1 dan Juni-Juli untuk Tahap 2). Untuk update resmi tahun 2026, silakan pantau terus situs lpdp.kemenkeu.go.id ya! 😊";
-        }
-        if (str_contains($m, 'erasmus')) {
-            return "Syarat utama beasiswa Erasmus+ (EMJM) biasanya meliputi memiliki gelar sarjana (S1), sertifikat kemampuan bahasa Inggris (IELTS/TOEFL), surat rekomendasi, CV, Motivation Letter, dan mendaftar pada program konsorsium Erasmus yang dituju. 😊";
-        }
-        if (str_contains($m, 'mext')) {
-            return "Beasiswa MEXT (Monbukagakusho) dari Pemerintah Jepang adalah beasiswa fully funded yang menanggung penuh biaya kuliah, tunjangan hidup bulanan, serta tiket pesawat pergi-pulang. 😊";
-        }
-        if (str_contains($m, 'wawancara') && (str_contains($m, 'tidak pakai') || str_contains($m, 'tanpa'))) {
-            return "Beasiswa tanpa wawancara biasanya fokus pada seleksi berkas dan nilai akademik. Contohnya beberapa beasiswa bantuan UKT atau beasiswa dari yayasan swasta tertentu. Namun mayoritas beasiswa bergengsi biasanya tetap menyertakan tahap wawancara.";
-        }
-        if (str_contains($m, 'fresh graduate') || str_contains($m, 'pengalaman')) {
-            return "Tentu! Banyak beasiswa S2 luar negeri yang sangat terbuka untuk fresh graduate tanpa syarat pengalaman kerja, seperti beasiswa Erasmus+ (Eropa), MEXT (Jepang), atau beasiswa dari universitas di Taiwan.";
-        }
-        if (str_contains($m, 'kurang mampu') || str_contains($m, 'anak mampu') || str_contains($m, 'kip')) {
-            return "Untuk mahasiswa kurang mampu, pilihan utamanya adalah KIP Kuliah (untuk dalam negeri) atau beasiswa yang berbasis 'Need-based Financial Aid' untuk luar negeri. Kami memiliki beberapa data bantuan kuliah tersebut di database.";
-        }
-
-        if (str_contains($m, 'perbedaan') && (str_contains($m, 'penuh') || str_contains($m, 'fully') || str_contains($m, 'full')) && (str_contains($m, 'sebagian') || str_contains($m, 'partially') || str_contains($m, 'partial'))) {
-            return "Perbedaan utamanya:\n- **Beasiswa Penuh (Fully Funded)** menanggung seluruh biaya (kuliah, hidup, tiket, dll).\n- **Beasiswa Sebagian (Partially Funded)** hanya menanggung sebagian biaya (misal hanya biaya kuliah atau uang saku saja).";
-        }
-        if (str_contains($m, 'perbedaan') && str_contains($m, 'fully funded') && str_contains($m, 'partially funded')) {
-            return "Perbedaan utamanya:\n- **Fully Funded** menanggung seluruh biaya (kuliah, hidup, tiket, dll).\n- **Partially Funded** hanya menanggung sebagian biaya (misal hanya biaya kuliah atau uang saku saja).";
-        }
-        
-        // Deteksi Pengertian (Hanya jika 'apa itu' secara spesifik)
-        if (preg_match('/\b(apa itu|pengertian|maksud dari|definisi|jelaskan|maksud|dimaksud|arti)\b/i', $m)) {
-            if (str_contains($m, 'fully funded') || str_contains($m, 'full funded') || str_contains($m, 'penuh')) {
-                return "Fully Funded adalah jenis beasiswa yang menanggung seluruh biaya studi, biasanya mencakup biaya kuliah (tuition fee), biaya hidup (living allowance), asuransi kesehatan, hingga tiket pesawat.";
-            }
-            if (str_contains($m, 'partially funded') || str_contains($m, 'partial funded') || str_contains($m, 'sebagian')) {
-                return "Partially Funded adalah beasiswa yang hanya menanggung sebagian biaya studi, misalnya hanya membiayai uang kuliah saja (tuition only) tanpa biaya hidup, atau sebaliknya.";
-            }
-        }
-
-        // Hanya trigger jika user secara spesifik menanyakan pengertiannya
-        if (preg_match('/\b(apa itu|pengertian|definisi|maksud|arti|jelaskan)\b/i', $m) && (str_contains($m, 'ielts') || str_contains($m, 'toefl'))) {
-            return "IELTS (International English Language Testing System) dan TOEFL (Test of English as a Foreign Language) adalah tes standar internasional untuk mengukur kemampuan bahasa Inggris yang sering menjadi syarat utama pendaftaran beasiswa luar negeri.";
-        }
-        if (str_contains($m, 'loa')) {
-            return "LoA (Letter of Acceptance) adalah surat resmi dari universitas yang menyatakan bahwa Anda telah diterima sebagai mahasiswa di universitas tersebut. LoA sering menjadi salah satu syarat mendaftar beasiswa.";
-        }
-        return null;
-    }
-
     private function getDetailIntent($m)
     {
         $m = strtolower($m);
@@ -544,6 +484,63 @@ class ChatbotController extends Controller
         return $this->finalizeResponse($ans, $normalizedData);
     }
 
+    /**
+     * Format SATU baris beasiswa untuk daftar, dengan format LENGKAP & konsisten:
+     * "N. **Nama** (Luar Negeri (Negara) - Jenjang - Pendanaan) - Deadline: ..."
+     * Dipakai di semua tampilan daftar (search, paginasi, kembali ke list).
+     */
+    private function formatScholarshipLine($s, $number, $englishFunding = false)
+    {
+        $s = (array) $s;
+        $nama = trim($s['nama_beasiswa'] ?? 'Beasiswa');
+
+        $attrs = [];
+
+        // Lokasi: tipe (Dalam/Luar Negeri) + negara.
+        // Beberapa baris sudah memuat tipe di kolom negara (mis. "Luar Negeri (China)") -
+        // pakai apa adanya agar tidak terjadi duplikasi "Luar Negeri (Luar Negeri (China))".
+        $negara = trim($s['negara'] ?? '');
+        $negaraLower = strtolower($negara);
+        if ($negara === '') {
+            $attrs[] = 'Luar Negeri';
+        } elseif (str_contains($negaraLower, 'luar negeri') || str_contains($negaraLower, 'dalam negeri')) {
+            $attrs[] = ucwords($negara);
+        } else {
+            $lokasiTipe = str_contains($negaraLower, 'indonesia') ? 'Dalam Negeri' : 'Luar Negeri';
+            $attrs[] = $lokasiTipe . ' (' . ucwords($negara) . ')';
+        }
+
+        // Jenjang
+        $attrs[] = !empty($s['jenjang']) ? $s['jenjang'] : '-';
+
+        // Pendanaan
+        $attrs[] = $this->getKategoriDisplay($s['kategori'] ?? '', $englishFunding);
+
+        return $number . ". **{$nama}** - " . implode(' - ', $attrs) . " - Deadline: " . ($s['deadline'] ?? '-');
+    }
+
+    /**
+     * Konversi nilai kolom `kategori` menjadi label pendanaan yang ramah pengguna.
+     */
+    private function getKategoriDisplay($kategori, $english = false)
+    {
+        $kat = strtolower($kategori ?? '');
+        $hasFull = str_contains($kat, 'fully') || str_contains($kat, 'penuh');
+        $hasPartial = str_contains($kat, 'partially') || str_contains($kat, 'sebagian') || str_contains($kat, 'partial');
+
+        if ($english) {
+            if ($hasFull && $hasPartial) return 'Fully & Partially Funded';
+            if ($hasFull) return 'Fully Funded';
+            if ($hasPartial) return 'Partially Funded';
+            return !empty($kategori) ? ucwords($kategori) : 'Partially Funded';
+        }
+
+        if ($hasFull && $hasPartial) return 'Pendanaan Penuh & Sebagian';
+        if ($hasFull) return 'Pendanaan Penuh (Full Gratis)';
+        if ($hasPartial) return 'Pendanaan Sebagian (Parsial)';
+        return !empty($kategori) ? ucwords($kategori) : 'Pendanaan Sebagian (Parsial)';
+    }
+
     private function showLastList()
     {
         $results = session()->get('last_search_results', []);
@@ -556,9 +553,8 @@ class ChatbotController extends Controller
 
         $resp = "Berikut kembali daftar beasiswa sebelumnya:\n\n";
         foreach ($results as $i => $s) {
-            $s = (array)$s;
             $num = $startIndex + $i + 1;
-            $resp .= $num . ". **" . trim($s['nama_beasiswa']) . "** - " . ($s['negara'] ?? 'Luar Negeri') . " (" . ($s['jenjang'] ?? '-') . ") - Deadline: " . ($s['deadline'] ?? '-') . "\n\n";
+            $resp .= $this->formatScholarshipLine($s, $num) . "\n\n";
         }
         $resp .= "Silakan ketik nomor beasiswa untuk melihat detailnya kembali.";
         return $this->finalizeResponse($resp);
@@ -583,10 +579,8 @@ class ChatbotController extends Controller
 
         $resp = "Berikut daftar beasiswa selanjutnya:\n\n";
         foreach ($limitedResults as $i => $s) {
-            $s = (array) $s;
-            $namaBeasiswa = trim($s['nama_beasiswa']);
             $displayNumber = $startIndex + $i + 1;
-            $resp .= $displayNumber . "\. **{$namaBeasiswa}** - " . ($s['negara'] ?? 'Luar Negeri') . " (" . ($s['jenjang'] ?? '-') . ") - Deadline: " . ($s['deadline'] ?? '-') . "\n\n";
+            $resp .= $this->formatScholarshipLine($s, $displayNumber) . "\n\n";
         }
 
         if (count($allResults) > $startIndex + 5) {
@@ -708,8 +702,7 @@ class ChatbotController extends Controller
                 $countResult = count($all);
                 $resp = "Berikut beasiswa tahun {$year} (menampilkan 5 dari {$countResult} data secara acak):\n\n";
                 foreach ($limitedResults as $i => $s) {
-                    $s = (array)$s;
-                    $resp .= ($i + 1) . ". **{$s['nama_beasiswa']}** - " . ($s['negara'] ?? 'Luar Negeri') . " (" . ($s['jenjang'] ?? '-') . ") - Deadline: " . ($s['deadline'] ?? '-') . "\n\n";
+                    $resp .= $this->formatScholarshipLine($s, $i + 1) . "\n\n";
                 }
                 if ($countResult > 5) {
                     $resp .= "Masih ada beasiswa lainnya. Ketik **'yang lain'** untuk melihat daftar selanjutnya, atau ketik nomor beasiswa untuk melihat **detail**.";
@@ -934,69 +927,9 @@ class ChatbotController extends Controller
             }
         }
 
+        $isEnglishQuery = (bool) preg_match('/\b(fully|partially|partial|fund)\b/i', $message);
         foreach ($limitedResults as $i => $s) {
-            $s = (array) $s;
-            $namaBeasiswa = trim($s['nama_beasiswa']);
-            $attrs = [];
-            
-            $hasLocKeyword = preg_match('/\b(negara|lokasi|tempat|benua|ln|dn|luar|dalam|di|dari|indonesia|inggris|jepang|jerman|swiss|usa|as|korea|turki|arab)\b/i', $message) 
-                || !empty($criteria['negara']) || !empty($criteria['benua']) || !empty($criteria['lokasi_tipe']);
-            
-            $hasLevelKeyword = preg_match('/\b(jenjang|tingkat|s1|s2|s3|d3|d4|sarjana|magister|doktor|diploma)\b/i', $message) 
-                || !empty($criteria['jenjang']);
-            
-            $hasFundingKeyword = preg_match('/\b(fully|partially|partial|fund|gratis|biaya|dana|saku|tunjangan|kategori)\b/i', $message) 
-                || !empty($criteria['funding']) || $fallbackToOtherFunding;
-            
-            $hasDeadlineKeyword = preg_match('/\b(deadline|dl|tanggal|bulan|kapan|tutup|batas|buka|aktif|sekarang)\b/i', $message) 
-                || !empty($criteria['bulan']) || !empty($criteria['sort_deadline']) || !empty($criteria['still_open']);
-            
-            if (!$hasLocKeyword && !$hasLevelKeyword && !$hasFundingKeyword && !$hasDeadlineKeyword) {
-                $hasLocKeyword = true;
-                $hasLevelKeyword = true;
-            }
-
-            if ($hasLocKeyword) {
-                $attrs[] = $s['negara'] ?? 'Luar Negeri';
-            }
-            if ($hasLevelKeyword) {
-                $attrs[] = $s['jenjang'] ?? '-';
-            }
-            if ($hasFundingKeyword) {
-                $kat = strtolower($s['kategori'] ?? '');
-                $isEnglishQuery = preg_match('/\b(fully|partially|partial|fund)\b/i', $message);
-                if ($isEnglishQuery) {
-                    $kategoriDisplay = "Partially Funded";
-                    if ((str_contains($kat, 'fully') || str_contains($kat, 'penuh')) && (str_contains($kat, 'partially') || str_contains($kat, 'sebagian') || str_contains($kat, 'partial'))) {
-                        $kategoriDisplay = "Fully & Partially Funded";
-                    } elseif (str_contains($kat, 'fully') || str_contains($kat, 'penuh')) {
-                        $kategoriDisplay = "Fully Funded";
-                    } elseif (str_contains($kat, 'partially') || str_contains($kat, 'sebagian') || str_contains($kat, 'partial')) {
-                        $kategoriDisplay = "Partially Funded";
-                    } elseif (!empty($s['kategori'])) {
-                        $kategoriDisplay = ucwords($s['kategori']);
-                    }
-                } else {
-                    $kategoriDisplay = "Pendanaan Sebagian (Parsial)";
-                    if ((str_contains($kat, 'fully') || str_contains($kat, 'penuh')) && (str_contains($kat, 'partially') || str_contains($kat, 'sebagian') || str_contains($kat, 'partial'))) {
-                        $kategoriDisplay = "Pendanaan Penuh & Sebagian";
-                    } elseif (str_contains($kat, 'fully') || str_contains($kat, 'penuh')) {
-                        $kategoriDisplay = "Pendanaan Penuh (Full Gratis)";
-                    } elseif (str_contains($kat, 'partially') || str_contains($kat, 'sebagian') || str_contains($kat, 'partial')) {
-                        $kategoriDisplay = "Pendanaan Sebagian (Parsial)";
-                    } elseif (!empty($s['kategori'])) {
-                        $kategoriDisplay = ucwords($s['kategori']);
-                    }
-                }
-                $attrs[] = $kategoriDisplay;
-            }
-
-            $resp .= ($i + 1) . ". **{$namaBeasiswa}**";
-            if (!empty($attrs)) {
-                $resp .= " (" . implode(' - ', $attrs) . ")";
-            }
-            $resp .= " - Deadline: " . ($s['deadline'] ?? '-');
-            $resp .= "\n\n";
+            $resp .= $this->formatScholarshipLine($s, $i + 1, $isEnglishQuery) . "\n\n";
         }
 
         if (count($filtered) > 5) {
@@ -1435,6 +1368,8 @@ Keluarkan HANYA JSON valid dengan skema:
 ATURAN PENTING:
 - intent "search": user mencari/minta daftar beasiswa dengan kriteria apa pun.
 - intent "detail": user menanyakan benefit/syarat/deadline/cara daftar/link dari beasiswa yang SUDAH dipilih (lihat konteks). Isi detail_type.
+- ref_number: nomor urut beasiswa pada daftar yang dirujuk user. WAJIB tangkap bentuk ANGKA ("1","2","no 3") MAUPUN kata bilangan/urutan ("satu","dua","tiga","pertama","kedua","ketiga","yang pertama","yg kedua", dst) lalu ubah ke int (satu/pertama=1, dua/kedua=2, tiga/ketiga=3, dst).
+- PEMILIHAN ITEM: jika user HANYA memilih sebuah item dari daftar (mis. "satu", "dua", "yang ketiga", "pilih nomor 2", "nomor 1") TANPA menyebut aspek tertentu -> intent "detail", detail_type "detail", dan isi ref_number.
 - intent "validation": user bertanya YA/TIDAK tentang beasiswa yang sedang dipilih/dirujuk (mis. "apakah ini di jepang?", "ada jurusan kedokteran ga?"). Isi kriteria yang divalidasi.
 - intent "next_page": user minta MELANJUTKAN daftar hasil sebelumnya / melihat lebih banyak (mis. "yang lain", "selanjutnya", "berikutnya", "ada lagi", "tampilkan lagi", "lainnya"). WAJIB toleran typo: "yang laib", "slanjutnya", "lainnyaa", "ada lg" -> tetap next_page. JANGAN isi kriteria baru.
 - intent "back_to_list": user minta KEMBALI ke daftar beasiswa sebelumnya (mis. "kembali", "balik", "list sebelumnya", "daftar tadi"). Toleran typo. JANGAN isi kriteria baru.
