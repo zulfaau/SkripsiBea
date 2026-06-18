@@ -1,0 +1,73 @@
+==================================================================
+REPORT PERFORMA CHATBOT SCHOLARBOT (MODE RAG ON)
+Tanggal generate : 2026-06-17 08:13:18
+Sumber           : laporan_pengujian_chatbot.txt
+Total pertanyaan : 138
+==================================================================
+
+RINGKASAN KESELURUHAN
+------------------------------------------------------------------
+  BERHASIL (responsif benar)   : 128  (92.8%)
+  KOSONG (tidak ada data)      :  10  (7.2%)
+  BUG (salah jadi out-of-topic) :   0  (0.0%)
+
+DISTRIBUSI JENIS JAWABAN
+------------------------------------------------------------------
+  LIST           : 111
+  KOSONG         :  10
+  FAQ/INFO       :   9
+  DETAIL         :   4
+  NEXTPAGE       :   3
+  PILIH          :   1
+
+PERFORMA PER KATEGORI
+------------------------------------------------------------------
+  Kategori                                         OK  Ksg  Bug
+  KATEGORI 1: Filter Berdasarkan Negara Tujuan      7    1    0
+  KATEGORI 2: Filter Berdasarkan Jurusan            5    0    0
+  KATEGORI 3: Filter Berdasarkan Status Pendanaa    5    0    0
+  KATEGORI 4: Filter Berdasarkan Tujuan Studi       5    0    0
+  KATEGORI 5: Filter Berdasarkan Persyaratan Bah    4    0    0
+  KATEGORI 6: Filter Berdasarkan Waktu              4    0    0
+  KATEGORI 7: Filter Deadline Terdekat              6    1    0
+  KATEGORI 8: Filter Deadline Bulan                10    0    0
+  KATEGORI 9: Berdasarkan Tahun                     3    0    0
+  KATEGORI 10: Deadline Belum Lewat                 6    0    0
+  KATEGORI 11: Filter Berdasarkan Jenjang           6    0    0
+  KATEGORI 12: Filter Berdasarkan Lokasi            3    1    0
+  KATEGORI 13: Filter Deadline per Negara           5    0    0
+  KATEGORI 14: Filter Deadline per Pendanaan        3    1    0
+  KATEGORI 15: Filter Berdasarkan Benua             6    1    0
+  KATEGORI 18: Kriteria Khusus                      9    2    0
+  KATEGORI 19: Kombinasi Multiple Filter            1    2    0
+  TAMBAHAN: Data per Tahun & Funding-Lokasi        17    1    0
+  TAMBAHAN: Singkatan Jenjang + LN/DN              14    0    0
+  KATEGORI 16 & 17: Follow-up Detail & Paginatio    9    0    0
+
+DAFTAR PERTANYAAN 'TIDAK ADA DATA' (KOSONG)
+------------------------------------------------------------------
+  [7] Beasiswa ke Jerman yang masih buka
+  [38] Beasiswa yang tutup bulan ini
+  [66] Beasiswa luar negeri yang tutup bulan ini
+  [76] Beasiswa partially funded yang akan tutup bulan ini
+  [83] Beasiswa doktor di Amerika Utara
+  [90] Beasiswa s2 bagi lulusan baru
+  [93] Beasiswa untuk IPK di bawah 3
+  [95] Beasiswa S2 di benua Eropa untuk jurusan kedokteran yang fully funded
+  [96] Beasiswa S1 luar negeri jurusan IT yang tutup bulan depan
+  [102] Beasiswa yang masih buka bulan ini
+
+DAFTAR BUG (salah jadi out-of-topic)
+------------------------------------------------------------------
+  (TIDAK ADA) - semua pertanyaan relevan terjawab tanpa salah-tolak.
+
+CATATAN KUALITAS (di luar metrik di atas)
+------------------------------------------------------------------
+  - 'BERHASIL' = chatbot memberi respons relevan (daftar/detail/FAQ/paginasi),
+    BUKAN jaminan presisi filter untuk kriteria sangat spesifik.
+  - Presisi LEMAH (hanya andal via embedding, tanpa aturan eksplisit):
+    'tiket pesawat', 'uang saku', 'biaya hidup', 'IELTS 6.0', 'Duolingo',
+    'short course', 'double degree', 'pertukaran pelajar'.
+  - 'KOSONG' sebagian WAJAR (query multi-filter sempit pada dataset 657 baris),
+    sebagian SUBOPTIMAL (mis. '...bulan ini', 'lulusan baru', 'IPK di bawah 3').
+  - FAQ dapat men-short-circuit query kompleks (mis. 'master Australia tanpa IELTS').

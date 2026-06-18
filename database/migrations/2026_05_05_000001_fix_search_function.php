@@ -10,6 +10,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
         // 1. Update Fungsi Trigger FTS agar menyertakan Benua dan Negara
         DB::statement("
             CREATE OR REPLACE FUNCTION scholarships_update_fts() RETURNS trigger AS $$
@@ -35,19 +39,20 @@ return new class extends Migration
         ");
 
         // 3. Update Fungsi hybrid_search agar mengembalikan kolom benua
+        DB::statement("DROP FUNCTION IF EXISTS hybrid_search(text, vector, integer)");
         DB::statement("
             CREATE OR REPLACE FUNCTION hybrid_search(query_text TEXT, query_embedding VECTOR(1536), match_count INT)
             RETURNS TABLE (
                 id BIGINT,
-                nama_beasiswa VARCHAR,
-                benua VARCHAR,
-                negara VARCHAR,
-                jenjang VARCHAR,
+                nama_beasiswa TEXT,
+                benua TEXT,
+                negara TEXT,
+                jenjang TEXT,
                 deskripsi TEXT,
                 benefit TEXT,
                 persyaratan TEXT,
-                deadline VARCHAR,
-                kategori VARCHAR,
+                deadline TEXT,
+                kategori TEXT,
                 similarity FLOAT8
             ) AS $$
             BEGIN
