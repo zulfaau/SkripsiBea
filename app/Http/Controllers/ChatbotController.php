@@ -101,6 +101,14 @@ class ChatbotController extends Controller
                 return $this->handleDetailRequest($detailIntent, null);
             }
 
+            // Detail diminta TAPI belum ada beasiswa yang dipilih, padahal list sedang aktif.
+            // Jangan jatuh ke pencarian (yang malah men-dump ulang list); minta user pilih nomor dulu.
+            if ($detailIntent && !session()->has('selected_scholarship') && session()->has('last_search_all_results')
+                && !$selectedNumber && !$isExplicitSearch) {
+                $this->currentIntent = 'detail';
+                return $this->finalizeResponse("Silakan ketik **nomor** beasiswa dari daftar di atas terlebih dahulu ya untuk melihat detailnya 😊 (contoh: ketik **1**).");
+            }
+
             // Eksekusi pemilihan nomor
             if ($selectedNumber) {
                 $allResults = session()->get('last_search_all_results', []);
@@ -156,6 +164,23 @@ class ChatbotController extends Controller
             if ($intent === 'thanks') {
                 $this->currentIntent = 'thank_you';
                 return $this->finalizeResponse($this->getThankYouResponse());
+            }
+
+            // Paginasi & kembali ke daftar via LLM (jaring pengaman saat fast-path regex
+            // meleset karena typo: "yang laib", "slanjutnya", "lainnyaa", dst).
+            if ($intent === 'next_page') {
+                if (session()->has('last_search_all_results')) {
+                    $this->currentIntent = 'next_page';
+                    return $this->handleNextPage(null);
+                }
+                return $this->finalizeResponse("Belum ada daftar beasiswa sebelumnya. Silakan cari beasiswa terlebih dahulu ya. 😊");
+            }
+            if ($intent === 'back_to_list') {
+                if (session()->has('last_search_results')) {
+                    $this->currentIntent = 'back_to_list';
+                    return $this->showLastList();
+                }
+                return $this->finalizeResponse("Belum ada daftar beasiswa sebelumnya untuk ditampilkan. Silakan cari beasiswa terlebih dahulu ya. 😊");
             }
 
             // Validasi follow-up ("apakah beasiswa ini di jepang?")
@@ -387,7 +412,7 @@ class ChatbotController extends Controller
 
         // Hanya trigger FAQ statis jika bertanya "apakah ada" atau "adakah"
         if (preg_match('/\b(apakah ada|adakah)\b/i', $m) && preg_match('/\b(tanpa toefl|tanpa ielts|tanpa syarat|tanpa persyaratan)\b/i', $m)) {
-            return "Ada beberapa beasiswa yang tidak mewajibkan TOEFL/IELTS, seperti beasiswa Turkiye Burslari (Turki), GKS (Korea - jalur tertentu), atau beasiswa Pemerintah Rusia. Beberapa beasiswa dalam negeri juga banyak yang tidak memerlukan sertifikat bahasa Inggris. Mau saya carikan yang spesifik di database? 😊";
+            return "Ada beberapa beasiswa yang tidak mewajibkan TOEFL/IELTS, seperti beasiswa Turkiye Burslari (Turki), GKS (Korea - jalur tertentu), atau beasiswa Pemerintah Rusia. Beberapa beasiswa dalam negeri juga banyak yang tidak memerlukan sertifikat bahasa Inggris.";
         }
 
         // List pertanyaan titipan user (Possibility)
@@ -508,8 +533,13 @@ class ChatbotController extends Controller
                        "5. **Kategori Pendanaan**: " . ($selected['kategori'] ?? '-') . "\n" .
                        "6. **Jenjang**: " . ($selected['jenjang'] ?? '-') . "\n" .
                        "7. **Jurusan**: " . ($selected['jurusan'] ?? 'Semua jurusan') . "\n\n" .
+                       "Ketik **benefit**, **syarat**, **deadline**, atau **cara daftar** untuk melihat lebih detail.\n\n" .
                        "ketik **kembali** untuk melihat list beasiswa sebelumnya.";
                 break;
+        }
+        // Petunjuk "kembali" untuk view detail spesifik (ringkasan 'detail' sudah punya petunjuknya sendiri).
+        if (!empty($ans) && $intent !== 'detail') {
+            $ans .= "\n\nKetik **kembali** untuk kembali ke daftar beasiswa sebelumnya.";
         }
         return $this->finalizeResponse($ans, $normalizedData);
     }
@@ -721,6 +751,13 @@ class ChatbotController extends Controller
                 if (empty($criteria['jenjang']) && !empty($lastCriteria['jenjang'])) $criteria['jenjang'] = $lastCriteria['jenjang'];
                 if (empty($criteria['bidang']) && !empty($lastCriteria['bidang'])) $criteria['bidang'] = $lastCriteria['bidang'];
                 if (empty($criteria['funding']) && !empty($lastCriteria['funding'])) $criteria['funding'] = $lastCriteria['funding'];
+                // Pertahankan filter waktu agar re-run tidak memunculkan beasiswa kedaluwarsa / di luar rentang.
+                if (empty($criteria['still_open']) && !empty($lastCriteria['still_open'])) $criteria['still_open'] = $lastCriteria['still_open'];
+                if (empty($criteria['deadline_before']) && !empty($lastCriteria['deadline_before'])) $criteria['deadline_before'] = $lastCriteria['deadline_before'];
+                if (empty($criteria['sort_deadline']) && !empty($lastCriteria['sort_deadline'])) {
+                    $criteria['sort_deadline'] = $lastCriteria['sort_deadline'];
+                    $criteria['sort_deadline_dir'] = $lastCriteria['sort_deadline_dir'] ?? 'asc';
+                }
             }
         }
 
@@ -849,7 +886,7 @@ class ChatbotController extends Controller
 
         if (empty($filtered)) {
             if (!empty($criteria['negara']) || !empty($criteria['mentioned_location'])) {
-                return $this->finalizeResponse("Mohon maaf, saya belum memiliki data beasiswa untuk lokasi/negara tersebut. 😊", $normalizedData);
+                return $this->finalizeResponse("Mohon maaf, saya belum memiliki data beasiswa untuk negara/kategori tersebut. 😊", $normalizedData);
             }
             if (!empty($criteria['mentioned_target_group'])) {
                 return $this->finalizeResponse("Mohon maaf, saya belum memiliki data beasiswa untuk target/kategori sasaran tersebut. 😊", $normalizedData);
@@ -1376,7 +1413,7 @@ $sessionContext
 
 Keluarkan HANYA JSON valid dengan skema:
 {
-  "intent": "search | detail | validation | out_of_topic | greeting | thanks",
+  "intent": "search | detail | validation | next_page | back_to_list | out_of_topic | greeting | thanks",
   "detail_type": "benefit | syarat | deadline | funding | url | apply | detail | null",
   "ref_number": <int atau null>,
   "negara": [<nama negara huruf kecil>],
@@ -1399,6 +1436,8 @@ ATURAN PENTING:
 - intent "search": user mencari/minta daftar beasiswa dengan kriteria apa pun.
 - intent "detail": user menanyakan benefit/syarat/deadline/cara daftar/link dari beasiswa yang SUDAH dipilih (lihat konteks). Isi detail_type.
 - intent "validation": user bertanya YA/TIDAK tentang beasiswa yang sedang dipilih/dirujuk (mis. "apakah ini di jepang?", "ada jurusan kedokteran ga?"). Isi kriteria yang divalidasi.
+- intent "next_page": user minta MELANJUTKAN daftar hasil sebelumnya / melihat lebih banyak (mis. "yang lain", "selanjutnya", "berikutnya", "ada lagi", "tampilkan lagi", "lainnya"). WAJIB toleran typo: "yang laib", "slanjutnya", "lainnyaa", "ada lg" -> tetap next_page. JANGAN isi kriteria baru.
+- intent "back_to_list": user minta KEMBALI ke daftar beasiswa sebelumnya (mis. "kembali", "balik", "list sebelumnya", "daftar tadi"). Toleran typo. JANGAN isi kriteria baru.
 - intent "out_of_topic": pesan TIDAK masuk akal sebagai pencarian beasiswa atau di luar topik beasiswa/pendidikan. Contoh: "beasiswa warnanya apa" (beasiswa tak punya warna), "resep nasi goreng", "cuaca hari ini". Walau ada kata "beasiswa", jika pertanyaannya nonsense -> out_of_topic.
 - intent "greeting"/"thanks": sapaan / ucapan terima kasih murni.
 - NEGARA: masukkan SEMUA nama tempat/negara yang user sebut ke "negara" (huruf kecil), TERMASUK yang tidak umum atau fiktif (mis. "wakanda", "atlantis", "antartika"), supaya ketersediaannya bisa divalidasi. "benua" HANYA boleh berisi: eropa, asia, amerika, afrika, australia; tempat lain masukkan ke "negara".
