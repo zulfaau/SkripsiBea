@@ -70,19 +70,10 @@ class ChatbotController extends Controller
             // FAST-PATH (regex murah, TANPA memanggil LLM) untuk input sepele.
             // =================================================================
 
-            // Salam / terima kasih / konfirmasi
-            if ($this->isGreeting($msg)) {
-                $this->currentIntent = 'greeting';
-                return $this->finalizeResponse($this->getGreetingResponse($msg));
-            }
-            if ($this->isThankYou($msg)) {
-                $this->currentIntent = 'thank_you';
-                return $this->finalizeResponse($this->getThankYouResponse());
-            }
-            if ($this->isAcknowledgment($msg)) {
-                $this->currentIntent = 'acknowledgment';
-                return $this->finalizeResponse("Baik, senang bisa membantu Anda! 😊 Jika nanti ada hal lain yang ingin ditanyakan seputar beasiswa, jangan ragu untuk kembali lagi ya. Semangat dan sukses untuk studinya! 🎓✨");
-            }
+            // Catatan: basa-basi percakapan (sapaan, terima kasih, acknowledgment) TIDAK lagi
+            // ditangani via rule-based di sini — semuanya diserahkan ke LLM understandQuery
+            // (intent greeting/thanks/acknowledgment) agar variasi & frasa minta-izin
+            // ("mau tanya dong", dll) tidak salah dilabeli out_of_topic.
 
             // Deteksi pemilihan nomor & intent detail (untuk "pilih no 3" / "benefit no 2" / "benefit")
             $detailIntent = $this->getDetailIntent($msg);
@@ -159,13 +150,13 @@ class ChatbotController extends Controller
                 $this->currentIntent = 'out_of_topic';
                 return $this->finalizeResponse($this->getOutOfTopicResponse());
             }
-            if ($intent === 'greeting') {
-                $this->currentIntent = 'greeting';
-                return $this->finalizeResponse($this->getGreetingResponse($msg));
-            }
-            if ($intent === 'thanks') {
-                $this->currentIntent = 'thank_you';
-                return $this->finalizeResponse($this->getThankYouResponse());
+            // Basa-basi percakapan: balasan ramah dibuat oleh LLM (field "response").
+            if (in_array($intent, ['greeting', 'thanks', 'acknowledgment'], true)) {
+                $this->currentIntent = $intent;
+                $reply = !empty($llm['response'])
+                    ? $llm['response']
+                    : "Baik, ada lagi yang bisa saya bantu seputar informasi beasiswa? 😊";
+                return $this->finalizeResponse($reply);
             }
 
             // Paginasi & kembali ke daftar via LLM (jaring pengaman saat fast-path regex
@@ -268,131 +259,6 @@ class ChatbotController extends Controller
         ]);
     }
 
-    private function isGreeting($message)
-    {
-        $greetingsRegex = '/\b(ha+i+|hi+|ha+lo+|ha+llo+|he+lo+|he+llo+|pagi+|siang+|sore+|malam+|permisi+|assalamualaikum+)\b/i';
-        $intents = ['mau nanya', 'tanya dong', 'boleh tanya', 'nanya dong', 'saya mau tanya', 'boleh nanya', 'bisakah saya tanya', 'ada yang mau saya tanyakan', 'tanya ngga'];
-        
-        $isGreet = false;
-        if (preg_match($greetingsRegex, $message)) {
-            $isGreet = true;
-        } else {
-            foreach ($intents as $intent) {
-                if (preg_match('/\b' . preg_quote($intent, '/') . '\b/i', $message)) {
-                    $isGreet = true;
-                    break;
-                }
-            }
-        }
-
-        // Khusus untuk "p" sebagai salam singkat, harus berdiri sendiri
-        if (!$isGreet && preg_match('/^p$/i', trim($message))) {
-            $isGreet = true;
-        }
-
-        if ($isGreet) {
-            $searchKeywords = ['beasiswa', 'scholarship', 's1', 's2', 's3', 'negara', 'bulan', 'deadline', 'apply', 'benefit', 'syarat'];
-            foreach ($searchKeywords as $kw) {
-                if (str_contains($message, $kw)) return false; 
-            }
-            return true;
-        }
-        return false;
-    }
-
-    private function getGreetingResponse($message)
-    {
-        // Jika user minta izin bertanya
-        if (str_contains($message, 'tanya') || str_contains($message, 'nanya')) {
-            $responses = [
-                "Tentu, silakan! Dengan senang hati saya akan membantu 😊 Apa yang ingin Anda tanyakan seputar beasiswa?",
-                "Boleh banget! Apa nih yang ingin kamu tanyain seputar info beasiswa? Aku siap bantu jawab ya! 😊",
-                "Silakan! **ScholarBot** siap membantu menjawab keraguan kamu seputar beasiswa. Mau tanya tentang apa nih? 🎓"
-            ];
-            return $responses[array_rand($responses)];
-        }
-
-        // Cek apakah ada sapaan waktu
-        $timeGreeting = '';
-        if (str_contains($message, 'pagi')) $timeGreeting = 'pagi';
-        elseif (str_contains($message, 'siang')) $timeGreeting = 'siang';
-        elseif (str_contains($message, 'sore')) $timeGreeting = 'sore';
-        elseif (str_contains($message, 'malam')) $timeGreeting = 'malam';
-
-        if ($timeGreeting) {
-            $responses = [
-                "Selamat " . $timeGreeting . " juga! 😊 Ada yang bisa saya bantu terkait informasi beasiswa?",
-                "Halo, selamat " . $timeGreeting . "! 👋 Ada yang ingin Anda tanyakan seputar beasiswa hari ini?",
-                "Selamat " . $timeGreeting . "! 😊 Kabar baik hari ini? Ada yang bisa saya bantu untuk mencari beasiswa?",
-                "Halo! Selamat " . $timeGreeting . " juga. Ada hal yang bisa saya bantu mengenai informasi beasiswa?",
-                "Hai, selamat " . $timeGreeting . "! Semangat terus ya cari beasiswanya. Ada yang mau ditanyakan?",
-                "Selamat " . $timeGreeting . "! Senang sekali bisa membantu Anda hari ini. Mau cari beasiswa di negara mana nih? 🎓"
-            ];
-        } else {
-            // Jika user sekadar menyapa umum (Halo/Hi/Assalamualaikum)
-            $responses = [
-                "Halo! 😊 Ada yang bisa dibantu mengenai informasi beasiswa?",
-                "Halo! 👋 Ada yang bisa saya bantu terkait informasi beasiswa hari ini?",
-                "Hi! 😊 Ada yang bisa saya bantu untuk mencari beasiswa yang sesuai dengan Anda?",
-                "Halo! Ada yang bisa saya bantu mengenai informasi beasiswa atau studi luar negeri?",
-                "Halo, pejuang beasiswa! 👋 Apa yang bisa saya bantu hari ini?",
-                "Hai! **ScholarBot** di sini siap membantu kamu cari info beasiswa terbaik. Ada yang ingin ditanyakan? 😊"
-            ];
-        }
-
-        return $responses[array_rand($responses)];
-    }
-
-    private function isAcknowledgment($message)
-    {
-        $acks = ['oke', 'okey', 'siap', 'sip', 'iya', 'baik', 'baiklah', 'ok', 'okei', 'paham', 'mengerti', 'yoi', 'yup', 'mantap'];
-        $isAck = false;
-        foreach ($acks as $word) {
-            if (preg_match('/\b' . preg_quote($word, '/') . '\b/i', $message)) {
-                $isAck = true;
-                break;
-            }
-        }
-        
-        if ($isAck) {
-            // Jika pesan mengandung sinyal pencarian/beasiswa atau cukup panjang, jangan anggap
-            // sebagai acknowledgment saja (biar lanjut ke LLM understand).
-            if (strlen($message) > 15 || preg_match('/\b(beasiswa|scholarship|cari|carikan|s1|s2|s3|jurusan|negara|deadline|benefit|syarat)\b/i', $message)) {
-                return false;
-            }
-            return true;
-        }
-        return false;
-    }
-
-    private function isThankYou($message)
-    {
-        $thanks = ['terima kasih', 'terimakasih', 'makasih', 'suwun', 'thanks', 'thx', 'thank you', 'tengkyu', 'mksh', 'maturnuwun', 'tks'];
-        $isThanks = false;
-        foreach ($thanks as $word) {
-            if (str_contains($message, $word)) { $isThanks = true; break; }
-        }
-        if (!$isThanks) return false;
-
-        // Jika kalimat juga mengandung sinyal pencarian beasiswa, ucapan terima kasih
-        // hanya pelengkap (mis. "carikan beasiswa s2 ... makasih") -> bukan intent thank-you.
-        if (preg_match('/\b(beasiswa|scholarship|cari|carikan|rekomendasi|s1|s2|s3|magister|sarjana|doktor|jurusan|fully|funded|luar\s*negeri|dalam\s*negeri)\b/i', $message)) {
-            return false;
-        }
-        return true;
-    }
-
-    private function getThankYouResponse()
-    {
-        $responses = [
-            "Sama-sama! Senang bisa membantu Anda 😊 Jika ada hal lain yang ingin ditanyakan seputar beasiswa, jangan ragu untuk bertanya ya!",
-            "Terima kasih kembali! Semoga sukses dengan pendaftaran beasiswanya 🎓✨",
-            "Sama-sama! Semangat terus pejuang beasiswa! 💪 Ada lagi yang bisa saya bantu?",
-            "Anytime! Senang bisa menemani pencarian beasiswa Anda hari ini. Sukses terus ya! 😊"
-        ];
-        return $responses[array_rand($responses)];
-    }
-
     private function isQuantificationQuery($message)
     {
         $keywords = ['hanya', 'cuma', 'berapa', 'jumlah', 'total', 'sedikit', 'banyak', 'doang'];
@@ -449,14 +315,26 @@ class ChatbotController extends Controller
                 $translated = $this->translateToIndonesian($content);
                 $ans = "Benefit **$name**:\n" . $translated; 
                 break;
-            case 'persyaratan': 
-            case 'syarat': 
+            case 'persyaratan':
+            case 'syarat':
                 $content = $selected['persyaratan'] ?? '-';
                 if ($content === '-' || strlen($content) < 20) {
                     return $this->handlePureAI("Tolong jelaskan apa saja syarat pendaftaran beasiswa {$name} secara detail.", true, $normalizedData, true);
                 }
-                $translated = $this->translateToIndonesian($content);
-                $ans = "Persyaratan **$name**:\n" . $translated; 
+                // Render ke template 8-section yang konsisten. Baris terstruktur (header KAPITAL)
+                // diparse deterministik; baris kalimat-Indonesia diekstrak via LLM ke section yang sama.
+                $sections = $this->parsePersyaratanSections($content);
+                if ($sections !== null) {
+                    $sections = $this->translateSectionValues($sections);
+                } else {
+                    $sections = $this->extractSectionsFromText($content);
+                }
+                if ($sections !== null) {
+                    $ans = "Persyaratan **$name**:\n\n" . $this->formatPersyaratanTemplate($sections);
+                } else {
+                    // Fallback aman bila ekstraksi LLM gagal.
+                    $ans = "Persyaratan **$name**:\n" . $this->translateToIndonesian($content);
+                }
                 break;
             case 'deadline': 
                 $ans = "Deadline **$name**: " . ($selected['deadline'] ?? '-'); 
@@ -629,10 +507,11 @@ class ChatbotController extends Controller
     private function isNegatedRequirement($window): bool
     {
         $patterns = [
-            '/\bno\s+[a-z\s]*requirement/',
+            '/\bno\s+[a-z\s]*requirement/',     // "No age requirement", "No other specific requirements"
             '/\bnot\s+required/',
-            '/\bno\s+(?:minimum|maximum|specific|particular)/',
+            '/\bno\s+(?:minimum|maximum|specific|particular|other)/',
             '/\bnone\b/',
+            '/\bn\/a\b/',
             '/tidak\s+ada/',
             '/tidak\s+di(?:perlukan|wajibkan|syaratkan|butuhkan|persyaratkan)/',
             '/tanpa\s+syarat/',
@@ -642,6 +521,186 @@ class ChatbotController extends Controller
             if (preg_match($p, $window)) return true;
         }
         return false;
+    }
+
+    /**
+     * Daftar kanonik 8 section persyaratan terstruktur, beserta urutan & label Indonesia.
+     * Header KAPITAL diambil persis seperti yang tersimpan di kolom `persyaratan`.
+     */
+    private const PERSYARATAN_SECTIONS = [
+        'AGE'              => 'Usia',
+        'GPA'              => 'IPK (Indeks Prestasi Kumulatif)',
+        'ENGLISH TEST'     => 'Tes Bahasa Inggris',
+        'NATIONALITY'      => 'Kewarganegaraan',
+        'OTHER LANGUAGE'   => 'Bahasa Lain',
+        'STANDARDIZED TEST' => 'Tes Standar',
+        'DOCUMENTS'        => 'Dokumen Pendaftaran',
+        'OTHERS'           => 'Persyaratan Khusus',
+    ];
+
+    /** Pesan "tanpa syarat" per section (dipakai saat section kosong/dinegasikan). */
+    private const PERSYARATAN_EMPTY_MSG = [
+        'AGE'              => 'Tidak ada persyaratan usia minimum atau maksimum.',
+        'GPA'              => 'Tidak ada persyaratan IPK minimum.',
+        'ENGLISH TEST'     => 'Tidak ada persyaratan tes bahasa Inggris.',
+        'NATIONALITY'      => 'Tidak ada persyaratan kewarganegaraan khusus.',
+        'OTHER LANGUAGE'   => 'Tidak disyaratkan.',
+        'STANDARDIZED TEST' => 'Tes standar tidak diperlukan.',
+        'DOCUMENTS'        => 'Tidak ada dokumen khusus yang disebutkan.',
+        'OTHERS'           => 'Tidak ada persyaratan spesifik lainnya yang disebutkan.',
+    ];
+
+    /**
+     * Parse teks persyaratan TERSTRUKTUR (ber-header KAPITAL) menjadi array berkunci
+     * kanonik (AGE, GPA, ...). Mengembalikan null jika teks BUKAN format terstruktur
+     * (mis. kalimat Indonesia biasa) sehingga caller bisa pakai jalur ekstraksi LLM.
+     *
+     * Ekstraksi dilakukan BERURUTAN sesuai urutan kanonik header — bukan split per
+     * kemunculan kata — karena "GPA"/"DOCUMENTS" juga muncul di dalam nilai section lain.
+     */
+    private function parsePersyaratanSections($text): ?array
+    {
+        $text = trim((string) $text);
+        if ($text === '') return null;
+
+        $headers = array_keys(self::PERSYARATAN_SECTIONS);
+
+        // Deteksi terstruktur: butuh penanda khas Inggris yang TAK muncul di kalimat
+        // Indonesia (NATIONALITY / STANDARDIZED TEST / OTHER LANGUAGE) + minimal 3 header.
+        $hasMarker = preg_match('/\b(NATIONALITY|STANDARDIZED TEST|OTHER LANGUAGE)\b/', $text);
+        $headerHits = 0;
+        foreach ($headers as $h) {
+            if (preg_match('/\b' . preg_quote($h, '/') . '\b/', $text)) $headerHits++;
+        }
+        if (!$hasMarker || $headerHits < 3) return null;
+
+        // Cari posisi kemunculan tiap header SECARA BERURUTAN, mulai dari posisi setelah
+        // header sebelumnya. Ini mencegah salah-tangkap "GPA" yang ada di dalam nilai.
+        $positions = [];
+        $cursor = 0;
+        foreach ($headers as $h) {
+            if (preg_match('/\b' . preg_quote($h, '/') . '\b/', $text, $m, PREG_OFFSET_CAPTURE, $cursor)) {
+                $positions[$h] = ['start' => $m[0][1], 'len' => strlen($m[0][0])];
+                $cursor = $m[0][1] + strlen($m[0][0]);
+            }
+        }
+        if (empty($positions)) return null;
+
+        // Nilai tiap header = teks antara akhir header ini s/d awal header berikut yang ketemu.
+        $found = array_keys($positions);
+        $sections = [];
+        foreach ($found as $i => $h) {
+            $valStart = $positions[$h]['start'] + $positions[$h]['len'];
+            $valEnd = isset($found[$i + 1]) ? $positions[$found[$i + 1]]['start'] : strlen($text);
+            $sections[$h] = trim(substr($text, $valStart, $valEnd - $valStart), " .\t\n\r");
+        }
+        // Pastikan semua key kanonik ada (yang tak ketemu = kosong → "tanpa syarat").
+        foreach ($headers as $h) {
+            if (!isset($sections[$h])) $sections[$h] = '';
+        }
+        return $sections;
+    }
+
+    /**
+     * Terjemahkan nilai section (Inggris) ke Indonesia lewat SATU panggilan LLM.
+     * Struktur tetap dirakit di PHP; hanya nilai yang diterjemahkan. Jika gagal,
+     * kembalikan section apa adanya (fallback aman, format tetap konsisten).
+     */
+    private function translateSectionValues(array $sections): array
+    {
+        $toTranslate = [];
+        foreach ($sections as $key => $val) {
+            if ($val !== '' && !$this->isNegatedRequirement(strtolower($val))) {
+                $toTranslate[$key] = $val;
+            }
+        }
+        if (empty($toTranslate)) return $sections;
+
+        try {
+            $system = "Anda penerjemah info beasiswa. Terjemahkan SETIAP nilai pada objek JSON berikut "
+                . "ke Bahasa Indonesia yang ringkas & formal. PERTAHANKAN key apa adanya. Jangan tambah "
+                . "atau hapus key. Jika satu nilai berisi beberapa poin, pisahkan tiap poin dengan baris baru (\\n). "
+                . "Pertahankan istilah baku (TOEFL, IELTS, GPA, CV, GMAT, dll). Balas HANYA objek JSON.";
+            $raw = $this->callChatLLM($system, json_encode($toTranslate, JSON_UNESCAPED_UNICODE), true, 0.2);
+            $raw = trim(preg_replace('/```(?:json)?/i', '', (string) $raw));
+            $raw = trim(str_replace('```', '', $raw));
+            $decoded = json_decode($raw, true);
+            if (is_array($decoded)) {
+                foreach ($decoded as $key => $val) {
+                    if (isset($sections[$key]) && is_string($val) && trim($val) !== '') {
+                        $sections[$key] = trim($val);
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error("translateSectionValues error: " . $e->getMessage());
+        }
+        return $sections;
+    }
+
+    /**
+     * Ekstrak teks persyaratan NON-terstruktur (kalimat Indonesia) ke 8 section kanonik
+     * via LLM. Mengembalikan array berkunci kanonik, atau null jika LLM gagal (caller fallback).
+     */
+    private function extractSectionsFromText($text): ?array
+    {
+        $keyMap = [
+            'usia' => 'AGE', 'ipk' => 'GPA', 'tes_bahasa_inggris' => 'ENGLISH TEST',
+            'kewarganegaraan' => 'NATIONALITY', 'bahasa_lain' => 'OTHER LANGUAGE',
+            'tes_standar' => 'STANDARDIZED TEST', 'dokumen' => 'DOCUMENTS', 'khusus' => 'OTHERS',
+        ];
+        try {
+            $system = "Anda asisten beasiswa. Petakan teks persyaratan beasiswa ke 8 kategori tetap. "
+                . "Balas HANYA objek JSON dengan key persis: usia, ipk, tes_bahasa_inggris, kewarganegaraan, "
+                . "bahasa_lain, tes_standar, dokumen, khusus. Nilai = ringkasan Bahasa Indonesia untuk kategori itu. "
+                . "Jika kategori TIDAK disebut di teks, isi string kosong \"\". Apa pun yang tidak masuk 7 kategori "
+                . "pertama, masukkan ke \"khusus\". Jangan mengarang; hanya berdasarkan teks. Jika satu nilai berisi "
+                . "beberapa poin, pisahkan dengan baris baru (\\n).";
+            $raw = $this->callChatLLM($system, $text, true, 0.2);
+            $raw = trim(preg_replace('/```(?:json)?/i', '', (string) $raw));
+            $raw = trim(str_replace('```', '', $raw));
+            $decoded = json_decode($raw, true);
+            if (!is_array($decoded)) return null;
+
+            $sections = [];
+            foreach ($keyMap as $jsonKey => $canonical) {
+                $sections[$canonical] = is_string($decoded[$jsonKey] ?? null) ? trim($decoded[$jsonKey]) : '';
+            }
+            return $sections;
+        } catch (\Exception $e) {
+            Log::error("extractSectionsFromText error: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Rakit template 8-section yang konsisten dari array section kanonik.
+     * Section kosong / dinegasikan → kalimat "tanpa syarat". Section berisi → bullet markdown.
+     */
+    private function formatPersyaratanTemplate(array $sections): string
+    {
+        $lines = [];
+        foreach (self::PERSYARATAN_SECTIONS as $key => $label) {
+            $val = trim((string) ($sections[$key] ?? ''));
+            $lines[] = "**{$label}**";
+
+            if ($val === '' || $this->isNegatedRequirement(strtolower($val))) {
+                $lines[] = self::PERSYARATAN_EMPTY_MSG[$key];
+                $lines[] = '';
+                continue;
+            }
+
+            // Perapian ringan + pecah jadi poin-poin.
+            $val = preg_replace('/\bmin\.\s*/i', 'minimal ', $val);
+            $points = preg_split('/\r\n|\r|\n|•|;/u', $val);
+            $points = array_values(array_filter(array_map(fn($p) => trim($p, " .\t"), $points), fn($p) => $p !== ''));
+            if (empty($points)) $points = [$val];
+            foreach ($points as $p) {
+                $lines[] = "- " . $p;
+            }
+            $lines[] = '';
+        }
+        return rtrim(implode("\n", $lines));
     }
 
     /**
@@ -1560,7 +1619,8 @@ $sessionContext
 
 Keluarkan HANYA JSON valid dengan skema:
 {
-  "intent": "search | detail | validation | next_page | back_to_list | out_of_topic | greeting | thanks",
+  "intent": "search | detail | validation | next_page | back_to_list | out_of_topic | greeting | thanks | acknowledgment",
+  "response": "<HANYA untuk intent greeting/thanks/acknowledgment: kalimat balasan ramah Bahasa Indonesia. Intent lain: null>",
   "detail_type": "benefit | syarat | deadline | funding | url | apply | detail | null",
   "ref_number": <int atau null>,
   "negara": [<nama negara huruf kecil>],
@@ -1587,8 +1647,11 @@ ATURAN PENTING:
 - intent "validation": user bertanya YA/TIDAK tentang beasiswa yang sedang dipilih/dirujuk (mis. "apakah ini di jepang?", "ada jurusan kedokteran ga?"). Isi kriteria yang divalidasi.
 - intent "next_page": user minta MELANJUTKAN daftar hasil sebelumnya / melihat lebih banyak (mis. "yang lain", "selanjutnya", "berikutnya", "ada lagi", "tampilkan lagi", "lainnya"). WAJIB toleran typo: "yang laib", "slanjutnya", "lainnyaa", "ada lg" -> tetap next_page. JANGAN isi kriteria baru.
 - intent "back_to_list": user minta KEMBALI ke daftar beasiswa sebelumnya (mis. "kembali", "balik", "list sebelumnya", "daftar tadi"). Toleran typo. JANGAN isi kriteria baru.
-- intent "out_of_topic": pesan TIDAK masuk akal sebagai pencarian beasiswa atau di luar topik beasiswa/pendidikan. Contoh: "beasiswa warnanya apa" (beasiswa tak punya warna), "resep nasi goreng", "cuaca hari ini". Walau ada kata "beasiswa", jika pertanyaannya nonsense -> out_of_topic.
-- intent "greeting"/"thanks": sapaan / ucapan terima kasih murni.
+- intent "out_of_topic": HANYA untuk pertanyaan yang JELAS di luar topik beasiswa/pendidikan (mis. "resep nasi goreng", "cuaca hari ini") atau nonsense ("beasiswa warnanya apa"). JANGAN gunakan untuk sapaan, basa-basi, atau frasa minta-izin bertanya.
+- intent "greeting": sapaan ("halo", "pagi", "assalamualaikum") DAN frasa minta-izin/meta bertanya ("mau tanya dong", "izin bertanya kak", "boleh nanya nggak", "mau konsultasi", "halo mau tanya"). Toleran typo. Frasa minta-izin TIDAK PERNAH out_of_topic.
+- intent "thanks": ucapan terima kasih murni ("makasih", "terima kasih ya").
+- intent "acknowledgment": konfirmasi/penerimaan singkat ("oke", "siap", "baik", "paham", "mengerti").
+- PENTING: untuk intent greeting/thanks/acknowledgment, WAJIB isi field "response" dengan kalimat balasan ramah Bahasa Indonesia yang relevan (mis. greeting → mempersilakan user bertanya seputar beasiswa; thanks → balasan terima kasih; acknowledgment → balasan singkat & ramah). Ini SATU-SATUNYA pengecualian dari aturan "JANGAN menjawab pertanyaan user". Untuk intent LAIN, "response" = null.
 - NEGARA: masukkan SEMUA nama tempat/negara yang user sebut ke "negara" (huruf kecil), TERMASUK yang tidak umum atau fiktif (mis. "wakanda", "atlantis", "antartika"), supaya ketersediaannya bisa divalidasi. "benua" HANYA boleh berisi: eropa, asia, amerika, afrika, australia; tempat lain masukkan ke "negara".
 - NEGASI: "selain/bukan/kecuali/tanpa negara X" -> masukkan ke "exclude", JANGAN ke kriteria utama.
 - "fully funded/gratis/pendanaan penuh/biaya penuh" -> funding "Fully Funded". "partially/sebagian/parsial" -> "Partially Funded".
