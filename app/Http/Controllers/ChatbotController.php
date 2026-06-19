@@ -100,6 +100,18 @@ class ChatbotController extends Controller
             // permintaan deadline beasiswa yang sedang dipilih.
             $looksLikeNewSearch = $isExplicitSearch || preg_match('/\bbeasiswa\b/i', $msg);
 
+            // Pertanyaan lanjutan tentang SATU syarat spesifik (mis. "ada syarat IPK?",
+            // "perlu TOEFL nggak?", "minimal usia berapa?") untuk beasiswa yang SUDAH dipilih.
+            // Jika syarat itu tidak disebut di data beasiswa, jawab bahwa beasiswa tersebut
+            // tanpa syarat itu (mis. "Iya, beasiswa tersebut tanpa syarat IPK").
+            if (session()->has('selected_scholarship') && !$selectedNumber && !$isExplicitSearch) {
+                $reqQuery = $this->getSpecificRequirementQuery($msg);
+                if ($reqQuery) {
+                    $this->currentIntent = 'detail';
+                    return $this->handleSpecificRequirementCheck($reqQuery);
+                }
+            }
+
             // Detail beasiswa yang sudah dipilih (mis. "benefit", "syarat", "cara daftar")
             if ($detailIntent && session()->has('selected_scholarship') && !$selectedNumber && !$looksLikeNewSearch) {
                 $this->currentIntent = 'detail';
@@ -482,6 +494,154 @@ class ChatbotController extends Controller
             $ans .= "\n\nKetik **kembali** untuk kembali ke daftar beasiswa sebelumnya.";
         }
         return $this->finalizeResponse($ans, $normalizedData);
+    }
+
+    /**
+     * Deteksi pertanyaan tentang SATU syarat spesifik (IPK, TOEFL, usia, dst).
+     * Dipakai untuk pertanyaan lanjutan setelah user memilih sebuah beasiswa,
+     * mis. "ada syarat IPK?", "perlu toefl nggak?", "minimal umur berapa?".
+     * Mengembalikan ['label' => 'IPK', 'keywords' => [...]] atau null.
+     */
+    private function getSpecificRequirementQuery($m)
+    {
+        $m = strtolower($m);
+
+        // Urutan penting: yang lebih spesifik didahulukan.
+        $map = [
+            'IPK'                => ['ipk', 'gpa', 'indeks prestasi'],
+            'TOEFL'              => ['toefl'],
+            'IELTS'              => ['ielts'],
+            'tes bahasa Inggris' => ['duolingo', 'tes bahasa', 'sertifikat bahasa', 'bahasa inggris', 'english test', 'kemampuan bahasa'],
+            'batas usia'         => ['usia', 'umur', 'age'],
+            'pengalaman kerja'   => ['pengalaman kerja', 'pengalaman organisasi', 'work experience', 'pengalaman'],
+            'surat rekomendasi'  => ['surat rekomendasi', 'rekomendasi', 'recommendation letter', 'reference letter', 'lor'],
+            'motivation letter'  => ['motivation letter', 'motivation essay', 'surat motivasi', 'essay', 'motivasi'],
+            'LoA'                => ['loa', 'letter of acceptance'],
+        ];
+
+        foreach ($map as $label => $keywords) {
+            foreach ($keywords as $kw) {
+                if ($kw !== '' && str_contains($m, $kw)) {
+                    return ['label' => $label, 'keywords' => $keywords];
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Jawab pertanyaan tentang satu syarat spesifik untuk beasiswa yang sedang dipilih.
+     * Jika syarat disebut di data → konfirmasi + kutip potongan persyaratannya.
+     * Jika tidak disebut → jawab bahwa beasiswa tersebut tanpa syarat itu.
+     */
+    private function handleSpecificRequirementCheck($req)
+    {
+        $selected = (array) session()->get('selected_scholarship');
+        $nama  = $selected['nama_beasiswa'] ?? 'Beasiswa';
+        $label = $req['label'];
+
+        $combined = trim(
+            ((string) ($selected['persyaratan'] ?? '')) . ' ' .
+            ((string) ($selected['deskripsi'] ?? '')) . ' ' .
+            ((string) ($selected['benefit'] ?? ''))
+        );
+
+        $analysis = $this->analyzeRequirement($combined, $req['keywords']);
+
+        $this->currentIntent = 'detail';
+
+        // 'absent' (tidak disebut) maupun 'not_required' (disebut TAPI dinegasikan,
+        // mis. "No age requirement") => beasiswa tersebut TANPA syarat itu.
+        if ($analysis['status'] !== 'required') {
+            return $this->finalizeResponse(
+                "Iya, beasiswa **$nama** tersebut tanpa syarat {$label}. 😊\n\n" .
+                "Ketik **syarat** untuk melihat persyaratan lengkapnya, atau **kembali** untuk kembali ke daftar beasiswa."
+            );
+        }
+
+        $ans = "Iya, beasiswa **$nama** mensyaratkan **{$label}**.";
+        if ($analysis['snippet'] !== '') {
+            $ans .= "\n\nKutipan persyaratannya:\n_" . $analysis['snippet'] . "_";
+        }
+        $ans .= "\n\nKetik **syarat** untuk melihat persyaratan lengkapnya, atau **kembali** untuk kembali ke daftar beasiswa.";
+        return $this->finalizeResponse($ans);
+    }
+
+    /**
+     * Analisis status satu syarat di dalam teks persyaratan.
+     * Mengembalikan ['status' => 'required'|'not_required'|'absent', 'snippet' => string].
+     * 'not_required' artinya keyword DISEBUT tapi dinegasikan, mis. "No age requirement",
+     * "GPA: tidak ada minimum" — sehingga TIDAK boleh dianggap sebagai syarat wajib.
+     */
+    private function analyzeRequirement($text, array $keywords): array
+    {
+        $text = trim($text);
+        if ($text === '') return ['status' => 'absent', 'snippet' => ''];
+
+        $lower = strtolower($text);
+        foreach ($keywords as $kw) {
+            if ($kw === '') continue;
+            // Word-boundary agar keyword pendek (age/gpa/ipk) tak salah cocok
+            // di tengah kata lain ("language", "manage", dst).
+            if (!preg_match('/\b' . preg_quote($kw, '/') . '\b/u', $lower, $m, PREG_OFFSET_CAPTURE)) {
+                continue;
+            }
+            $pos = $m[0][1];
+            $snippet = $this->windowAround($text, $pos, strlen($kw));
+            $status = $this->isNegatedRequirement(strtolower($snippet)) ? 'not_required' : 'required';
+            return ['status' => $status, 'snippet' => trim($snippet)];
+        }
+        return ['status' => 'absent', 'snippet' => ''];
+    }
+
+    /**
+     * Ambil potongan teks "section" di sekitar posisi keyword. Batas section
+     * ditandai header HURUF BESAR (>=2 huruf kapital berurutan), mis.
+     * "AGE No age requirement GPA ..." -> "AGE No age requirement".
+     */
+    private function windowAround($text, $pos, $kwLen)
+    {
+        // Batas akhir: header HURUF BESAR berikutnya setelah keyword.
+        $end = strlen($text);
+        if (preg_match('/\s[A-Z]{2,}/', $text, $mm, PREG_OFFSET_CAPTURE, $pos + $kwLen)) {
+            $end = $mm[0][1];
+        }
+
+        // Batas awal: header HURUF BESAR terakhir sebelum keyword (bila ada).
+        $start = max(0, $pos - 30);
+        if (preg_match_all('/\s[A-Z]{2,}/', substr($text, 0, $pos), $hm, PREG_OFFSET_CAPTURE)) {
+            $last = end($hm[0]);
+            $start = $last[1] + 1;
+        }
+
+        $snippet = trim(substr($text, $start, $end - $start));
+        // Jaga agar tidak kepanjangan kalau data tak punya header sama sekali.
+        if (mb_strlen($snippet) > 160) {
+            $snippet = trim(mb_substr($snippet, 0, 160)) . '…';
+        }
+        return $snippet;
+    }
+
+    /**
+     * Apakah potongan teks menegasikan adanya syarat? (EN & ID)
+     * mis. "No age requirement", "not required", "tidak ada", "tanpa syarat".
+     */
+    private function isNegatedRequirement($window): bool
+    {
+        $patterns = [
+            '/\bno\s+[a-z\s]*requirement/',
+            '/\bnot\s+required/',
+            '/\bno\s+(?:minimum|maximum|specific|particular)/',
+            '/\bnone\b/',
+            '/tidak\s+ada/',
+            '/tidak\s+di(?:perlukan|wajibkan|syaratkan|butuhkan|persyaratkan)/',
+            '/tanpa\s+syarat/',
+            '/bebas\s+(?:usia|umur)/',
+        ];
+        foreach ($patterns as $p) {
+            if (preg_match($p, $window)) return true;
+        }
+        return false;
     }
 
     /**
