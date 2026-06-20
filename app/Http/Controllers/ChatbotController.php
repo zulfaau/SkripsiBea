@@ -45,17 +45,8 @@ class ChatbotController extends Controller
         $ragEnabled = $request->input('rag_enabled', true);
         $rawMessage = $request->input('message');
 
-        // =================================================================
-        // CARA ALTERNATIF: TRANSLATE WAKTU RELATIF MENJADI ABSOLUT
-        // Kita ubah "bulan ini" jadi "bulan saat ini" sebelum ke AI
-        // =================================================================
-        $bulanIndo = [1 => 'januari', 2 => 'februari', 3 => 'maret', 4 => 'april', 5 => 'mei', 6 => 'juni', 7 => 'juli', 8 => 'agustus', 9 => 'september', 10 => 'oktober', 11 => 'november', 12 => 'desember'];
-        $bulanSekarang = $bulanIndo[(int)date('m')];
-        $tahunSekarang = date('Y');
-
-        $rawMessage = preg_replace('/\b(bulan\s+ini|bulan\s+sekarang)\b/i', 'bulan ' . $bulanSekarang, $rawMessage);
-        $rawMessage = preg_replace('/\b(tahun\s+ini|tahun\s+sekarang)\b/i', 'tahun ' . $tahunSekarang, $rawMessage);
-        $rawMessage = preg_replace('/\b(tahun\s+depan)\b/i', 'tahun ' . ($tahunSekarang + 1), $rawMessage);
+        // Waktu relatif ("bulan ini", "tahun depan", dst) TIDAK lagi di-translate via regex;
+        // resolusinya diserahkan ke LLM understandQuery (punya [INFORMASI WAKTU SAAT INI]).
 
         // JIKA RAG DIMATIKAN, LANGSUNG KE AI TANPA CEK DATABASE
         if (!$ragEnabled) {
@@ -1164,58 +1155,39 @@ class ChatbotController extends Controller
         }
 
         // =================================================================
-        // DETEKSI INTENT WAKTU (rule-based, deterministik, tak bergantung LLM).
-        // Dihitung di AWAL agar query "masih buka / rentang waktu" tidak terbajak
-        // ke jalur daftar-acak-per-tahun di bawah (yang mengabaikan filter waktu).
+        // INTENT WAKTU (sort_deadline / still_open / deadline_before) sepenuhnya dari
+        // LLM via mapLlmToCriteria — tidak ada lagi deteksi regex pada pesan user.
         // =================================================================
-        if (preg_match('/\b(paling dekat|deadline dekat|mepet|terdekat|tercepat)\b/i', $message)) {
-            $criteria['sort_deadline'] = true;
-            $criteria['sort_deadline_dir'] = 'asc';
-        } elseif (preg_match('/\b(terjauh|terlama|paling lama|paling jauh)\b/i', $message)) {
-            $criteria['sort_deadline'] = true;
-            $criteria['sort_deadline_dir'] = 'desc';
-        }
-        // "masih buka / aktif / belum tutup" -> still_open (tak hilang walau LLM lupa set).
-        if (preg_match('/\b(masih\s+buka|masih\s+di\s?buka|sedang\s+di\s?buka|belum\s+(?:tutup|di\s?tutup|lewat|berakhir)|masih\s+aktif|masih\s+terbuka)\b/i', $message)) {
-            $criteria['still_open'] = true;
-        }
-        // Batas ATAS waktu ("sampai akhir tahun", "sampai bulan maret"). Rule-based diutamakan;
-        // jika tak cocok, nilai deadline_before dari LLM (mapLlmToCriteria) tetap dipakai.
-        $upperBound = $this->parseDeadlineUpperBound($message);
-        if ($upperBound !== null) {
-            $criteria['deadline_before'] = $upperBound;
-        }
         $hasTimeRangeIntent = !empty($criteria['still_open']) || !empty($criteria['deadline_before']) || !empty($criteria['sort_deadline']);
 
-        $hasYearPattern = preg_match('/\b(20[2-3][0-9])\b/', $message, $matches);
-        if ($hasYearPattern) {
-            $year = $matches[1];
-            $isGeneralListRequest = preg_match('/\b(data|list|daftar|semua|tampilkan|berikan|print|show|kumpulan|database|seluruh)\b/i', $message);
-            
-            $tempCriteria = $criteria;
-            $hasSpecificFilters = !empty($tempCriteria['negara']) || !empty($tempCriteria['benua']) || !empty($tempCriteria['jenjang']) || !empty($tempCriteria['bidang']) || !empty($tempCriteria['lokasi_tipe']) || !empty($tempCriteria['funding']);
-            
-            if (($isGeneralListRequest || !$hasSpecificFilters) && !$hasTimeRangeIntent) {
+        // Daftar acak per tahun: hanya bila user menyebut TAHUN (dari LLM) TANPA filter
+        // spesifik lain & tanpa intent rentang waktu. "General list request" tak lagi
+        // dideteksi via regex — cukup ketiadaan filter spesifik lain.
+        if (!empty($criteria['tahun']) && !$hasTimeRangeIntent) {
+            $hasSpecificFilters = !empty($criteria['negara']) || !empty($criteria['benua']) || !empty($criteria['jenjang']) || !empty($criteria['bidang']) || !empty($criteria['lokasi_tipe']) || !empty($criteria['funding']) || !empty($criteria['req_filters']) || !empty($criteria['req_values']);
+
+            if (!$hasSpecificFilters) {
+                $year = $criteria['tahun'][0];
                 $allowedYears = ['2024', '2025', '2026', '2027'];
                 if (!in_array($year, $allowedYears)) {
                     return $this->finalizeResponse("Mohon maaf, **ScholarBot** hanya menyediakan data untuk tahun **2024**, **2025**, **2026**, dan **2027** saat ini, terima kasih 😊", $normalizedData);
                 }
-                
+
                 $all = DB::table('scholarships')
                     ->where('deadline', 'like', "%{$year}%")
                     ->select(self::SCHOLARSHIP_COLUMNS)
                     ->get()
                     ->toArray();
-                    
+
                 shuffle($all);
                 $all = array_slice($all, 0, 105);
                 $limitedResults = array_slice($all, 0, 5);
-                
+
                 session()->put('last_search_all_results', $all);
                 session()->put('last_search_page', 1);
                 session()->put('last_search_results', $limitedResults);
                 session()->forget('selected_scholarship');
-                
+
                 $countResult = count($all);
                 $resp = "Berikut beasiswa tahun {$year} (menampilkan 5 dari {$countResult} data secara acak):\n\n";
                 foreach ($limitedResults as $i => $s) {
@@ -1226,7 +1198,7 @@ class ChatbotController extends Controller
                 } else {
                     $resp .= "Silakan ketik nomor beasiswa untuk melihat **detail** seperti **benefit**, **syarat**, **deadline**, atau **cara daftar**.";
                 }
-                
+
                 $this->currentIntent = 'search';
                 return $this->finalizeResponse($resp, $normalizedData);
             }
@@ -1893,7 +1865,7 @@ Anda adalah parser niat untuk chatbot pencari BEASISWA berbahasa Indonesia. Tuga
 [INFORMASI WAKTU SAAT INI]:
 - Bulan: $bulanSekarang
 - Tahun: $tahunSekarang
-(PENTING: Jika user menyebut kata "bulan ini", "tahun ini", atau "sekarang", Anda WAJIB menerjemahkannya menjadi bulan dan tahun di atas ke dalam output JSON).
+(PENTING: Terjemahkan SEMUA acuan waktu relatif ke nilai absolut berdasarkan info di atas: "bulan ini"/"tahun ini"/"sekarang" -> bulan & tahun saat ini; "tahun depan" -> tahun saat ini + 1; "tahun lalu" -> tahun saat ini - 1; "bulan depan"/"bulan lalu" -> bulan terkait. Masukkan hasilnya ke array "bulan"/"tahun" pada output JSON).
 
 Toleransi typo, singkatan (s2=S2, ln=luar negeri, dn=dalam negeri, dll), bahasa gaul, dan bahasa Inggris. Pahami maksud sebenarnya.
 
@@ -2425,38 +2397,6 @@ PROMPT;
         }
     }
 
-    /**
-     * Mendeteksi batas ATAS waktu dari frasa rentang user dan mengembalikannya sebagai
-     * unix timestamp (akhir hari, inklusif). Mengembalikan null jika tak ada frasa yang cocok.
-     * Contoh: "sampai akhir tahun" -> 31 Des tahun ini; "sampai bulan maret" -> 31 Mar tahun ini.
-     */
-    private function parseDeadlineUpperBound($message)
-    {
-        $msg = strtolower($message);
-        $yearNow = (int)date('Y');
-
-        // "(sampai/hingga) akhir tahun [YYYY]" -> 31 Desember.
-        if (preg_match('/\bakhir\s+tahun(?:\s+(20[2-3][0-9]))?\b/i', $msg, $m)) {
-            $yr = !empty($m[1]) ? (int)$m[1] : $yearNow;
-            return mktime(23, 59, 59, 12, 31, $yr);
-        }
-
-        // "sampai/hingga/sebelum [akhir] [bulan] <namabulan> [YYYY]" -> akhir bulan tersebut.
-        $bulanMap = [
-            'januari' => 1, 'februari' => 2, 'pebruari' => 2, 'maret' => 3, 'april' => 4,
-            'mei' => 5, 'juni' => 6, 'juli' => 7, 'agustus' => 8, 'september' => 9,
-            'oktober' => 10, 'november' => 11, 'nopember' => 11, 'desember' => 12,
-        ];
-        $names = implode('|', array_keys($bulanMap));
-        if (preg_match('/\b(?:sampai|hingga|sebelum|s\.?d\.?)\s+(?:akhir\s+)?(?:bulan\s+)?(' . $names . ')(?:\s+(20[2-3][0-9]))?\b/i', $msg, $m)) {
-            $bln = $bulanMap[strtolower($m[1])];
-            $yr = !empty($m[2]) ? (int)$m[2] : $yearNow;
-            $lastDay = (int)date('t', mktime(0, 0, 0, $bln, 1, $yr));
-            return mktime(23, 59, 59, $bln, $lastDay, $yr);
-        }
-
-        return null;
-    }
 
     private function parseDeadlineDate($dateStr)
     {
