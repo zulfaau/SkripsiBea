@@ -307,6 +307,24 @@
         <div id="chat-window">
             <div class="message bot-message">
                 Halo! Saya <b>ScholarBot</b> ✨. Ada yang bisa saya bantu terkait informasi beasiswa hari ini?
+                <br><br>
+                Anda dapat menanyakan informasi beasiswa berdasarkan:
+                <br>
+                🌏 <b>Benua</b> atau <b>Negara</b> tujuan
+                <br>
+                🎓 Jenjang pendidikan (<b>S1, S2, atau S3</b>)
+                <br>
+                📅 Tanggal <b>Deadline</b> pendaftaran
+                <br>
+                💰 Kategori beasiswa (<b>Fully Funded / Partial Funded</b>)
+                <br>
+                📚 <b>Jurusan</b> spesifik
+                <br>
+                🎁 <b>Benefit</b> yang didapatkan
+                <br>
+                📝 <b>Persyaratan</b> pendaftaran
+                <br>
+                🔗 <b>Link apply</b> atau <b>Cara mendaftar</b>
             </div>
         </div>
 
@@ -331,7 +349,7 @@
         const sendBtn = document.getElementById('send-btn');
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-        function appendMessage(text, isUser = false) {
+        function appendMessage(text, isUser = false, responseTime = null) {
             const msgDiv = document.createElement('div');
             msgDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
             
@@ -340,6 +358,22 @@
             } else {
                 // Gunakan marked untuk render markdown dari bot
                 msgDiv.innerHTML = marked.parse(text);
+                
+                // Tambahkan response time jika ada
+                if (responseTime !== null) {
+                    const timeDiv = document.createElement('div');
+                    timeDiv.style.marginTop = '12px';
+                    timeDiv.style.paddingTop = '8px';
+                    timeDiv.style.borderTop = '1px dashed #cbd5e1';
+                    timeDiv.style.fontSize = '12px';
+                    timeDiv.style.fontWeight = '700';
+                    timeDiv.style.color = '#ef4444'; // warna merah/orange menyerupai api
+                    timeDiv.style.display = 'inline-flex';
+                    timeDiv.style.alignItems = 'center';
+                    timeDiv.style.gap = '4px';
+                    timeDiv.innerHTML = `🔥 ${responseTime} detik`;
+                    msgDiv.appendChild(timeDiv);
+                }
             }
             
             chatWindow.appendChild(msgDiv);
@@ -374,7 +408,7 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    appendMessage(data.answer);
+                    appendMessage(data.answer, false, data.response_time);
                 } else {
                     appendMessage("Maaf, saya sedang mengalami gangguan. Silakan coba lagi nanti.");
                 }

@@ -169,9 +169,10 @@ class ChatbotController extends Controller
 
     private function finalizeResponse($answer, $normalizedData = null, $success = true)
     {
+        $duration = microtime(true) - $this->startTime;
+
         // Simpan log ke database untuk evaluasi kinerja (Response Time & Accuracy)
         try {
-            $duration = microtime(true) - $this->startTime;
             DB::table('chat_logs')->insert([
                 'user_id' => auth()->id(),
                 'user_message' => $this->userMessage,
@@ -186,9 +187,26 @@ class ChatbotController extends Controller
             Log::error("Failed to save chat log: " . $e->getMessage());
         }
 
+        // Simpan log secara otomatis ke file CSV (Excel)
+        try {
+            $csvFile = base_path('log_response_time_web.csv');
+            $isNewFile = !file_exists($csvFile);
+            $file = fopen($csvFile, 'a');
+            if ($isNewFile) {
+                fputcsv($file, ['Waktu Akses', 'Pertanyaan', 'Response Time (Detik)', 'Status']);
+            }
+            $waktuAkses = date('Y-m-d H:i:s');
+            $statusStr = $success ? 'OK' : 'ERROR';
+            fputcsv($file, [$waktuAkses, $this->userMessage, round($duration, 3), $statusStr]);
+            fclose($file);
+        } catch (\Exception $e) {
+            Log::error("Failed to save CSV log: " . $e->getMessage());
+        }
+
         return response()->json([
             'success' => $success,
-            'answer' => $answer
+            'answer' => $answer,
+            'response_time' => round($duration, 3)
         ]);
     }
 

@@ -152,38 +152,38 @@
       @endforelse
     </section>
   </main>
-  <footer class="w-full bg-slate-800 py-16 text-slate-400 flex-grow-0 relative z-10 mt-20">
+  <footer class="w-full bg-[#FFFFFF] py-16 text-gray-500 flex-grow-0 border-t border-slate-200 mt-20 relative z-10">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 gap-12 md:grid-cols-3 md:gap-8 text-center md:text-left">
         <div>
-          <a href="{{ url('/') }}" class="flex items-center gap-2.5 justify-center md:justify-start text-white">
+          <a href="{{ url('/') }}" class="flex items-center gap-2.5 justify-center md:justify-start text-gray-800">
             <span class="text-2xl font-bold tracking-tight">🤖ScholarBot</span>
           </a>
-          <p class="mt-4 text-sm leading-relaxed text-slate-400 max-w-xs mx-auto md:mx-0">
+          <p class="mt-4 text-sm leading-relaxed text-gray-500 max-w-xs mx-auto md:mx-0">
             Platform pintar untuk menemukan beasiswa yang tepat untuk masa depanmu.
           </p>
         </div>
         
         <div class="flex flex-col items-center">
-          <h3 class="text-sm font-bold tracking-wider text-white uppercase mb-4">Navigation</h3>
+          <h3 class="text-sm font-bold tracking-wider text-gray-800 uppercase mb-4">Navigation</h3>
           <div class="flex flex-col gap-3 text-sm font-medium">
-            <a href="{{ url('/') }}" class="hover:text-indigo-400 transition-colors">Home</a>
-            <a href="{{ route('scholarship') }}" class="hover:text-indigo-400 transition-colors">Scholarships</a>
-            <a href="{{ route('chatbot') }}" class="hover:text-indigo-400 transition-colors">Chatbot</a>
-            <a href="{{ route('bookmarks') }}" class="hover:text-indigo-400 transition-colors">Saved</a>
+            <a href="{{ url('/') }}" class="hover:text-blue-600 transition-colors">Home</a>
+            <a href="{{ route('scholarship') }}" class="hover:text-blue-600 transition-colors">Scholarships</a>
+            <a href="{{ route('chatbot') }}" class="hover:text-blue-600 transition-colors">Chatbot</a>
+            <a href="{{ route('bookmarks') }}" class="text-blue-600 transition-colors">Saved</a>
           </div>
         </div>
         
         <div class="flex flex-col items-center md:items-end">
-          <h3 class="text-sm font-bold tracking-wider text-white uppercase mb-4">Mulai Sekarang</h3>
-          <p class="text-sm text-slate-400 mb-4 font-medium">Punya pertanyaan soal beasiswa? Tanya AI sekarang.</p>
-          <a href="{{ route('chatbot') }}" class="inline-flex items-center justify-center rounded-xl bg-indigo-500 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 transition-all">
+          <h3 class="text-sm font-bold tracking-wider text-gray-800 uppercase mb-4">Mulai Sekarang</h3>
+          <p class="text-sm text-gray-500 mb-4 font-medium">Punya pertanyaan soal beasiswa? Tanya AI sekarang.</p>
+          <a href="{{ route('chatbot') }}" class="inline-flex items-center justify-center rounded-xl bg-indigo-500 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-600 transition-all">
             Tanya AI
           </a>
         </div>
       </div>
-      <div class="mt-16 border-t border-slate-700 pt-8 text-center">
-        <p class="text-sm text-slate-500">© 2026 ScholarBot. All rights reserved.</p>
+      <div class="mt-16 border-t border-slate-200 pt-8 text-center">
+        <p class="text-sm text-gray-400">© 2026 ScholarBot. All rights reserved.</p>
       </div>
     </div>
   </footer>

@@ -108,7 +108,7 @@ Route::get('/dashboard', function (Illuminate\Http\Request $request) {
     }
     
     return view('dashboard', compact('scholarships', 'lastUpdated'));
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth', 'verified', 'role:admin'])->name('dashboard');
 
 Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::resource('users', UserController::class)->except(['show']);

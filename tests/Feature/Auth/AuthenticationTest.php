@@ -19,10 +19,27 @@ class AuthenticationTest extends TestCase
 
     public function test_users_can_authenticate_using_the_login_screen(): void
     {
+        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
         $user = User::factory()->create();
+        $user->assignRole('user');
 
         $response = $this->post('/login', [
             'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $this->assertAuthenticated();
+        $response->assertRedirect('/');
+    }
+
+    public function test_admin_can_authenticate_and_redirect_to_dashboard(): void
+    {
+        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
+
+        $response = $this->post('/login', [
+            'email' => $admin->email,
             'password' => 'password',
         ]);
 

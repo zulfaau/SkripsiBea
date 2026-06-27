@@ -103,7 +103,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:translate-x-2 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
               </a>
               <div class="h-8 w-px bg-slate-200 hidden sm:block"></div>
-              <p class="text-sm font-semibold text-slate-400 tracking-widest uppercase">Trusted by 10k+ Students</p>
+              <p class="text-sm font-semibold text-slate-400 tracking-widest uppercase">Trusted by 500+ Students</p>
             </div>
           </div>
         </div>
@@ -184,7 +184,7 @@
         @foreach($featuredScholarships as $item)
         <a href="{{ route('scholarship.detail', $item->id) }}" class="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-md shadow-slate-200/50 border border-slate-100 transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-indigo-500/10">
           <div class="relative h-48 overflow-hidden bg-indigo-50 flex items-center justify-center text-indigo-200">
-            <img src="https://source.unsplash.com/featured/800x600?education,university,college,lecturer&sig={{ $item->id }}" 
+            <img src="https://picsum.photos/seed/featured-{{ $item->id }}/800/600" 
                  alt="{{ $item->nama_beasiswa }}" 
                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
                  onerror="this.src='https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=800&auto=format&fit=crop'" />
@@ -222,7 +222,7 @@
       <div class="grid grid-cols-1 gap-8 divide-y divide-slate-200 md:grid-cols-3 md:divide-x md:divide-y-0 text-center">
         <div class="px-6 py-4 flex flex-col items-center">
           <svg class="h-10 w-10 text-indigo-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
-          <p class="text-5xl font-extrabold text-indigo-600">1000+</p>
+          <p class="text-5xl font-extrabold text-indigo-600">700+</p>
           <p class="mt-3 text-lg font-medium text-slate-500">Informasi Beasiswa</p>
         </div>
         <div class="px-6 py-4 flex flex-col items-center">

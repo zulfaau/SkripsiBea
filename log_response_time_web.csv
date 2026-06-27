@@ -1,0 +1,85 @@
+"Waktu Akses",Pertanyaan,"Response Time (Detik)",Status
+"2026-06-23 03:06:05","halooo scholarbot",7.141,OK
+"2026-06-23 03:06:30",halo,3.417,OK
+"2026-06-23 03:10:30","berikan beasiswa ff sarjana di swiss",8.848,OK
+"2026-06-23 03:10:46","berikan semua link beasiswa tersebut",5.14,OK
+"2026-06-23 03:11:16","carikan beasiswa ff sarjana ln yang segera tutup",9.567,OK
+"2026-06-23 03:12:02",next,1.955,OK
+"2026-06-23 03:12:17","berikan link beasiswa no 3",2.011,OK
+"2026-06-23 03:14:41","berikan beasiswa sarjana di benua eropa yang akan tutup",5.991,OK
+"2026-06-23 03:52:57","halo selamat pagi",6.953,OK
+"2026-06-23 03:53:09","aku mau nanya dong scholarbot",3.367,OK
+"2026-06-23 03:54:27","carikan saya beasiswa master di amerika yang tanpa IETLS",17.913,OK
+"2026-06-23 03:54:40","no 1",3.266,OK
+"2026-06-23 03:54:53","apakah beasiswa tersebut tanpa IETLS?",3.694,OK
+"2026-06-23 03:55:20",syarat,7.109,OK
+"2026-06-23 04:03:42","carikan beasiswa ipk dibawah 3.0",10.188,OK
+"2026-06-23 04:03:54","no 2",3.775,OK
+"2026-06-23 04:04:08","apakah beasiswa tersebut ipk nya dibawah 3.0?",3.962,OK
+"2026-06-23 04:04:20",syarat,6.181,OK
+"2026-06-23 04:06:47","berikan beasiswa sarjana yang belum tutup",10.524,OK
+"2026-06-23 04:07:30","berikan beasiswa sarjana yang belum tutup di dn",13.437,OK
+"2026-06-23 04:07:46",next,3.317,OK
+"2026-06-24 08:43:45","berikan beasiswa sarjana di rusia",15.401,OK
+"2026-06-24 08:44:47","berikan beasiswa sarjana di amerika yang masih buka",8.908,OK
+"2026-06-24 08:46:10","berikan beasiswa sarjana di australia yang masih buka",12.528,OK
+"2026-06-24 08:51:28","mau yang ff aja",8.022,OK
+"2026-06-24 08:59:23","berikan beasiswa sarjana di australia yang masih buka ff",8.942,OK
+"2026-06-24 09:00:50","berikan beasiswa master di australia yang masih buka",9.546,OK
+"2026-06-24 23:48:40","berikan beasiswa ipk dibawah 3",13.271,OK
+"2026-06-24 23:49:59","no 3",3.608,OK
+"2026-06-24 23:50:15","apakah beasiswa tersebut ipk dibawah 3?",3.089,OK
+"2026-06-24 23:50:56","berikan beasiswa di australia yang masih buka",9.273,OK
+"2026-06-24 23:51:20","mau yang ff aja ada ngga",7.792,OK
+"2026-06-24 23:51:36",next,3.333,OK
+"2026-06-24 23:52:40","mau yang phd aja tapi ff",9.081,OK
+"2026-06-24 23:52:54","no 2",3.042,OK
+"2026-06-24 23:53:17","beasiswa tersebut ipk dibawah 3 bukan?",3.241,OK
+"2026-06-24 23:55:13",kembali,3.621,OK
+"2026-06-24 23:55:25","no 1",3.043,OK
+"2026-06-24 23:55:49","apakah beasiswa tersebut ipk dibawah 3?",2.951,OK
+"2026-06-24 23:56:22",kembali,3.336,OK
+"2026-06-24 23:56:56","carikan beasiswa nilai dibawah 80",10.118,OK
+"2026-06-24 23:57:32","berikan beasiswa nilai dibawah 80 yang belum tutup",8.754,OK
+"2026-06-24 23:57:49","no 2",3.953,OK
+"2026-06-24 23:58:11","apakah beasiswa tersebut syarat nilai dibawah 80?",3.077,OK
+"2026-06-24 23:58:40","berikan link nya",3.942,OK
+"2026-06-24 23:59:11","okey terima kasih ya",3.201,OK
+"2026-06-24 23:59:53","mau tanya beasiswa dong",3.116,OK
+"2026-06-25 00:00:11","berikan beasiswa master di australia yang masih buka",6.87,OK
+"2026-06-25 00:00:37",next,3.107,OK
+"2026-06-25 00:03:30","mau tanya beasiswa dong",3.531,OK
+"2026-06-25 00:03:44","berikan beasiswa master di australia yang masih buka",8.37,OK
+"2026-06-25 00:04:55","mau yang ff aja",8.835,OK
+"2026-06-25 00:08:44","dari list tersebut beasiswa mana yang memiliki syarat ipk dibawah 3?",10.031,OK
+"2026-06-25 00:10:45","kembali ke list beasiswa sebelumnya",3.681,OK
+"2026-06-25 00:11:18","kembali ke list beasiswa ff master australia sebelumnya",2.822,OK
+"2026-06-25 01:59:47","aku mau tanya beasiswa dong",2.847,OK
+"2026-06-25 02:01:31","berikan beasiswa ln yang sedang buka",9.11,OK
+"2026-06-25 02:01:55",next,4.248,OK
+"2026-06-25 02:16:56","aku mau tanya beasiswa dong",3.745,OK
+"2026-06-25 02:17:18","berikan beasiswa ln yang sedang buka",7.293,OK
+"2026-06-25 02:21:27","yang lain dong",3.487,OK
+"2026-06-25 02:22:34",next,3.551,OK
+"2026-06-25 02:25:43","berikan beasiswa di australia saja",8.492,OK
+"2026-06-25 02:27:25","yang sarjana saja",7.64,OK
+"2026-06-25 02:28:51",next,3.722,OK
+"2026-06-25 02:29:18","yang lain dong",3.186,OK
+"2026-06-25 02:29:58","tapi yang masih buka aja",9.287,OK
+"2026-06-25 02:31:01","yang lain dong",3.575,OK
+"2026-06-25 02:33:09","mau yang jurusan ekonomi",8.204,OK
+"2026-06-25 02:36:07","yang lain dong",3.61,OK
+"2026-06-25 02:37:33","mau yang no 3",3.18,OK
+"2026-06-25 02:39:19","syaratnya apa aja",7.428,OK
+"2026-06-25 02:40:06","benefitnya apa aja yang didapat?",2.819,OK
+"2026-06-25 02:41:06","berikan link apply beasiswa tersebut",3.111,OK
+"2026-06-25 02:41:41","okey terima kasih ya",2.623,OK
+"2026-06-25 07:37:27","berikan beasiswa di jurusan ekonomi",14.461,OK
+"2026-06-25 07:37:49","berikan beasiswa di jurusan ekonomi yang masih",7.604,OK
+"2026-06-25 07:38:19","berikan beasiswa di universitas indonesia yang masih membuka pendaftaran",6.236,OK
+"2026-06-25 07:38:49",next,2.182,OK
+"2026-06-27 06:27:52","kamu bisa memberikan saya informasi beasiswa?",5.067,OK
+"2026-06-27 06:28:22","berikan beasiswa master di amerika yang masih buka",6.98,OK
+"2026-06-27 06:44:12","berikan beasiswa sarjana di indonesia yang masih buka dong",24.209,OK
+"2026-06-27 06:46:35","carikan beasiswa phd ln yang pf masih buka sampai sekarang",12.262,OK
+"2026-06-27 06:47:20","berikan beasiswa master di universitas indonesia",16.469,OK
