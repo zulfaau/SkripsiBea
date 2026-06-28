@@ -145,6 +145,16 @@ class ChatbotController extends Controller
                 }
             }
 
+            // Pencarian berdasarkan NAMA UNIVERSITAS belum didukung (data tidak terindeks
+            // per universitas). Fallback tegas dengan arahan ulang sebelum jalur pencarian.
+            if ($intent === 'search' && !empty($criteria['university'])) {
+                $this->currentIntent = 'search';
+                return $this->finalizeResponse(
+                    "Mohon maaf, saat ini **ScholarBot** belum bisa mencari beasiswa berdasarkan nama universitas (**" . $criteria['university'] . "**). " .
+                    "Silakan cari berdasarkan **negara**, **jenjang** (S1/S2/S3), atau **jurusan** ya. 😊"
+                );
+            }
+
             // Default: PENCARIAN
             $this->currentIntent = 'search';
             return $this->handleSearch($criteria, $rawMessage);
@@ -1896,6 +1906,7 @@ Keluarkan HANYA JSON valid dengan skema:
   "response": "<HANYA untuk intent greeting/thanks/acknowledgment: kalimat balasan ramah Bahasa Indonesia. Intent lain: null>",
   "detail_type": "benefit | syarat | deadline | funding | url | apply | detail | null",
   "ref_number": <int atau null>,
+  "university": "<nama universitas/kampus jika user mencari beasiswa berdasarkan NAMA universitas (mis. Harvard, MIT, Oxford, NUS, Universitas Indonesia, UGM, ITB), atau null>",
   "negara": [<nama negara huruf kecil>],
   "benua": [<eropa|asia|amerika|afrika|australia>],
   "jenjang": [<S1|S2|S3|D3|D4>],
@@ -1947,6 +1958,7 @@ ATURAN PENTING:
 - intent "acknowledgment": konfirmasi/penerimaan singkat ("oke", "siap", "baik", "paham", "mengerti").
 - PENTING: untuk intent greeting/thanks/acknowledgment, WAJIB isi field "response" dengan kalimat balasan ramah Bahasa Indonesia yang relevan (mis. greeting → mempersilakan user bertanya seputar beasiswa; thanks → balasan terima kasih; acknowledgment → balasan singkat & ramah). Ini SATU-SATUNYA pengecualian dari aturan "JANGAN menjawab pertanyaan user". Untuk intent LAIN, "response" = null.
 - NEGARA: masukkan SEMUA nama tempat/negara yang user sebut ke "negara" (huruf kecil), TERMASUK yang tidak umum atau fiktif (mis. "wakanda", "atlantis", "antartika"), supaya ketersediaannya bisa divalidasi. "benua" HANYA boleh berisi: eropa, asia, amerika, afrika, australia; tempat lain masukkan ke "negara".
+- UNIVERSITAS: jika user mencari beasiswa berdasarkan NAMA UNIVERSITAS/KAMPUS sebagai acuan (mis. "beasiswa di Harvard", "beasiswa MIT", "beasiswa Universitas Indonesia", "beasiswa UGM/ITB/NUS/Oxford"), isi "university" dengan nama universitas itu, dan JANGAN masukkan nama universitas tersebut ke "negara"/"benua"/"bidang". CATATAN: ini HANYA untuk nama institusi/kampus, BUKAN nama program beasiswa (Chevening, LPDP, Erasmus, AAS, Fulbright, dll tetap pencarian biasa dengan "university": null).
 - NEGASI: "selain/bukan/kecuali/tanpa negara X" -> masukkan ke "exclude", JANGAN ke kriteria utama.
 - "fully funded/gratis/pendanaan penuh/biaya penuh" -> funding "Fully Funded". "partially/sebagian/parsial" -> "Partially Funded".
 - "exchange/pertukaran pelajar/student exchange/program pertukaran/exchange program" -> funding "Exchange".
@@ -1994,6 +2006,9 @@ PROMPT;
             'bidang' => $arr($j['bidang'] ?? []),
             'lokasi_tipe' => null,
         ];
+
+        $uni = trim((string)($j['university'] ?? ''));
+        $c['university'] = ($uni !== '' && strtolower($uni) !== 'null') ? $uni : null;
 
         $fund = strtolower((string)($j['funding'] ?? ''));
         if (str_contains($fund, 'exchange') || str_contains($fund, 'pertukaran')) $c['funding'] = 'Exchange';
