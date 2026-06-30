@@ -116,7 +116,7 @@ class ChatbotController extends Controller
                     // Kategori ditentukan LLM via req_filters/req_values, lalu dijawab yes/no
                     // oleh handleSpecificRequirementCheck (pengganti fast-path regex lama).
                     $reqKey = $this->firstRequirementKey($criteria);
-                    if ($reqKey && ($req = $this->reqQueryFromKey($reqKey))) {
+                    if ($reqKey && ($req = $this->reqQueryFromKey($reqKey, $criteria))) {
                         session()->put('selected_scholarship', $target);
                         $this->currentIntent = 'detail';
                         return $this->handleSpecificRequirementCheck($req);
@@ -572,11 +572,7 @@ class ChatbotController extends Controller
             $header = self::REQUIREMENT_SECTION_MAP[$jsonKey] ?? null;
             return $header !== null ? trim((string) ($sections[$header] ?? '')) : '';
         }
-        return trim(
-            $persyaratan . ' ' .
-            ((string) ($s['deskripsi'] ?? '')) . ' ' .
-            ((string) ($s['benefit'] ?? ''))
-        );
+        return trim($persyaratan);
     }
 
     /**
@@ -630,6 +626,54 @@ class ChatbotController extends Controller
         $negatedOrEmpty = $sectionText === '' || $this->isNegatedRequirement($sectionText);
         // Section kosong/dinegasikan => kategori ini tidak disyaratkan => tak cocok.
         if ($negatedOrEmpty) return false;
+
+        // Khusus bahasa_lain: jika user mencari "sertifikat" atau "tes" bahasa tertentu,
+        // pastikan beasiswa tersebut memang mensyaratkan sertifikasi/tes (seperti JLPT, HSK, TOPIK,
+        // sertifikat bahasa, dll) dan bukan sekadar menyebut nama negaranya/bahasanya untuk hal lain (mis. sertifikat pajak).
+        if ($key === 'bahasa_lain' && preg_match('/\b(sertifikat|sertifikasi|certificate|tes|test|bukti|skor|score|jlpt|hsk|topik|dele|goethe|testdaf|dsh|delf|dalf|tef|torfl)\b/i', $val)) {
+            $certPatterns = [
+                'jepang' => ['jlpt', 'nihongo noryoku shiken', 'nihongo', 'n1', 'n2', 'n3', 'n4', 'n5', 'sertifikat bahasa jepang', 'sertifikat kemampuan bahasa jepang', 'tes bahasa jepang', 'kemampuan bahasa jepang', 'kemahiran bahasa jepang'],
+                'mandarin' => ['hsk', 'tocfl', 'sertifikat bahasa mandarin', 'sertifikat mandarin', 'sertifikat bahasa tiongkok', 'kemampuan bahasa mandarin', 'kemampuan bahasa china'],
+                'korea' => ['topik', 'sertifikat bahasa korea', 'sertifikat topik', 'kemampuan bahasa korea'],
+                'jerman' => ['goethe', 'testdaf', 'dsh', 'sertifikat bahasa jerman', 'kemampuan bahasa jerman'],
+                'prancis' => ['delf', 'dalf', 'tef', 'sertifikat bahasa prancis', 'kemampuan bahasa prancis'],
+                'spanyol' => ['dele', 'siele', 'sertifikat bahasa spanyol', 'kemampuan bahasa spanyol'],
+                'arab' => ['toafl', 'sertifikat bahasa arab', 'kemampuan bahasa arab'],
+                'inggris' => ['toefl', 'ielts', 'duolingo', 'toeic', 'pte']
+            ];
+
+            $detectedLang = null;
+            foreach (['jepang', 'mandarin', 'korea', 'jerman', 'prancis', 'spanyol', 'arab', 'inggris'] as $lang) {
+                if (str_contains($val, $lang)) {
+                    $detectedLang = $lang;
+                    break;
+                }
+            }
+            if (!$detectedLang) {
+                foreach (self::REQUIREMENT_VALUE_SYNONYMS['bahasa_lain'] as $lang => $langPats) {
+                    foreach ($langPats as $p) {
+                        if ($p !== '' && str_contains($val, $p)) {
+                            $detectedLang = $lang;
+                            break 2;
+                        }
+                    }
+                }
+            }
+
+            if ($detectedLang && isset($certPatterns[$detectedLang])) {
+                $matchedCert = false;
+                foreach ($certPatterns[$detectedLang] as $cp) {
+                    if (preg_match('/\b' . preg_quote($cp, '/') . '\b/ui', $sectionText)) {
+                        $matchedCert = true;
+                        break;
+                    }
+                }
+                if (!$matchedCert) {
+                    return false;
+                }
+            }
+        }
+
         foreach ($this->resolveValuePatterns($key, $val) as $pat) {
             // Pakai BATAS KATA (\b) bukan substring, agar akronim pendek (ib/gre/sat/act)
             // tidak salah cocok di tengah kata lain ("wajib", "degree", "satu").
@@ -655,12 +699,7 @@ class ChatbotController extends Controller
             return $header !== null ? trim((string) ($sections[$header] ?? '')) : '';
         }
 
-        $combined = trim(
-            $persyaratan . ' ' .
-            ((string) ($s['deskripsi'] ?? '')) . ' ' .
-            ((string) ($s['benefit'] ?? ''))
-        );
-        $analysis = $this->analyzeRequirement($combined, self::REQUIREMENT_KEYWORDS[$jsonKey] ?? []);
+        $analysis = $this->analyzeRequirement($persyaratan, self::REQUIREMENT_KEYWORDS[$jsonKey] ?? []);
         return $analysis['snippet']; // '' bila kata kunci kategori tak ditemukan.
     }
 
@@ -816,11 +855,33 @@ class ChatbotController extends Controller
      * Bangun argumen ['label','keywords'] untuk handleSpecificRequirementCheck dari key
      * kategori, memanfaatkan konstanta yang sudah ada (pengganti getSpecificRequirementQuery).
      */
-    private function reqQueryFromKey(string $key): ?array
+    private function reqQueryFromKey(string $key, $criteria = null): ?array
     {
         $label = self::REQUIREMENT_LABELS[$key] ?? null;
         if ($label === null) return null;
-        return ['label' => $label, 'keywords' => self::REQUIREMENT_KEYWORDS[$key] ?? []];
+
+        $keywords = self::REQUIREMENT_KEYWORDS[$key] ?? [];
+
+        if ($criteria && !empty($criteria['req_values'][$key])) {
+            $val = strtolower(trim($criteria['req_values'][$key]));
+            $synonyms = self::REQUIREMENT_VALUE_SYNONYMS[$key] ?? [];
+            foreach ($synonyms as $canonical => $pats) {
+                if (str_contains($val, $canonical)) {
+                    $keywords = $pats;
+                    $label = ucwords($canonical);
+                    break;
+                }
+                foreach ($pats as $p) {
+                    if ($p !== '' && str_contains($val, $p)) {
+                        $keywords = $pats;
+                        $label = ucwords($canonical);
+                        break 2;
+                    }
+                }
+            }
+        }
+
+        return ['label' => $label, 'keywords' => $keywords];
     }
 
     /** Gabungan deskripsi req_filters (ada/tanpa) + req_values (nilai spesifik). */
@@ -1286,6 +1347,9 @@ class ChatbotController extends Controller
         if (!empty($criteria['no_test'])) {
             $searchQueryClean = preg_replace('/\b(ielts|toefl|tanpa|test|tes|syarat|persyaratan|list)\b/i', '', $searchQueryClean);
         }
+        if (!empty($criteria['no_interview'])) {
+            $searchQueryClean = preg_replace('/\b(wawancara|interview|tanpa|proses)\b/i', '', $searchQueryClean);
+        }
         // -----------------------------------
 
         $searchQueryClean = preg_replace('/\s+/', ' ', trim($searchQueryClean));
@@ -1441,6 +1505,14 @@ class ChatbotController extends Controller
             if (!empty($criteria['bidang'])) $headerParts[] = "jurusan " . implode(', ', array_map('ucwords', $criteria['bidang']));
             if (!empty($criteria['jenjang'])) $headerParts[] = "jenjang " . implode('/', $criteria['jenjang']);
             if (!empty($criteria['negara'])) $headerParts[] = "di " . implode(', ', array_map('ucwords', $criteria['negara']));
+            if (!empty($criteria['no_interview'])) $headerParts[] = "tanpa wawancara";
+            if (!empty($criteria['no_test'])) $headerParts[] = "tanpa tes bahasa Inggris";
+            if (!empty($criteria['ekonomi'])) $headerParts[] = "untuk ekonomi lemah";
+            if (!empty($criteria['gender']) && $criteria['gender'] === 'perempuan') $headerParts[] = "khusus perempuan";
+            if (!empty($criteria['fresh_grad'])) $headerParts[] = "untuk fresh graduate";
+            if (!empty($criteria['benefit_keywords'])) {
+                $headerParts[] = "dengan benefit " . implode(', ', $criteria['benefit_keywords']);
+            }
             if (!empty($criteria['req_filters']) || !empty($criteria['req_values'])) {
                 $reqDesc = $this->describeRequirements($criteria);
                 if ($reqDesc !== '') $headerParts[] = $reqDesc;
@@ -1499,7 +1571,26 @@ class ChatbotController extends Controller
             }
             // -----------------------
             
-            if (!empty($criteria['gender']) && $criteria['gender'] === 'perempuan' && !str_contains($content, 'perempuan') && !str_contains($content, 'wanita')) return false;
+            if (!empty($criteria['gender']) && $criteria['gender'] === 'perempuan') {
+                if (!str_contains($content, 'perempuan') && !str_contains($content, 'wanita') && !str_contains($content, 'mahasiswi') && !str_contains($content, 'putri') && !str_contains($content, 'siswi')) {
+                    return false;
+                }
+                // Jika beasiswa terbuka untuk kedua gender (unisex), abaikan dari filter "khusus perempuan"
+                $unisexPatterns = [
+                    '/pria\s*(dan|atau|\/|-)?\s*wanita/i',
+                    '/laki\s*(?:-\s*laki)?\s*(dan|atau|\/|-)?\s*perempuan/i',
+                    '/putra\s*(dan|atau|\/|-)?\s*putri/i',
+                    '/siswa\s*(dan|atau|\/|-)?\s*siswi/i',
+                ];
+                foreach ($unisexPatterns as $pat) {
+                    if (preg_match($pat, $content)) {
+                        return false;
+                    }
+                }
+                if (preg_match('/\b(pria|laki[-‑\s]*laki|putra)\b/ui', $content)) {
+                    return false;
+                }
+            }
             if (!empty($criteria['ekonomi']) && !str_contains($content, 'kurang mampu') && !str_contains($content, 'ekonomi') && !str_contains($content, 'kip')) return false;
             if (!empty($criteria['fresh_grad']) && !str_contains($content, 'fresh graduate') && !str_contains($content, 'lulusan baru')) return false;
             if (!empty($criteria['no_interview']) && str_contains($content, 'wawancara')) {
@@ -1637,9 +1728,20 @@ class ChatbotController extends Controller
                     $m = true;
                 } else {
                     foreach ($criteria['bidang'] as $b) {
-                        if (str_contains($rowBidang, $b) || str_contains($rowDeskripsi, $b) || str_contains($rowPersyaratan, $b)) {
-                            $m = true;
-                            break;
+                        $synonyms = $this->getMajorSynonyms($b);
+                        foreach ($synonyms as $syn) {
+                            if (strlen($syn) <= 3) {
+                                $pattern = '/\b' . preg_quote($syn, '/') . '\b/i';
+                                if (preg_match($pattern, $rowBidang)) {
+                                    $m = true;
+                                    break 2;
+                                }
+                            } else {
+                                if (str_contains($rowBidang, $syn) || str_contains($rowDeskripsi, $syn) || str_contains($rowPersyaratan, $syn)) {
+                                    $m = true;
+                                    break 2;
+                                }
+                            }
                         }
                     }
                 }
@@ -1724,6 +1826,30 @@ class ChatbotController extends Controller
         }
 
         return $uniqueResults; 
+    }
+
+    private function getMajorSynonyms(string $bidang): array
+    {
+        $bidang = trim(strtolower($bidang));
+        $syns = [$bidang];
+
+        if ($bidang === 'it' || $bidang === 'ti' || $bidang === 'teknologi informasi' || $bidang === 'informatika' || $bidang === 'ilmu komputer' || $bidang === 'computer science' || $bidang === 'information technology') {
+            return ['it', 'ti', 'teknologi informasi', 'informatika', 'ilmu komputer', 'computer science', 'information technology', 'software', 'programming', 'sistem informasi', 'system innovation', 'computing'];
+        }
+        if ($bidang === 'kedokteran' || $bidang === 'medicine' || $bidang === 'medis') {
+            return ['kedokteran', 'medicine', 'medis', 'medical', 'dokter', 'kesehatan', 'health', 'farmasi', 'pharmacy', 'clinical'];
+        }
+        if ($bidang === 'hukum' || $bidang === 'law') {
+            return ['hukum', 'law', 'legal', 'jurisprudence'];
+        }
+        if ($bidang === 'ekonomi' || $bidang === 'economy' || $bidang === 'bisnis' || $bidang === 'business' || $bidang === 'manajemen' || $bidang === 'management') {
+            return ['ekonomi', 'economy', 'economic', 'bisnis', 'business', 'manajemen', 'management', 'keuangan', 'finance', 'mba'];
+        }
+        if ($bidang === 'teknik' || $bidang === 'engineering') {
+            return ['teknik', 'engineering', 'engineer', 'mechanical', 'civil', 'electrical', 'chemical'];
+        }
+
+        return $syns;
     }
 
     private function generateEmbedding($text)
@@ -1952,7 +2078,7 @@ ATURAN PENTING:
 - intent "validation": user bertanya YA/TIDAK tentang beasiswa yang sedang dipilih/dirujuk (mis. "apakah ini di jepang?", "ada jurusan kedokteran ga?"). Isi kriteria yang divalidasi (negara/benua/jenjang/bidang/funding). KHUSUS pertanyaan yes/no tentang SATU kategori SYARAT dari beasiswa terpilih (mis. "ada syarat IPK?", "perlu TOEFL ga?", "ada batasan usia?", "wajib bahasa lain?") -> intent "validation" DAN isi req_filters[kategori]="ada" untuk kategori yang ditanyakan (ipk/tes_bahasa_inggris/usia/kewarganegaraan/bahasa_lain/tes_standar/dokumen/khusus).
 - intent "next_page": user minta MELANJUTKAN daftar hasil sebelumnya / melihat lebih banyak (mis. "yang lain", "selanjutnya", "berikutnya", "ada lagi", "tampilkan lagi", "lainnya"). WAJIB toleran typo: "yang laib", "slanjutnya", "lainnyaa", "ada lg" -> tetap next_page. JANGAN isi kriteria baru. PENTING: kata "lain" sebagai bagian dari KRITERIA pencarian — mis. "bahasa lain", "syarat lain", "jurusan lain", "negara lain" — BUKAN next_page; itu intent "search". next_page HANYA bila user benar-benar minta melanjutkan daftar tanpa kriteria baru.
 - intent "back_to_list": user minta KEMBALI ke daftar beasiswa sebelumnya (mis. "kembali", "balik", "list sebelumnya", "daftar tadi"). Toleran typo. JANGAN isi kriteria baru.
-- intent "out_of_topic": HANYA untuk pertanyaan yang JELAS di luar topik beasiswa/pendidikan (mis. "resep nasi goreng", "cuaca hari ini") atau nonsense ("beasiswa warnanya apa"). JANGAN gunakan untuk sapaan, basa-basi, atau frasa minta-izin bertanya.
+- intent "out_of_topic": HANYA untuk pertanyaan yang JELAS di luar topik beasiswa/pendidikan (mis. "resep nasi goreng", "cuaca hari ini") atau nonsense ("beasiswa warnanya apa"). JANGAN gunakan untuk sapaan, basa-basi, atau frasa minta-izin bertanya. Pertanyaan mencari beasiswa berdasarkan gender (mis. "khusus perempuan/wanita"), ekonomi lemah, atau status kelulusan (fresh graduate) adalah VALID dan masuk intent "search", BUKAN "out_of_topic".
 - intent "greeting": sapaan ("halo", "pagi", "assalamualaikum") DAN frasa minta-izin/meta bertanya ("mau tanya dong", "izin bertanya kak", "boleh nanya nggak", "mau konsultasi", "halo mau tanya"). Toleran typo. Frasa minta-izin TIDAK PERNAH out_of_topic.
 - intent "thanks": ucapan terima kasih murni ("makasih", "terima kasih ya").
 - intent "acknowledgment": konfirmasi/penerimaan singkat ("oke", "siap", "baik", "paham", "mengerti").
@@ -1973,8 +2099,16 @@ ATURAN PENTING:
   - bahasa_lain: "dengan syarat bahasa lain/bahasa asing (selain Inggris: jepang, jerman, korea, dll), jlpt, dele, hsk" -> "ada"; "tanpa bahasa lain" -> "tanpa".
   - tes_standar: "wajib GRE/GMAT/SAT" -> "ada"; "tanpa GRE/GMAT/SAT/tes standar" -> "tanpa".
   - dokumen: "ada syarat dokumen tertentu (transkrip, ijazah, cv)" -> "ada"; "tanpa dokumen khusus" -> "tanpa".
-  - khusus: persyaratan lain (surat rekomendasi, motivation letter, essay, LoA, wawancara, pengalaman) -> "ada"/"tanpa".
-- NILAI SPESIFIK (req_values): jika user menyebut NILAI tertentu untuk sebuah kategori, isi req_values dengan nilai itu (huruf kecil). Contoh: "beasiswa berbahasa arab" -> bahasa_lain "arab"; "IPK saya 3.0" / "syarat ipk 3.0" -> ipk "3.0"; "untuk usia 25 tahun" -> usia "25"; "yang minta GRE" -> tes_standar "gre"; "wajib transkrip" -> dokumen "transkrip"; "khusus WNI" -> kewarganegaraan "indonesia"; "toefl 80" -> tes_bahasa_inggris "toefl 80". Jika kategori tidak menyebut nilai spesifik, isi null. Saat req_values terisi, kategori itu otomatis dianggap "ada" (tidak perlu set req_filters juga).
+  - khusus: persyaratan lain (surat rekomendasi, motivation letter, essay, LoA, pengalaman. CATATAN: Untuk wawancara/interview, JANGAN gunakan khusus; gunakan flags.tanpa_wawancara) -> "ada"/"tanpa".
+- NILAI SPESIFIK (req_values): jika user menyebut NILAI tertentu untuk sebuah kategori, isi req_values dengan nilai itu (huruf kecil). Contoh: "beasiswa berbahasa arab" -> bahasa_lain "arab"; "syarat JLPT / HSK / TOPIK" -> bahasa_lain "jepang" / "mandarin" / "korea"; "IPK saya 3.0" / "syarat ipk 3.0" -> ipk "3.0"; "untuk usia 25 tahun" -> usia "25"; "yang minta GRE" -> tes_standar "gre"; "wajib transkrip" -> dokumen "transkrip"; "surat rekomendasi" -> dokumen "rekomendasi"; "khusus WNI" -> kewarganegaraan "indonesia"; "toefl 80" -> tes_bahasa_inggris "toefl 80". Jika kategori tidak menyebut nilai spesifik, isi null. Saat req_values terisi, kategori itu otomatis dianggap "ada" (tidak perlu set req_filters juga).
+- FLAGS: set true pada key yang sesuai jika user meminta kriteria khusus berikut:
+  - tanpa_test_bahasa: jika mencari beasiswa tanpa toefl/ielts/tes bahasa inggris.
+  - ekonomi_lemah: jika mencari beasiswa untuk keluarga kurang mampu, ekonomi lemah, penerima KIP, dll.
+  - khusus_perempuan: jika mencari beasiswa khusus wanita/perempuan/mahasiswi/putri.
+  - fresh_graduate: jika mencari beasiswa untuk lulusan baru / fresh graduate.
+  - tanpa_wawancara: jika mencari beasiswa tanpa proses wawancara atau tanpa wawancara.
+- NEGASI SYARAT: Jika user meminta beasiswa "tanpa [syarat]" (misal: "tanpa toefl", "tanpa ipk", "tanpa wawancara", "tanpa bahasa jepang"), set req_filters untuk kategori terkait menjadi "tanpa". JANGAN masukkan nilai tersebut ke req_values. Contoh: "tanpa bahasa jepang" -> req_filters.bahasa_lain = "tanpa" (JANGAN isi req_values.bahasa_lain dengan "jepang").
+- BAHASA vs NEGARA: Jika user menyebut kata yang bisa merujuk ke negara maupun bahasa (misal: "jepang", "jerman", "prancis", "spanyol", "arab"), perhatikan konteksnya. Jika merujuk ke kemampuan/syarat bahasa (contoh: "wajib bisa bahasa jerman", "sertifikat bahasa jerman", "lancar bahasa spanyol"), masukkan ke req_values.bahasa_lain. JANGAN masukkan ke "negara" kecuali user secara eksplisit juga menyebutkan lokasinya (misal: "di Jerman").
 - QUERY_SCOPE: berdasarkan KONTEKS PERCAKAPAN, tentukan apakah pesan ini "follow_up" (MELANJUTKAN pencarian sebelumnya: menyempitkan/menambah/mengganti SATU kriteria pada hasil sebelumnya TANPA menyebut ulang kata "beasiswa", mis. "yang di jepang dong", "yang fully funded aja", "khusus S2") atau "new_search" (pencarian BARU yang berdiri sendiri, mis. "carikan beasiswa S2 di jerman", "beasiswa dengan syarat bahasa lain ada ga"). ATURAN: jika pesan menyebut kata "beasiswa" dan menyatakan kriteria lengkapnya sendiri, ATAU diawali kata cari/carikan/tampilkan/temukan -> SELALU "new_search" (walau ada konteks sebelumnya). Jika belum ada konteks pencarian sebelumnya ATAU intent bukan search, isi null.
 - Keluarkan JSON saja, tanpa penjelasan, tanpa markdown.
 PROMPT;
@@ -2171,6 +2305,18 @@ PROMPT;
             $this->currentIntent = 'validation_funding';
             if ($isMatched) return $this->finalizeResponse("Iya benar, beasiswa **$nama** kategorinya adalah **$actualDisplay**. 😊");
             return $this->finalizeResponse("Bukan, beasiswa **$nama** kategorinya adalah **$actualDisplay**, bukan $targetDisplay. 😊");
+        }
+
+        if (!empty($criteria['no_interview']) || preg_match('/\b(wawancara|interview)\b/i', $rawMessage)) {
+            $this->currentIntent = 'validation_wawancara';
+            $content = strtolower(($targetScholarship['nama_beasiswa'] ?? '') . ' ' . ($targetScholarship['persyaratan'] ?? '') . ' ' . ($targetScholarship['deskripsi'] ?? ''));
+            $hasInterview = str_contains($content, 'wawancara') && !str_contains($content, 'tanpa wawancara');
+            
+            if ($hasInterview) {
+                return $this->finalizeResponse("Beasiswa **$nama** mensyaratkan proses wawancara. 😊\n\nKetik **syarat** untuk melihat persyaratan lengkapnya, atau **kembali** untuk kembali to daftar beasiswa.");
+            } else {
+                return $this->finalizeResponse("Beasiswa **$nama** ini tanpa proses wawancara. 😊\n\nKetik **syarat** untuk melihat persyaratan lengkapnya, atau **kembali** untuk kembali to daftar beasiswa.");
+            }
         }
 
         return null;
