@@ -1,0 +1,305 @@
+================================================================================
+          RINCIAN PENGUJIAN NLP CHATBOT (ACTUAL VS PREDICTED INTENT)
+================================================================================
+
+1. Pertanyaan : Ada beasiswa S1 ln?
+   Actual     : Search
+   Predicted  : Search
+   Status     : BERHASIL
+
+2. Pertanyaan : Saya mau kuliah di Jepang pakai beasiswa penuh
+   Actual     : Search
+   Predicted  : Search
+   Status     : BERHASIL
+
+3. Pertanyaan : Beasiswa tanpa IELTS ada?
+   Actual     : Search
+   Predicted  : Search
+   Status     : BERHASIL
+
+4. Pertanyaan : Halo, selamat pagi kak mau tanya
+   Actual     : Greeting (Social)
+   Predicted  : Greeting (Social)
+   Status     : BERHASIL
+
+5. Pertanyaan : Tolong tampilkan halaman berikutnya
+   Actual     : Navigation
+   Predicted  : Navigation
+   Status     : BERHASIL
+
+6. Pertanyaan : Tolong jelaskan apa saja benefit beasiswa nomor 3
+   Actual     : Detail
+   Predicted  : Detail
+   Status     : BERHASIL
+
+7. Pertanyaan : Bagaimana cara mendaftar beasiswa tersebut?
+   Actual     : Detail
+   Predicted  : Detail
+   Status     : BERHASIL
+
+8. Pertanyaan : Apakah beasiswa nomor 1 berlokasi di Jepang?
+   Actual     : Validation
+   Predicted  : Validation
+   Status     : BERHASIL
+
+9. Pertanyaan : Ada syarat minimal IPK ga untuk beasiswa ini?
+   Actual     : Validation
+   Predicted  : Validation
+   Status     : BERHASIL
+
+10. Pertanyaan : Cara membuat nasi goreng Aceh bagaimana ya?
+    Actual     : Out of Topic
+    Predicted  : Out of Topic
+    Status     : BERHASIL
+
+11. Pertanyaan : Terima kasih banyak ya bantuannya
+    Actual     : Thanks (Social)
+    Predicted  : Thanks (Social)
+    Status     : BERHASIL
+
+12. Pertanyaan : Beasiswa S2 IT di negara Jerman
+    Actual     : Search
+    Predicted  : Search
+    Status     : BERHASIL
+
+13. Pertanyaan : Saya berumur 30 tahun, ada beasiswa S3?
+    Actual     : Search
+    Predicted  : Search
+    Status     : BERHASIL
+
+14. Pertanyaan : Oke, saya paham kak
+    Actual     : Acknowledgment (Social)
+    Predicted  : Acknowledgment (Social)
+    Status     : BERHASIL
+
+15. Pertanyaan : Cari beasiswa S1 luar negeri tanpa batasan umur
+    Actual     : Search
+    Predicted  : Search
+    Status     : BERHASIL
+
+16. Pertanyaan : Tampilkan beasiswa S3 selain di negara Amerika
+    Actual     : Search
+    Predicted  : Search
+    Status     : BERHASIL
+
+17. Pertanyaan : Cari beasiswa S2 yang deadline-nya bulan depan
+    Actual     : Search
+    Predicted  : Search
+    Status     : BERHASIL
+
+18. Pertanyaan : Beasiswa yang minta skor TOEFL minimal 500
+    Actual     : Search
+    Predicted  : Search
+    Status     : BERHASIL
+
+19. Pertanyaan : Kapan deadline pendaftaran beasiswa nomor 4?
+    Actual     : Detail
+    Predicted  : Detail
+    Status     : BERHASIL
+
+20. Pertanyaan : Kasih tau link resmi website beasiswa ini dong
+    Actual     : Detail
+    Predicted  : Detail
+    Status     : BERHASIL
+
+21. Pertanyaan : Apakah beasiswa nomor 2 ini tipenya fully funded?
+    Actual     : Validation
+    Predicted  : Validation
+    Status     : BERHASIL
+
+22. Pertanyaan : Ada syarat harus bisa bahasa Jepang ga?
+    Actual     : Validation
+    Predicted  : Validation
+    Status     : BERHASIL
+
+23. Pertanyaan : Beasiswa yang mewajibkan dokumen paspor
+    Actual     : Search
+    Predicted  : Search
+    Status     : BERHASIL
+
+24. Pertanyaan : Apakah beasiswa tersebut mewajibkan dokumen paspor?
+    Actual     : Validation
+    Predicted  : Validation
+    Status     : BERHASIL
+
+25. Pertanyaan : Tampilkan beasiswa luar negeri yang masih buka
+    Actual     : Search
+    Predicted  : Search
+    Status     : BERHASIL
+
+26. Pertanyaan : Urutkan beasiswa S2 berdasarkan deadline terdekat
+    Actual     : Search
+    Predicted  : Search
+    Status     : BERHASIL
+
+27. Pertanyaan : Beasiswa pertukaran pelajar (exchange) di Korea
+    Actual     : Search
+    Predicted  : Search
+    Status     : BERHASIL
+
+28. Pertanyaan : Rekomendasi beasiswa S1 dengan IPK minimal 3.25
+    Actual     : Search
+    Predicted  : Search
+    Status     : BERHASIL
+
+29. Pertanyaan : Ada beasiswa UGM untuk tahun 2026?
+    Actual     : Search
+    Predicted  : Search
+    Status     : BERHASIL (Sistem menolak dengan tepat)
+
+30. Pertanyaan : Tampilkan beasiswa di benua Asia untuk S2
+    Actual     : Search
+    Predicted  : Search
+    Status     : BERHASIL
+
+31. Pertanyaan : Siapa pencipta lagu Indonesia Raya?
+    Actual     : Out of Topic
+    Predicted  : Out of Topic
+    Status     : BERHASIL
+
+32. Pertanyaan : Assalamualaikum, mau tanya-tanya tentang beasiswa
+    Actual     : Greeting (Social)
+    Predicted  : Greeting (Social)
+    Status     : BERHASIL
+
+33. Pertanyaan : Pilihin beasiswa nomor dua dong kak
+    Actual     : Detail
+    Predicted  : Detail
+    Status     : BERHASIL
+
+34. Pertanyaan : Tolong carikan beasiswa S1 dengan syarat wajib bisa bahasa Arab
+    Actual     : Search
+    Predicted  : Search
+    Status     : BERHASIL
+
+35. Pertanyaan : Carikan beasiswa yang menanggung biaya tiket pesawat
+    Actual     : Search
+    Predicted  : Search
+    Status     : BERHASIL
+
+36. Pertanyaan : Mau lihat daftar beasiswa lainnya dong
+    Actual     : Navigation
+    Predicted  : Navigation
+    Status     : BERHASIL
+
+37. Pertanyaan : Oke siap kak makasih infonya
+    Actual     : Thanks (Social)
+    Predicted  : Thanks (Social)
+    Status     : BERHASIL
+
+38. Pertanyaan : Apakah beasiswa ini wajib punya surat rekomendasi?
+    Actual     : Validation
+    Predicted  : Validation
+    Status     : BERHASIL
+
+39. Pertanyaan : Berapa suhu di kota Jakarta hari ini?
+    Actual     : Out of Topic
+    Predicted  : Out of Topic
+    Status     : BERHASIL
+
+40. Pertanyaan : Beasiswa S1 dalam negeri untuk tahun 2025
+    Actual     : Search
+    Predicted  : Search
+    Status     : BERHASIL
+
+41. Pertanyaan : Cari beasiswa S1 di benua Australia
+    Actual     : Search
+    Predicted  : Search
+    Status     : BERHASIL
+
+42. Pertanyaan : Beasiswa S3 selain yang bertipe Partially Funded
+    Actual     : Search
+    Predicted  : Search
+    Status     : BERHASIL
+
+43. Pertanyaan : Syarat pendaftaran beasiswa yang sedang saya pilih apa saja?
+    Actual     : Detail
+    Predicted  : Detail
+    Status     : BERHASIL
+
+44. Pertanyaan : Tolong tampilkan beasiswa S2 dengan syarat Sertifikat HSK
+    Actual     : Search
+    Predicted  : Search
+    Status     : BERHASIL
+
+45. Pertanyaan : Carikan beasiswa S1 di Universitas Indonesia
+    Actual     : Search
+    Predicted  : Search
+    Status     : BERHASIL
+
+46. Pertanyaan : Bandingkan beasiswa nomor 1 dengan nomor 3, bagusan mana?
+    Actual     : Detail (Comparative)
+    Predicted  : Search
+    Status     : GAGAL / Sistem belum mendukung perbandingan
+
+47. Pertanyaan : Cari beasiswa S1 yang syarat nilai UTBK-nya minimal 650
+    Actual     : Search (Validation)
+    Predicted  : Validation
+    Status     : GAGAL / Sistem belum mendukung validasi nilai UTBK
+
+48. Pertanyaan : Bagaimana cara membuat visa setelah saya lolos beasiswa nomor 2?
+    Actual     : Out of Topic
+    Predicted  : Out of Topic
+    Status     : BERHASIL (Out-of-scope handling)
+
+49. Pertanyaan : Tolong tampilkan beasiswa S2 dengan syarat Sertifikat Jepang (JLPT)
+    Actual     : Search
+    Predicted  : Search
+    Status     : BERHASIL
+
+50. Pertanyaan : Beasiswa S2 full gratis di benua Eropa yang masih buka
+    Actual     : Search
+    Predicted  : Search
+    Status     : BERHASIL
+
+51. Pertanyaan : Beasiswa S1 luar negeri benua asia selain ke negara Malaysia
+    Actual     : Search
+    Predicted  : Search
+    Status     : BERHASIL
+
+52. Pertanyaan : Apakah beasiswa nomor 1 ini ada batas umur maksimal?
+    Actual     : Validation
+    Predicted  : Validation
+    Status     : BERHASIL
+
+53. Pertanyaan : Tunjangannya apa saja ya untuk beasiswa ini?
+    Actual     : Detail
+    Predicted  : Detail
+    Status     : BERHASIL
+
+54. Pertanyaan : Berikan beasiswa yang tutup sampai akhir tahun 2026
+    Actual     : Search
+    Predicted  : Search
+    Status     : BERHASIL
+
+55. Pertanyaan : Minta link website beasiswanya dong 
+    Actual     : Detail
+    Predicted  : Detail
+    Status     : BERHASIL
+
+56. Pertanyaan : Berikan rekomendasi beasiswa kuliah tanpa proses wawancara
+    Actual     : Search
+    Predicted  : Search
+    Status     : BERHASIL
+
+57. Pertanyaan : Cara daftar beasiswa tersebut gimana?
+    Actual     : Detail
+    Predicted  : Detail
+    Status     : BERHASIL
+
+58. Pertanyaan : Tampilkan beasiswa yang tutup hari Selasa minggu depan
+    Actual     : Search
+    Predicted  : Search
+    Status     : BERHASIL
+
+59. Pertanyaan : Menurut kamu, peluang saya lolos beasiswa LPDP besar nggak ya kalau IPK saya cuma 3.01 dan belum punya pengalaman kerja?
+    Actual     : Advisory / Opinion
+    Predicted  : Search
+    Status     : GAGAL / Jawaban tidak relevan karena sistem tidak mendukung opini
+
+60. Pertanyaan : Coba tampilkan beasiswa S2 di Eropa yang uang saku bulanannya (living cost) lebih besar daripada beasiswa AAS di Australia
+    Actual     : Search
+    Predicted  : Detail
+    Status     : GAGAL / Sistem belum mendukung logika perbandingan antar beasiswa
+
+================================================================================

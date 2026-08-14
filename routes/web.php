@@ -99,7 +99,11 @@ Route::get('/dashboard', function (Illuminate\Http\Request $request) {
         }
     }
 
-    $scholarships = $query->orderBy('id', 'desc')->paginate(20);
+    $perPage = $request->input('per_page', 20);
+    if (!in_array($perPage, [10, 20, 50, 100])) {
+        $perPage = 20;
+    }
+    $scholarships = $query->orderBy('id', 'desc')->paginate($perPage);
     
     try {
         $lastUpdated = \App\Models\Scholarship::max('updated_at');

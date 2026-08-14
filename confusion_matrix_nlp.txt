@@ -1,0 +1,49 @@
+================================================================================
+                    CONFUSION MATRIX - PENGUJIAN NLP CHATBOT
+================================================================================
+
+Total Data Uji  : 60 Skenario
+Total Benar     : 56
+Total Salah     : 4
+Akurasi         : 56 / 60 = 93.33%
+
+--------------------------------------------------------------------------------
+                     PREDICTED INTENT (Tebakan Sistem)
+--------------------------------------------------------------------------------
+ACTUAL INTENT   | Search | Detail | Validation | Navigation | Social | OOT |
+--------------------------------------------------------------------------------
+Search          |   29   |    1   |      1     |      0     |    0   |  0  |
+Detail          |    1   |    9   |      0     |      0     |    0   |  0  |
+Validation      |    0   |    0   |      7     |      0     |    0   |  0  |
+Navigation      |    0   |    0   |      0     |      2     |    0   |  0  |
+Social          |    0   |    0   |      0     |      0     |    5   |  0  |
+Out of Topic    |    0   |    0   |      0     |      0     |    0   |  4  |
+Advisory        |    1   |    0   |      0     |      0     |    0   |  0  |
+--------------------------------------------------------------------------------
+*OOT = Out of Topic
+*Advisory = Opini/Saran (Tidak dikenali sistem, sehingga meleset ke Search)
+
+================================================================================
+Rincian Kesalahan Klasifikasi (False Positives / False Negatives):
+================================================================================
+
+1. Data No. 46 (Actual: Detail -> Predicted: Search)
+   Alasan: Adanya kata "Bandingkan beasiswa..." membuat sistem mengira ini
+   pencarian beasiswa baru, padahal pengguna meminta rincian detail/komparasi
+   dari beasiswa yang sudah ada.
+
+2. Data No. 47 (Actual: Search -> Predicted: Validation)
+   Alasan: Adanya parameter spesifik "UTBK 650" membuat sistem memprosesnya
+   sebagai validasi syarat (memeriksa dokumen), bukan pencarian kriteria.
+
+3. Data No. 59 (Actual: Advisory -> Predicted: Search)
+   Alasan: Pengguna menanyakan "peluang lolos" (opini). Karena sistem tidak 
+   memiliki intent 'Advisory', sistem ter-fallback ke 'Search' akibat 
+   mendeteksi kata kunci "LPDP" dan "IPK".
+
+4. Data No. 60 (Actual: Search -> Predicted: Detail)
+   Alasan: Permintaan komparasi "uang saku lebih besar" membingungkan
+   sistem, sehingga salah menangkapnya sebagai intent mengecek detail benefit
+   salah satu beasiswa saja.
+
+================================================================================

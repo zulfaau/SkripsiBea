@@ -114,6 +114,15 @@
                     <option value="embedded" {{ request('status') == 'embedded' ? 'selected' : '' }}>Embedded</option>
                     <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
                 </select>
+
+                <div class="h-10 w-px bg-gray-200 hidden md:block"></div>
+
+                <select name="per_page" onchange="this.form.submit()" class="border-0 focus:ring-0 text-sm text-gray-700 py-2 bg-transparent flex-initial appearance-none bg-no-repeat bg-right pr-8 min-w-[100px]" style="background-image: url('data:image/svg+xml;utf8,<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M6 9L12 15L18 9\" stroke=\"%239CA3AF\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>'); bg-position: right 0.5rem center; background-size: 1.25rem;">
+                    <option value="10" {{ request('per_page') == '10' ? 'selected' : '' }}>10 / page</option>
+                    <option value="20" {{ request('per_page', 20) == '20' ? 'selected' : '' }}>20 / page</option>
+                    <option value="50" {{ request('per_page') == '50' ? 'selected' : '' }}>50 / page</option>
+                    <option value="100" {{ request('per_page') == '100' ? 'selected' : '' }}>100 / page</option>
+                </select>
                 <button type="submit" class="hidden"></button>
             </form>
 
@@ -149,8 +158,10 @@
                                         <div class="text-sm font-semibold text-gray-900">{{ $s->nama_beasiswa ?? $s->name }}</div>
                                         <div class="text-xs text-gray-500 mt-1 truncate max-w-md">{{ Str::limit($s->deskripsi ?? $s->description, 70) }}</div>
                                     </td>
-                                    <td class="px-4 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900 font-medium">{{ $s->negara ?? $s->country }}</div>
+                                    <td class="px-4 py-4 max-w-xs">
+                                        <div class="text-sm text-gray-900 font-medium truncate" title="{{ $s->negara ?? $s->country }}">
+                                            {{ $s->negara ?? $s->country }}
+                                        </div>
                                     </td>
                                     <td class="px-4 py-4 whitespace-nowrap">
                                         <span class="px-2 py-1 inline-flex text-[10px] leading-4 font-semibold rounded-md bg-purple-100 text-purple-700">

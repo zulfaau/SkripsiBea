@@ -108,19 +108,22 @@ class ChatbotController extends Controller
                     $target = (array)session()->get('selected_scholarship');
                 }
                 if ($target) {
-                    // 1) Validasi lokasi/jenjang/jurusan/funding (mis. "apakah ini di jepang?").
-                    $resp = $this->handleValidationQuery($criteria, $target, $rawMessage);
-                    if ($resp) return $resp;
-
-                    // 2) Validasi SATU kategori syarat (mis. "ada syarat IPK?", "perlu TOEFL?").
+                    // 1) Validasi SATU kategori syarat (mis. "ada syarat IPK?", "perlu TOEFL?").
                     // Kategori ditentukan LLM via req_filters/req_values, lalu dijawab yes/no
                     // oleh handleSpecificRequirementCheck (pengganti fast-path regex lama).
                     $reqKey = $this->firstRequirementKey($criteria);
                     if ($reqKey && ($req = $this->reqQueryFromKey($reqKey, $criteria))) {
                         session()->put('selected_scholarship', $target);
                         $this->currentIntent = 'detail';
-                        return $this->handleSpecificRequirementCheck($req);
+                        return $this->handleSpecificRequirementCheck($req, $reqKey);
                     }
+
+                    // 2) Validasi lokasi/jenjang/jurusan/funding (mis. "apakah ini di jepang?").
+                    $resp = $this->handleValidationQuery($criteria, $target, $rawMessage);
+                    if ($resp) return $resp;
+                } else {
+                    $this->currentIntent = 'validation_error';
+                    return $this->finalizeResponse("Silakan pilih salah satu nomor beasiswa dari daftar di atas terlebih dahulu agar saya bisa mengecek persyaratannya. 😊");
                 }
             }
 
@@ -267,6 +270,11 @@ class ChatbotController extends Controller
                 }
                 // Render ke template 8-section yang konsisten. Baris terstruktur (header KAPITAL)
                 // diparse deterministik; baris kalimat-Indonesia diekstrak via LLM ke section yang sama.
+                $isEnglish = false;
+                foreach (['scholarship', 'requirements', 'eligibility', 'the', 'and', 'of', 'for', 'with'] as $kw) {
+                    if (str_contains(strtolower($content), $kw)) { $isEnglish = true; break; }
+                }
+
                 $sections = $this->parsePersyaratanSections($content);
                 if ($sections !== null) {
                     $sections = $this->translateSectionValues($sections);
@@ -274,10 +282,11 @@ class ChatbotController extends Controller
                     $sections = $this->extractSectionsFromText($content);
                 }
                 if ($sections !== null) {
-                    $ans = "Persyaratan **$name**:\n\n" . $this->formatPersyaratanTemplate($sections);
+                    $ans = "Persyaratan **$name**:\n\n" . $this->formatPersyaratanTemplate($sections) . ($isEnglish ? "\n\n*(Terjemahan Otomatis)*" : "");
                 } else {
                     // Fallback aman bila ekstraksi LLM gagal.
-                    $ans = "Persyaratan **$name**:\n" . $this->translateToIndonesian($content);
+                    $translated = $this->translateToIndonesian($content);
+                    $ans = "Persyaratan **$name**:\n" . $translated;
                 }
                 break;
             case 'deadline': 
@@ -323,19 +332,28 @@ class ChatbotController extends Controller
      * Jika syarat disebut di data → konfirmasi + kutip potongan persyaratannya.
      * Jika tidak disebut → jawab bahwa beasiswa tersebut tanpa syarat itu.
      */
-    private function handleSpecificRequirementCheck($req)
+    private function handleSpecificRequirementCheck($req, $reqKey)
     {
         $selected = (array) session()->get('selected_scholarship');
         $nama  = $selected['nama_beasiswa'] ?? 'Beasiswa';
-        $label = $req['label'];
+        $label = $this->formatRequirementLabel($reqKey, $req['label']);
 
-        $combined = trim(
-            ((string) ($selected['persyaratan'] ?? '')) . ' ' .
-            ((string) ($selected['deskripsi'] ?? '')) . ' ' .
-            ((string) ($selected['benefit'] ?? ''))
-        );
-
-        $analysis = $this->analyzeRequirement($combined, $req['keywords']);
+        $persyaratan = (string) ($selected['persyaratan'] ?? '');
+        $sections = $this->parsePersyaratanSections($persyaratan);
+        
+        if ($sections !== null) {
+            $header = self::REQUIREMENT_SECTION_MAP[$reqKey] ?? null;
+            $targetText = $header !== null ? trim((string) ($sections[$header] ?? '')) : '';
+            if ($targetText === '') {
+                $analysis = ['status' => 'absent', 'snippet' => ''];
+            } else {
+                $status = $this->isNegatedRequirement(strtolower($targetText)) ? 'not_required' : 'required';
+                $analysis = ['status' => $status, 'snippet' => $targetText];
+            }
+        } else {
+            $targetText = trim($persyaratan);
+            $analysis = $this->analyzeRequirement($targetText, $req['keywords']);
+        }
 
         $this->currentIntent = 'detail';
 
@@ -343,17 +361,46 @@ class ChatbotController extends Controller
         // mis. "No age requirement") => beasiswa tersebut TANPA syarat itu.
         if ($analysis['status'] !== 'required') {
             return $this->finalizeResponse(
-                "Iya, beasiswa **$nama** tersebut tanpa syarat {$label}. 😊\n\n" .
+                "Beasiswa **$nama** tidak mensyaratkan {$label}. 😊\n\n" .
                 "Ketik **syarat** untuk melihat persyaratan lengkapnya, atau **kembali** untuk kembali ke daftar beasiswa."
             );
         }
 
         $ans = "Iya, beasiswa **$nama** mensyaratkan **{$label}**.";
         if ($analysis['snippet'] !== '') {
-            $ans .= "\n\nKutipan persyaratannya:\n_" . $analysis['snippet'] . "_";
+            $snippet = $analysis['snippet'];
+            $translatedSnippet = $this->translateToIndonesian($snippet);
+            
+            $ans .= "\n\nKutipan persyaratannya:\n" . $translatedSnippet;
         }
         $ans .= "\n\nKetik **syarat** untuk melihat persyaratan lengkapnya, atau **kembali** untuk kembali ke daftar beasiswa.";
         return $this->finalizeResponse($ans);
+    }
+
+    private function formatRequirementLabel(string $key, string $canonicalLabel): string
+    {
+        $canonicalLower = strtolower($canonicalLabel);
+        switch ($key) {
+            case 'bahasa_lain':
+                return "wajib bisa bahasa " . ucwords($canonicalLower);
+            case 'tes_bahasa_inggris':
+                if ($canonicalLower === 'tes bahasa inggris' || $canonicalLower === 'inggris') {
+                    return "Tes Bahasa Inggris (TOEFL/IELTS)";
+                }
+                return "skor " . strtoupper($canonicalLower);
+            case 'usia':
+                return "batasan usia";
+            case 'ipk':
+                return "IPK minimal";
+            case 'kewarganegaraan':
+                return "kewarganegaraan tertentu";
+            case 'tes_standar':
+                return "tes standar (GRE/GMAT/SAT)";
+            case 'dokumen':
+                return "dokumen " . ucwords($canonicalLower);
+            default:
+                return $canonicalLabel;
+        }
     }
 
     /**
@@ -396,11 +443,24 @@ class ChatbotController extends Controller
             $end = $mm[0][1];
         }
 
-        // Batas awal: header HURUF BESAR terakhir sebelum keyword (bila ada).
+        // Batas awal: maksimal 30 karakter ke belakang.
         $start = max(0, $pos - 30);
+        
+        // JANGAN melewati batas kalimat (titik) atau baris baru (\n) sebelumnya
+        $lastNewline = strrpos(substr($text, 0, $pos), "\n");
+        $lastPeriod = strrpos(substr($text, 0, $pos), ".");
+        $strongBoundary = max($lastNewline !== false ? $lastNewline : 0, $lastPeriod !== false ? $lastPeriod : 0);
+        
+        if ($strongBoundary > $start) {
+            $start = $strongBoundary + 1;
+        }
+
+        // Sesuaikan dengan header HURUF BESAR terdekat.
         if (preg_match_all('/\s[A-Z]{2,}/', substr($text, 0, $pos), $hm, PREG_OFFSET_CAPTURE)) {
             $last = end($hm[0]);
-            $start = $last[1] + 1;
+            if ($last[1] + 1 > $start) {
+                $start = $last[1] + 1;
+            }
         }
 
         $snippet = trim(substr($text, $start, $end - $start));
@@ -425,8 +485,9 @@ class ChatbotController extends Controller
             '/\bn\/a\b/',
             '/tidak\s+ada/',
             '/tidak\s+di(?:perlukan|wajibkan|syaratkan|butuhkan|persyaratkan)/',
-            '/tanpa\s+syarat/',
-            '/bebas\s+(?:usia|umur)/',
+            '/tidak\s+(?:perlu|wajib)/ui',
+            '/tanpa/ui',
+            '/bebas/ui',
         ];
         foreach ($patterns as $p) {
             if (preg_match($p, $window)) return true;
@@ -514,16 +575,16 @@ class ChatbotController extends Controller
      */
     private const REQUIREMENT_VALUE_SYNONYMS = [
         'bahasa_lain' => [
-            'arab'    => ['arab', 'arabic'],
-            'mandarin'=> ['mandarin', 'chinese', 'tiongkok', 'hsk'],
-            'jepang'  => ['jepang', 'japanese', 'nihongo', 'jlpt'],
-            'jerman'  => ['jerman', 'german', 'deutsch', 'dsh', 'testdaf', 'goethe'],
-            'prancis' => ['prancis', 'perancis', 'french', 'francais', 'delf', 'dalf', 'tef'],
-            'korea'   => ['korea', 'korean', 'topik', 'hangul'],
-            'spanyol' => ['spanyol', 'spanish', 'espanol', 'dele', 'siele'],
-            'italia'  => ['italia', 'italian', 'italiano'],
-            'rusia'   => ['rusia', 'russian', 'torfl'],
-            'belanda' => ['belanda', 'dutch', 'nt2'],
+            'arab'    => ['bahasa arab', 'arabic'],
+            'mandarin'=> ['mandarin', 'chinese', 'tiongkok', 'hsk', 'bahasa mandarin'],
+            'jepang'  => ['bahasa jepang', 'japanese', 'nihongo', 'jlpt'],
+            'jerman'  => ['bahasa jerman', 'german', 'deutsch', 'dsh', 'testdaf', 'goethe'],
+            'prancis' => ['bahasa prancis', 'bahasa perancis', 'french', 'francais', 'delf', 'dalf', 'tef'],
+            'korea'   => ['bahasa korea', 'korean', 'topik', 'hangul'],
+            'spanyol' => ['bahasa spanyol', 'spanish', 'espanol', 'dele', 'siele'],
+            'italia'  => ['bahasa italia', 'italian', 'italiano'],
+            'rusia'   => ['bahasa rusia', 'russian', 'torfl'],
+            'belanda' => ['bahasa belanda', 'dutch', 'nt2'],
         ],
         'kewarganegaraan' => [
             'indonesia' => ['indonesia', 'indonesian', 'wni'],
@@ -1990,6 +2051,7 @@ class ChatbotController extends Controller
                 ['role' => 'user', 'content' => $userMessage],
             ],
             'temperature' => $temperature,
+            'max_tokens' => 2000,
         ];
         if ($jsonMode) $payload['response_format'] = ['type' => 'json_object'];
 
@@ -2073,12 +2135,15 @@ Keluarkan HANYA JSON valid dengan skema:
 ATURAN PENTING:
 - intent "search": user mencari/minta daftar beasiswa dengan kriteria apa pun.
 - intent "detail": user menanyakan benefit/syarat/deadline/cara daftar/link dari beasiswa yang SUDAH dipilih (lihat konteks). Isi detail_type.
+- DETAIL_TYPE MAPPING: jika intent adalah "detail", petakan detail_type dengan tepat berdasarkan aspek yang ditanyakan:
+  - "syarat": jika menanyakan skor TOEFL/IELTS, IPK, batas usia, dokumen (transkrip/rekomendasi), wawancara, kewarganegaraan, dll (contoh: "skor toefl nya harus berapa", "butuh ielts berapa", "ipk minimal berapa", "ada wawancara ga").
+  - "benefit": jika menanyakan uang saku, tiket pesawat, biaya kuliah, akomodasi, asuransi, dll (contoh: "dapat uang saku ga", "dapat apa saja", "tunjangannya apa").
 - ref_number: nomor urut beasiswa pada daftar yang dirujuk user. WAJIB tangkap bentuk ANGKA ("1","2","no 3") MAUPUN kata bilangan/urutan ("satu","dua","tiga","pertama","kedua","ketiga","yang pertama","yg kedua", dst) lalu ubah ke int (satu/pertama=1, dua/kedua=2, tiga/ketiga=3, dst).
 - PEMILIHAN ITEM: jika user HANYA memilih sebuah item dari daftar (mis. "satu", "dua", "yang ketiga", "pilih nomor 2", "nomor 1") TANPA menyebut aspek tertentu -> intent "detail", detail_type "detail", dan isi ref_number.
 - intent "validation": user bertanya YA/TIDAK tentang beasiswa yang sedang dipilih/dirujuk (mis. "apakah ini di jepang?", "ada jurusan kedokteran ga?"). Isi kriteria yang divalidasi (negara/benua/jenjang/bidang/funding). KHUSUS pertanyaan yes/no tentang SATU kategori SYARAT dari beasiswa terpilih (mis. "ada syarat IPK?", "perlu TOEFL ga?", "ada batasan usia?", "wajib bahasa lain?") -> intent "validation" DAN isi req_filters[kategori]="ada" untuk kategori yang ditanyakan (ipk/tes_bahasa_inggris/usia/kewarganegaraan/bahasa_lain/tes_standar/dokumen/khusus).
 - intent "next_page": user minta MELANJUTKAN daftar hasil sebelumnya / melihat lebih banyak (mis. "yang lain", "selanjutnya", "berikutnya", "ada lagi", "tampilkan lagi", "lainnya"). WAJIB toleran typo: "yang laib", "slanjutnya", "lainnyaa", "ada lg" -> tetap next_page. JANGAN isi kriteria baru. PENTING: kata "lain" sebagai bagian dari KRITERIA pencarian — mis. "bahasa lain", "syarat lain", "jurusan lain", "negara lain" — BUKAN next_page; itu intent "search". next_page HANYA bila user benar-benar minta melanjutkan daftar tanpa kriteria baru.
 - intent "back_to_list": user minta KEMBALI ke daftar beasiswa sebelumnya (mis. "kembali", "balik", "list sebelumnya", "daftar tadi"). Toleran typo. JANGAN isi kriteria baru.
-- intent "out_of_topic": HANYA untuk pertanyaan yang JELAS di luar topik beasiswa/pendidikan (mis. "resep nasi goreng", "cuaca hari ini") atau nonsense ("beasiswa warnanya apa"). JANGAN gunakan untuk sapaan, basa-basi, atau frasa minta-izin bertanya. Pertanyaan mencari beasiswa berdasarkan gender (mis. "khusus perempuan/wanita"), ekonomi lemah, atau status kelulusan (fresh graduate) adalah VALID dan masuk intent "search", BUKAN "out_of_topic".
+- intent "out_of_topic": HANYA untuk pertanyaan yang JELAS di luar topik beasiswa/pendidikan (mis. "resep nasi goreng", "cuaca hari ini") atau nonsense ("beasiswa warnanya apa"). PENTING: Pertanyaan tentang administrasi/proses PASCA-KELULUSAN (misal: "cara membuat visa", "membuat paspor", "imigrasi") WAJIB dikategorikan sebagai "out_of_topic", MESKIPUN pengguna menyebutkan nomor beasiswa secara eksplisit (contoh: "cara membuat visa beasiswa nomor 2"). JANGAN gunakan untuk sapaan, basa-basi, atau frasa minta-izin bertanya. Pertanyaan mencari beasiswa berdasarkan gender (mis. "khusus perempuan/wanita"), ekonomi lemah, atau status kelulusan (fresh graduate) adalah VALID dan masuk intent "search", BUKAN "out_of_topic".
 - intent "greeting": sapaan ("halo", "pagi", "assalamualaikum") DAN frasa minta-izin/meta bertanya ("mau tanya dong", "izin bertanya kak", "boleh nanya nggak", "mau konsultasi", "halo mau tanya"). Toleran typo. Frasa minta-izin TIDAK PERNAH out_of_topic.
 - intent "thanks": ucapan terima kasih murni ("makasih", "terima kasih ya").
 - intent "acknowledgment": konfirmasi/penerimaan singkat ("oke", "siap", "baik", "paham", "mengerti").
@@ -2113,15 +2178,25 @@ ATURAN PENTING:
 - Keluarkan JSON saja, tanpa penjelasan, tanpa markdown.
 PROMPT;
 
-        $raw = $this->callChatLLM($system, $message, true, 0.0);
-        $raw = trim($raw);
-        $raw = preg_replace('/```(?:json)?/i', '', $raw);
-        $raw = trim(str_replace('```', '', $raw));
-        $json = json_decode($raw, true);
-        if (!is_array($json) || empty($json['intent'])) {
-            throw new \Exception("Ekstraksi LLM tidak valid: " . substr($raw, 0, 200));
+        $maxRetries = 3;
+        for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+            try {
+                $raw = $this->callChatLLM($system, $message, true, 0.0);
+                $raw = trim($raw);
+                $raw = preg_replace('/```(?:json)?/i', '', $raw);
+                $raw = trim(str_replace('```', '', $raw));
+                $json = json_decode($raw, true);
+                if (!is_array($json) || empty($json['intent'])) {
+                    throw new \Exception("Ekstraksi LLM tidak valid (attempt $attempt): " . substr($raw, 0, 100));
+                }
+                return $json;
+            } catch (\Exception $e) {
+                if ($attempt === $maxRetries) {
+                    throw $e;
+                }
+                sleep(2); // Wait 2 seconds before retrying
+            }
         }
-        return $json;
     }
 
     private function mapLlmToCriteria($j)
@@ -2362,7 +2437,11 @@ PROMPT;
                    "Mohon maaf, chatbot kami tidak menerima pertanyaan diluar informasi beasiswa, jika ingin bertanya hal tersebut bisa anda off kan toggle diatas dan silahkan ulangi pertanyaannya."';
                 
                 $systemPrompt .= "\n\nContext Beasiswa dari Dataset Kami:\n" . $context;
-                $systemPrompt .= "\n\nINSTRUKSI PENTING: Jawablah secara singkat dan akurat hanya berdasarkan context di atas. Jika tidak ada di context, katakan secara jujur bahwa informasi tersebut belum tersedia di database kami. Batasi daftar beasiswa maksimal 5 saja.";
+                $systemPrompt .= "\n\nINSTRUKSI PENTING:\n";
+                $systemPrompt .= "1. Jawablah secara singkat dan akurat HANYA berdasarkan context di atas.\n";
+                $systemPrompt .= "2. Jika tidak ada di context, katakan secara jujur bahwa informasi tersebut belum tersedia di database kami.\n";
+                $systemPrompt .= "3. Batasi daftar beasiswa maksimal 5 saja.\n";
+                $systemPrompt .= "4. ATURAN JAWABAN YA/TIDAK: Jika user bertanya apakah suatu beasiswa 'tanpa IELTS' atau 'tidak mensyaratkan IELTS', dan data di context membenarkan hal itu, maka Anda HARUS menjawab dengan persetujuan positif: 'Iya, beasiswa ini tanpa IELTS (tidak mensyaratkan tes bahasa Inggris)'. DILARANG KERAS menjawab dengan kata 'Tidak' karena maknanya akan ambigu.";
             } else {
                 $systemPrompt .= 'Saat ini Anda beroperasi dalam MODE STANDAR (General AI). 
                 Jawablah pertanyaan user secara bebas dan ramah tentang TOPIK APAPUN. 
@@ -2551,7 +2630,7 @@ PROMPT;
 
     private function getOutOfTopicResponse()
     {
-        return "Mohon maaf, chatbot tidak bisa menjawab selain informasi beasiswa.";
+        return "Mohon maaf, saat ini **ScholarBot** difokuskan untuk membantu Anda seputar informasi, pencarian, dan tata cara pendaftaran beasiswa saja. 😊\n\nUntuk pertanyaan di luar topik tersebut (seperti pengurusan visa pasca-kelulusan, resep masakan, cuaca, dll), saya belum bisa menjawabnya. \n*(Tips: Jika Anda ingin bertanya bebas mengenai topik umum, silakan nonaktifkan tombol **'RAG'** di atas untuk menggunakan mode Pure AI)*.";
     }
 
     private function getScholarshipContext($query)
